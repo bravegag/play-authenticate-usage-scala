@@ -1,2 +1,2 @@
 # play-authenticate-scala
-Scala version of https://github.com/joscha/play-authenticate
+Scala version of the usage sample of https://github.com/joscha/play-authenticate
