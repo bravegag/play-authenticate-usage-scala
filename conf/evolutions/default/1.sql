@@ -14,17 +14,17 @@ CREATE TABLE "user" (
 	email VARCHAR(100),
 	password VARCHAR(100) DEFAULT NULL,
 	salt VARCHAR(100) DEFAULT NULL,
-	last_login timestamp,
-	active boolean,
-	email_validated boolean,	
+	last_login TIMESTAMP,
+	active BOOLEAN,
+	email_validated BOOLEAN,	
 	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE linked_account (
 	user_id BIGINT,
-	provider_username varchar(255),
-	provider_key varchar(255),
+	provider_username VARCHAR(255),
+	provider_key VARCHAR(255),
 	modified TIMESTAMP DEFAULT now(),
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );

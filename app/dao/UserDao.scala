@@ -2,7 +2,7 @@ package dao
 
 import javax.inject.{Inject, Singleton}
 
-import com.feth.play.module.pa.user.AuthUser
+import scala.concurrent.Future
 import generated.Tables._
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
@@ -12,8 +12,24 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) 
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def findByAuthUserIdentity(authUser: Option[AuthUser]): Option[User] = {
-    // TODO: implement
-    None
+  def findActiveByProviderKeyAndEmail(providerKey: String, email: String): Future[Option[UserRow]] = {
+    val action = sql"""SELECT t1.* FROM \"user\" t1 " +
+                       "WHERE t1.active=true AND " +
+                       "      t1.email=${email} AND " +
+                       "      EXISTS (SELECT * FROM linked_account t2 " +
+                       "              WHERE t2.user_id = t1.id AND " +
+                       "                    t2.provider_key = ${providerKey})""".as[UserRow].headOption
+    db.run(action)
+  }
+
+  //------------------------------------------------------------------------
+  def findActiveByProviderKeyUserName(providerKey: String, providerUserName: String): Future[Option[UserRow]] = {
+    val action = sql"""SELECT t1.* FROM \"user\" t1 " +
+                       "WHERE t1.active=true AND "
+                             "EXISTS (SELECT * FROM linked_account t2 " +
+                                     "WHERE t2.user_id = t1.id AND " +
+                                           "t2.provider_key = ${providerKey} AND " +
+                                           "t2.provider_username = ${providerUserName})""".as[UserRow].headOption
+    db.run(action)
   }
 }

@@ -2,9 +2,12 @@ package dao
 
 import play.api.db.slick._
 import slick.driver.JdbcProfile
-import scala.concurrent.Future
+
+import scala.concurrent.{Await, Future}
 import generated.Tables._
 import profile.api._
+
+import scala.concurrent.duration.Duration
 
 /**
   * Identifyable base for all Model types, it is also a Product
@@ -118,4 +121,11 @@ trait GenericDaoStrong[T <: Table[E] with IdentifyableTable[PK], E <: StrongEnti
     * @return newly created entity with updated id
     */
   def createAndFetchWithNewId(entity: E): Future[Entity[PK]]
+}
+
+/**
+  * Blocks the future until done implicitly
+  */
+object BlockUntilDoneHelper {
+  implicit def blockUntilDone[A](f: Future[A]) = Await.result(f, Duration.Inf)
 }
