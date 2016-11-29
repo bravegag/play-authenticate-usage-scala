@@ -1,6 +1,5 @@
 package dao
 
-import javax.inject.Inject
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import play.api.db.slick._
