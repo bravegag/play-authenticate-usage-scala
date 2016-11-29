@@ -58,9 +58,9 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
 
   //------------------------------------------------------------------------
   /**
-    * Returns newly created entity
+    * Creates (and forgets) a new entity, returns a unit future
     * @param entity entity to create, input id is ignored
-    * @return newly created entity
+    * @return returns a unit future
     */
   def create(entity: E): Future[Unit]
 
