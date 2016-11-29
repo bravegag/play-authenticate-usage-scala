@@ -1,3 +1,4 @@
+
 import javax.inject._
 import play.api._
 import play.api.http.HttpFilters
@@ -29,5 +30,4 @@ class Filters @Inject() (
     // filters at all.
     if (env.mode == Mode.Dev) Seq(exampleFilter) else Seq.empty
   }
-
 }
