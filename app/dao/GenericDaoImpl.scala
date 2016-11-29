@@ -43,10 +43,9 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  override def create(entity: E): Future[Entity[PK]] = {
-    val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
-    val action = insertQuery += entity
-    db.run(action)
+  override def create(entity: E): Future[Unit] = {
+    val action = tableQuery += entity
+    db.run(action).map(_ => ())
   }
 
   //------------------------------------------------------------------------
