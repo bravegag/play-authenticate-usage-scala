@@ -16,21 +16,16 @@ class Application @Inject() (auth: PlayAuthenticate, userProvider: UserProvider,
   // public
   //-------------------------------------------------------------------
   def index() = Action {
-    // create a sample user
-    val user = new UserRow(id = 0, username = Some("bravegag"), firstName = Some("Giovanni"),
-      lastName = Some("Azua"), modified = None)
-    userDao.create(user).onSuccess { case x => println(x) }
-
     Ok(views.html.index.render(userProvider))
   }
 
   //-------------------------------------------------------------------
   def jsRoutes() = Action {
   	// TODO: migrate
-/*  	
+/*
     Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
       routes.javascript.Signup.forgotPassword)).as("text/javascript")
-*/      
+*/
 	  Ok("TODO: migrate")
   }
 
