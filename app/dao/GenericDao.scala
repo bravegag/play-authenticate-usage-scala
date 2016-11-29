@@ -1,7 +1,8 @@
 package dao
 
 import javax.inject.Inject
-
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
@@ -10,11 +11,27 @@ import scala.concurrent.Future
   * Identifyable base for all Model types, it is also a Product
   * @tparam PK Primary key type
   */
-trait Identifyable[PK] extends Product {
+trait Entity[PK] {
+  //------------------------------------------------------------------------
+  // public
+  //------------------------------------------------------------------------
+  def copy(id : PK) : Entity[PK]
+
   //------------------------------------------------------------------------
   // members
   //------------------------------------------------------------------------
-  def id : PK
+  val id : PK
+}
+
+/**
+  * Identifyable table for all Table types
+  * @tparam PK Primary key type
+  */
+trait IdentifyableTable[PK]  {
+  //------------------------------------------------------------------------
+  // members
+  //------------------------------------------------------------------------
+  def id : slick.lifted.Rep[PK]
 }
 
 /**
@@ -24,8 +41,8 @@ trait GenericDaoHelper {
   val profile: slick.driver.JdbcProfile
   import profile.api._
 
-  class GenericDao[PK, ER <: Identifyable[PK], ET <: Table[ER], TQ <: TableQuery[ET]] @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
-      (tableQuery: TQ) extends HasDatabaseConfigProvider[JdbcProfile] {
+  class GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType] @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
+      (tableQuery: TableQuery[T]) extends HasDatabaseConfigProvider[JdbcProfile] {
     import driver.api._
 
     //------------------------------------------------------------------------
@@ -43,14 +60,14 @@ trait GenericDaoHelper {
       * @param id identifier
       * @return the matching entity for the given id
       */
-    def findById(id: PK): Future[Option[ER]] = db.run(tableQuery.filter(_.id === id).result.headOption)
+    def findById(id: PK): Future[Option[E]] = db.run(tableQuery.filter(_.id === id).result.headOption)
 
     //------------------------------------------------------------------------
     /**
       * Returns all entities in this model
       * @return all entities in this model
       */
-    def findAll(): Future[Seq[ER]] = db.run(tableQuery.result)
+    def findAll(): Future[Seq[E]] = db.run(tableQuery.result)
 
     //------------------------------------------------------------------------
     /**
@@ -58,8 +75,8 @@ trait GenericDaoHelper {
       * @param entity entity to create, input id is ignored
       * @return newly created entity with updated id
       */
-    def create(entity: ER): Future[ER] = {
-      val insertQuery = tableQuery returning tableQuery.map(_.id) into ((entity, id) => entity.copy(id = id))
+    def create(entity: E): Future[E] = {
+      val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copy(id = id))
       val action = insertQuery += entity
       db.run(action)
     }
@@ -70,7 +87,7 @@ trait GenericDaoHelper {
       * @param entities to be inserted
       * @return number of inserted entities
       */
-    def create(entities: Seq[ER]): Future[Int] = db.run(tableQuery ++= entities)
+    def create(entities: Seq[E]): Future[Unit] = db.run(tableQuery ++= entities).map(_ => ())
 
     //------------------------------------------------------------------------
     /**
@@ -78,8 +95,8 @@ trait GenericDaoHelper {
       * @param update Entity to update (by id)
       * @return returns a Future
       */
-    def update(update: ER): Future[Unit] = {
-      db.run(tableQuery.filter(_.id === update.id).update(update)).map(_ => ()).map(_ => ())
+    def update(update: E): Future[Unit] = {
+      db.run(tableQuery.filter(_.id === update.id).update(update)).map(_ => ())
     }
 
     //------------------------------------------------------------------------
@@ -91,4 +108,3 @@ trait GenericDaoHelper {
     def delete(id: PK): Future[Unit] = db.run(tableQuery.filter(_.id === id).delete).map(_ => ())
   }
 }
-
