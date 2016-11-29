@@ -7,7 +7,7 @@ CREATE TABLE "user" (
 	last_name VARCHAR(50),
 	middle_name VARCHAR(50),
 	first_name VARCHAR(50),
-	dob DATE,
+	date_of_birth DATE,
 	telephone VARCHAR(100),
 	location_id BIGINT,
 	username VARCHAR(100),
@@ -22,22 +22,22 @@ CREATE TABLE "user" (
 );
 
 CREATE TABLE linked_account (
-	user_id BIGINT,
-	provider_username VARCHAR(255),
-	provider_key VARCHAR(255),
+	user_id BIGINT NOT NULL,
+	provider_username VARCHAR(255) NOT NULL,
+	provider_key VARCHAR(255) NOT NULL,
 	modified TIMESTAMP DEFAULT now(),
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
 CREATE TABLE security_role (
 	id BIGSERIAL,
-	role_name VARCHAR(255),
+	name VARCHAR(255) NOT NULL,
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE user_security_role (
-	user_id BIGINT,
-	security_role_id BIGINT,
+	user_id BIGINT NOT NULL,
+	security_role_id BIGINT NOT NULL,
 	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (user_id, security_role_id),
 	FOREIGN KEY (user_id) REFERENCES "user"(id),
@@ -56,7 +56,7 @@ CREATE TABLE token_action (
 
 CREATE TABLE security_permission (
 	id BIGSERIAL,
-  	value VARCHAR(255),
+  	value VARCHAR(255) NOT NULL,
 	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (id)
 );

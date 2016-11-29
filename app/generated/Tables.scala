@@ -1,5 +1,6 @@
 package generated
 
+import be.objectify.deadbolt.scala.models.{Permission, Role, Subject}
 import dao._
 
 // AUTO-GENERATED Slick data model
@@ -95,7 +96,7 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param value Database column value SqlType(varchar), Length(255,true), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class SecurityPermissionRow(id: Long, value: Option[String] = None, modified: Option[java.sql.Timestamp]) extends StrongEntity[Long] {
+  case class SecurityPermissionRow(id: Long, value: Option[String] = None, modified: Option[java.sql.Timestamp]) extends StrongEntity[Long] with Permission {
     override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
   }
   /** GetResult implicit for fetching SecurityPermissionRow objects using plain SQL queries */
@@ -121,8 +122,8 @@ trait Tables {
 
   /** Entity class storing rows of table SecurityRole
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
-   *  @param roleName Database column role_name SqlType(varchar), Length(255,true), Default(None) */
-  case class SecurityRoleRow(id: Long, roleName: Option[String] = None) extends StrongEntity[Long] {
+   *  @param name Database column name SqlType(varchar), Length(255,true), Default(None) */
+  case class SecurityRoleRow(id: Long, name: Option[String] = None) extends StrongEntity[Long] with Role {
     override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
   }
   /** GetResult implicit for fetching SecurityRoleRow objects using plain SQL queries */
@@ -132,14 +133,14 @@ trait Tables {
   }
   /** Table description of table security_role. Objects of this class serve as prototypes for rows in queries. */
   class SecurityRole(_tableTag: Tag) extends Table[SecurityRoleRow](_tableTag, "security_role") {
-    def * = (id, roleName) <> (SecurityRoleRow.tupled, SecurityRoleRow.unapply)
+    def * = (id, name) <> (SecurityRoleRow.tupled, SecurityRoleRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), roleName).shaped.<>({r=>import r._; _1.map(_=> SecurityRoleRow.tupled((_1.get, _2)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), name).shaped.<>({r=>import r._; _1.map(_=> SecurityRoleRow.tupled((_1.get, _2)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column role_name SqlType(varchar), Length(255,true), Default(None) */
-    val roleName: Rep[Option[String]] = column[Option[String]]("role_name", O.Length(255,varying=true), O.Default(None))
+    /** Database column name SqlType(varchar), Length(255,true), Default(None) */
+    val name: Rep[Option[String]] = column[Option[String]]("name", O.Length(255,varying=true), O.Default(None))
   }
   /** Collection-like TableQuery object for table SecurityRole */
   lazy val SecurityRole = new TableQuery(tag => new SecurityRole(tag))
@@ -200,8 +201,17 @@ trait Tables {
    *  @param active Database column active SqlType(bool), Default(None)
    *  @param emailValidated Database column email_validated SqlType(bool), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserRow(id: Long, lastName: Option[String] = None, middleName: Option[String] = None, firstName: Option[String] = None, dob: Option[java.sql.Date] = None, telephone: Option[String] = None, locationId: Option[Long] = None, username: Option[String] = None, email: Option[String] = None, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Option[Boolean] = None, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends StrongEntity[Long] {
+  case class UserRow(id: Long, lastName: Option[String] = None, middleName: Option[String] = None, firstName: Option[String] = None, dob: Option[java.sql.Date] = None, telephone: Option[String] = None, locationId: Option[Long] = None, username: Option[String] = None, email: Option[String] = None, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Option[Boolean] = None, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends StrongEntity[Long] with Subject {
     override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
+
+    // TODO: implement
+    override def identifier: String = ""
+
+    // TODO: implement
+    override def roles: List[Role] = List()
+
+    // TODO: implement
+    override def permissions: List[Permission] = List[Permission]()
   }
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
   implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Option[Long]], e4: GR[Option[java.sql.Timestamp]], e5: GR[Option[Boolean]]): GR[UserRow] = GR{
