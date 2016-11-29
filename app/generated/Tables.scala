@@ -26,7 +26,9 @@ trait Tables {
    *  @param providerUsername Database column provider_username SqlType(varchar), Length(255,true), Default(None)
    *  @param providerKey Database column provider_key SqlType(varchar), Length(255,true), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class LinkedAccountRow(userId: Option[Long] = None, providerUsername: Option[String] = None, providerKey: Option[String] = None, modified: Option[java.sql.Timestamp])
+  case class LinkedAccountRow(userId: Option[Long] = None, providerUsername: Option[String] = None, providerKey: Option[String] = None, modified: Option[java.sql.Timestamp]) extends Entity[Option[Long]] {
+    override def id() = userId
+  }
   /** GetResult implicit for fetching LinkedAccountRow objects using plain SQL queries */
   implicit def GetResultLinkedAccountRow(implicit e0: GR[Option[Long]], e1: GR[Option[String]], e2: GR[Option[java.sql.Timestamp]]): GR[LinkedAccountRow] = GR{
     prs => import prs._
@@ -93,7 +95,9 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param value Database column value SqlType(varchar), Length(255,true), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class SecurityPermissionRow(id: Long, value: Option[String] = None, modified: Option[java.sql.Timestamp])
+  case class SecurityPermissionRow(id: Long, value: Option[String] = None, modified: Option[java.sql.Timestamp]) extends StrongEntity[Long] {
+    override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
+  }
   /** GetResult implicit for fetching SecurityPermissionRow objects using plain SQL queries */
   implicit def GetResultSecurityPermissionRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Timestamp]]): GR[SecurityPermissionRow] = GR{
     prs => import prs._
@@ -118,7 +122,9 @@ trait Tables {
   /** Entity class storing rows of table SecurityRole
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param roleName Database column role_name SqlType(varchar), Length(255,true), Default(None) */
-  case class SecurityRoleRow(id: Long, roleName: Option[String] = None)
+  case class SecurityRoleRow(id: Long, roleName: Option[String] = None) extends StrongEntity[Long] {
+    override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
+  }
   /** GetResult implicit for fetching SecurityRoleRow objects using plain SQL queries */
   implicit def GetResultSecurityRoleRow(implicit e0: GR[Long], e1: GR[Option[String]]): GR[SecurityRoleRow] = GR{
     prs => import prs._
@@ -144,7 +150,9 @@ trait Tables {
    *  @param `type` Database column type SqlType(varchar), Length(2,true), Default(None)
    *  @param created Database column created SqlType(timestamp), Default(None)
    *  @param expires Database column expires SqlType(timestamp), Default(None) */
-  case class TokenActionRow(userId: Option[Long] = None, token: Option[String] = None, `type`: Option[String] = None, created: Option[java.sql.Timestamp] = None, expires: Option[java.sql.Timestamp] = None)
+  case class TokenActionRow(userId: Option[Long] = None, token: Option[String] = None, `type`: Option[String] = None, created: Option[java.sql.Timestamp] = None, expires: Option[java.sql.Timestamp] = None) extends Entity[Option[Long]] {
+    override def id() = userId
+  }
   /** GetResult implicit for fetching TokenActionRow objects using plain SQL queries */
   implicit def GetResultTokenActionRow(implicit e0: GR[Option[Long]], e1: GR[Option[String]], e2: GR[Option[java.sql.Timestamp]]): GR[TokenActionRow] = GR{
     prs => import prs._
@@ -244,7 +252,9 @@ trait Tables {
    *  @param userId Database column user_id SqlType(int8)
    *  @param securityPermissionId Database column security_permission_id SqlType(int8)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserSecurityPermissionRow(userId: Long, securityPermissionId: Long, modified: Option[java.sql.Timestamp])
+  case class UserSecurityPermissionRow(userId: Long, securityPermissionId: Long, modified: Option[java.sql.Timestamp]) extends Entity[(Long, Long)] {
+    override def id() = (userId, securityPermissionId)
+  }
   /** GetResult implicit for fetching UserSecurityPermissionRow objects using plain SQL queries */
   implicit def GetResultUserSecurityPermissionRow(implicit e0: GR[Long], e1: GR[Option[java.sql.Timestamp]]): GR[UserSecurityPermissionRow] = GR{
     prs => import prs._
