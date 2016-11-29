@@ -7,6 +7,9 @@ import controllers.routes
 import play.mvc.Call
 
 class MyResolver extends Resolver {
+  //------------------------------------------------------------------------
+  // public
+  //------------------------------------------------------------------------
   def login: Call = {
     // Your login page
     // TODO: migrate
@@ -14,14 +17,17 @@ class MyResolver extends Resolver {
     routes.Application.index
   }
 
+  //------------------------------------------------------------------------
   def afterAuth: Call = {
     // The user will be redirected to this page after authentication
     // if no original URL was saved
     routes.Application.index
   }
 
+  //------------------------------------------------------------------------
   def afterLogout: Call = routes.Application.index
 
+  //------------------------------------------------------------------------
   def auth(provider: String): Call = {
     // You can provide your own authentication implementation,
     // however the default should be sufficient for most cases
@@ -30,18 +36,21 @@ class MyResolver extends Resolver {
     routes.Application.index
   }
 
+  //------------------------------------------------------------------------
   def askMerge: Call = {
     // TODO: migrate
     //routes.Account.askMerge
     routes.Application.index
   }
 
+  //------------------------------------------------------------------------
   def askLink: Call = {
     // TODO: migrate
     //routes.Account.askLink
     routes.Application.index
   }
 
+  //------------------------------------------------------------------------
   override def onException(e: AuthException): Call = {
     if (e.isInstanceOf[AccessDeniedException]) {
       // TODO: migrate

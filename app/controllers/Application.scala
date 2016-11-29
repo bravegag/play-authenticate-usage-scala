@@ -22,7 +22,7 @@ class Application @Inject() (auth: PlayAuthenticate, userProvider: UserProvider)
     Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
       routes.javascript.Signup.forgotPassword)).as("text/javascript")
 */      
-	Ok("TODO: migrate")
+	  Ok("TODO: migrate")
   }
 
   //-------------------------------------------------------------------

@@ -1,8 +1,9 @@
 package dao
 
+import javax.inject.Inject
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-import play.api.db.slick.HasDatabaseConfigProvider
+import play.api.db.slick._
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
 import generated.Tables._
@@ -38,7 +39,8 @@ trait IdentifyableTable[PK]  {
 /**
   * Generic DAO implementation
   */
-class GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType](tableQuery: TableQuery[T]) extends HasDatabaseConfigProvider[JdbcProfile] {
+abstract class GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType]
+    (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends HasDatabaseConfigProvider[JdbcProfile] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -69,7 +71,7 @@ class GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: 
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  def create(entity: E): Future[E] = {
+  def create(entity: E): Future[Entity[PK]] = {
     val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copy(id = id))
     val action = insertQuery += entity
     db.run(action)

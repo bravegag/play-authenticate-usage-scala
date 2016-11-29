@@ -1,12 +1,14 @@
 package dao
 
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
+
 import com.feth.play.module.pa.user.AuthUser
 import generated.Tables._
+import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
 @Singleton
-class UserDao extends GenericDao[User, UserRow, Long] (User) {
+class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericDao[User, UserRow, Long] (dbConfigProvider, User) {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
