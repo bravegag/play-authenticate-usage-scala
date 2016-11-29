@@ -117,5 +117,5 @@ trait GenericDaoStrong[T <: Table[E] with IdentifyableTable[PK], E <: StrongEnti
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  def createAndFetchWithId(entity: E): Future[Entity[PK]]
+  def createAndFetchWithNewId(entity: E): Future[Entity[PK]]
 }

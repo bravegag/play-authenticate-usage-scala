@@ -22,7 +22,7 @@ abstract class GenericDaoStrongImpl [T <: Table[E] with IdentifyableTable[PK], E
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  override def createAndFetchWithId(entity: E): Future[Entity[PK]] = {
+  override def createAndFetchWithNewId(entity: E): Future[Entity[PK]] = {
     val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
     val action = insertQuery += entity
     db.run(action)
