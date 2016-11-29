@@ -8,7 +8,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
 @Singleton
-class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericDao[User, UserRow, Long] (dbConfigProvider, User) {
+class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericDaoImpl[User, UserRow, Long] (dbConfigProvider, User) {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

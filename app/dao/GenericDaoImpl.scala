@@ -1,5 +1,7 @@
 package dao
 
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 import play.api.db.slick._
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
@@ -7,36 +9,10 @@ import generated.Tables._
 import profile.api._
 
 /**
-  * Identifyable base for all Model types, it is also a Product
-  * @tparam PK Primary key type
+  * Generic DAO implementation
   */
-trait Entity[PK] {
-  //------------------------------------------------------------------------
-  // public
-  //------------------------------------------------------------------------
-  def copyWithNewId(id : PK) : Entity[PK]
-
-  //------------------------------------------------------------------------
-  // members
-  //------------------------------------------------------------------------
-  val id : PK
-}
-
-/**
-  * Identifyable table for all Table types
-  * @tparam PK Primary key type
-  */
-trait IdentifyableTable[PK] {
-  //------------------------------------------------------------------------
-  // members
-  //------------------------------------------------------------------------
-  def id : slick.lifted.Rep[PK]
-}
-
-/**
-  * Generic DAO definition
-  */
-trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] extends HasDatabaseConfigProvider[JdbcProfile] {
+abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType]
+    (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDao[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -44,7 +20,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * Returns the row count for this Model
     * @return the row count for this Model
     */
-  def count(): Future[Int]
+  override def count(): Future[Int] = db.run(tableQuery.length.result)
 
   //------------------------------------------------------------------------
   /**
@@ -52,14 +28,14 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @param id identifier
     * @return the matching entity for the given id
     */
-  def findById(id: PK): Future[Option[E]]
+  override def findById(id: PK): Future[Option[E]] = db.run(tableQuery.filter(_.id === id).result.headOption)
 
   //------------------------------------------------------------------------
   /**
     * Returns all entities in this model
     * @return all entities in this model
     */
-  def findAll(): Future[Seq[E]]
+  override def findAll(): Future[Seq[E]] = db.run(tableQuery.result)
 
   //------------------------------------------------------------------------
   /**
@@ -67,7 +43,11 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  def create(entity: E): Future[Entity[PK]]
+  override def create(entity: E): Future[Entity[PK]] = {
+    val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
+    val action = insertQuery += entity
+    db.run(action)
+  }
 
   //------------------------------------------------------------------------
   /**
@@ -75,7 +55,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @param entities to be inserted
     * @return number of inserted entities
     */
-  def create(entities: Seq[E]): Future[Unit]
+  override def create(entities: Seq[E]): Future[Unit] = db.run(tableQuery ++= entities).map(_ => ())
 
   //------------------------------------------------------------------------
   /**
@@ -83,7 +63,9 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @param update Entity to update (by id)
     * @return returns a Future
     */
-  def update(update: E): Future[Unit]
+  override def update(update: E): Future[Unit] = {
+    db.run(tableQuery.filter(_.id === update.id).update(update)).map(_ => ())
+  }
 
   //------------------------------------------------------------------------
   /**
@@ -91,5 +73,5 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @param id The Id to delete
     * @return returns a Future
     */
-  def delete(id: PK): Future[Unit]
+  override def delete(id: PK): Future[Unit] = db.run(tableQuery.filter(_.id === id).delete).map(_ => ())
 }

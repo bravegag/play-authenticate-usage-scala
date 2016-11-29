@@ -193,7 +193,7 @@ trait Tables {
    *  @param emailValidated Database column email_validated SqlType(bool), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
   case class UserRow(id: Long, lastName: Option[String] = None, middleName: Option[String] = None, firstName: Option[String] = None, dob: Option[java.sql.Date] = None, telephone: Option[String] = None, locationId: Option[Long] = None, username: Option[String] = None, email: Option[String] = None, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Option[Boolean] = None, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends Entity[Long] {
-    override def copy(id: Long) = this.copy(id = id)
+    override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
   }
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
   implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Option[Long]], e4: GR[Option[java.sql.Timestamp]], e5: GR[Option[Boolean]]): GR[UserRow] = GR{
