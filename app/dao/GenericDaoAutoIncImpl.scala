@@ -11,9 +11,9 @@ import profile.api._
 /**
   * Generic Strong DAO implementation
   */
-abstract class GenericDaoStrongImpl [T <: Table[E] with IdentifyableTable[PK], E <: StrongEntity[PK], PK: BaseColumnType]
+abstract class GenericDaoAutoIncImpl [T <: Table[E] with IdentifyableTable[PK], E <: StrongEntity[PK], PK: BaseColumnType]
     (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDaoImpl[T, E, PK](dbConfigProvider, tableQuery)
-      with GenericDaoStrong[T, E, PK] {
+      with GenericDaoAutoInc[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -22,9 +22,9 @@ abstract class GenericDaoStrongImpl [T <: Table[E] with IdentifyableTable[PK], E
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  override def createAndFetchWithNewId(entity: E): Future[Entity[PK]] = {
+  override def createAndFetch(entity: E): Future[Future[Option[E]]] = {
     val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
-    val action = insertQuery += entity
+    val action = (insertQuery += entity).flatMap(row => findById(row.id))
     db.run(action)
   }
 }

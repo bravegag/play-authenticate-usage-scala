@@ -111,7 +111,7 @@ trait StrongEntity[PK] extends Entity[PK] {
 /**
   * Generic DAO strong entity definition
   */
-trait GenericDaoStrong[T <: Table[E] with IdentifyableTable[PK], E <: StrongEntity[PK], PK] extends GenericDao[T, E, PK] {
+trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: StrongEntity[PK], PK] extends GenericDao[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -120,7 +120,7 @@ trait GenericDaoStrong[T <: Table[E] with IdentifyableTable[PK], E <: StrongEnti
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  def createAndFetchWithNewId(entity: E): Future[Entity[PK]]
+  def createAndFetch(entity: E): Future[Option[E]]
 }
 
 /**
