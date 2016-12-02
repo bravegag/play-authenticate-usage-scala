@@ -96,7 +96,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
   * Identifyable base for all Strong Entity Model types
   * @tparam PK Primary key type
   */
-trait StrongEntity[PK] extends Entity[PK] {
+trait AutoIncEntity[PK] extends Entity[PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -111,7 +111,7 @@ trait StrongEntity[PK] extends Entity[PK] {
 /**
   * Generic DAO strong entity definition
   */
-trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: StrongEntity[PK], PK] extends GenericDao[T, E, PK] {
+trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK], PK] extends GenericDao[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

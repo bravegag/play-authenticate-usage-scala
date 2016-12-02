@@ -11,7 +11,7 @@ import profile.api._
 /**
   * Generic Strong DAO implementation
   */
-abstract class GenericDaoAutoIncImpl [T <: Table[E] with IdentifyableTable[PK], E <: StrongEntity[PK], PK: BaseColumnType]
+abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK], PK: BaseColumnType]
     (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDaoImpl[T, E, PK](dbConfigProvider, tableQuery)
       with GenericDaoAutoInc[T, E, PK] {
   //------------------------------------------------------------------------
