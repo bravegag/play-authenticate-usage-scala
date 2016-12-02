@@ -22,7 +22,7 @@ abstract class GenericDaoAutoIncImpl [T <: Table[E] with IdentifyableTable[PK], 
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  override def createAndFetch(entity: E): Future[Future[Option[E]]] = {
+  override def createAndFetch(entity: E): Future[Option[E]] = {
     val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
     val action = (insertQuery += entity).flatMap(row => findById(row.id))
     db.run(action)
