@@ -28,7 +28,7 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
     * @param id identifier
     * @return the matching entity for the given id
     */
-  override def findById(id: PK): Future[Option[E]] = db.run(tableQuery.filter(_.id === id).result.headOption)
+  override def findById(id: PK): DBIO[Option[E]] = tableQuery.filter(_.id === id).result.headOption
 
   //------------------------------------------------------------------------
   /**

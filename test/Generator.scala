@@ -1,4 +1,3 @@
-import java.util.concurrent.TimeUnit
 
 import slick.driver.PostgresDriver
 import slick.jdbc.meta.MTable
@@ -19,9 +18,12 @@ object Generator extends App {
   val password = "postgres"
 
   val db = Database.forURL(url, username, password)
-  val dbio = PostgresDriver.createModel(Some(MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW")))))
-  val model = db.run(dbio)
-  val future : Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model))
-  val codegen : SourceCodeGenerator = Await.result(future, Duration.create(5, TimeUnit.MINUTES))
-  codegen.writeToFile(slickDriver, outputDir, pkg, "Tables", "Tables.scala")
+  val model = db.run(PostgresDriver.createModel(Some(MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW"))))))
+  // customize code generator
+  val codegenFuture : Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
+    // add some custom import
+    override def code = "import dao._" + "\n" + super.code
+
+  })
+  Await.result(codegenFuture, Duration.Inf).writeToFile(slickDriver, outputDir, pkg, "Tables", "Tables.scala")
 }

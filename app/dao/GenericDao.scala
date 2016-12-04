@@ -50,7 +50,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @param id identifier
     * @return the matching entity for the given id
     */
-  def findById(id: PK): Future[Option[E]]
+  def findById(id: PK): DBIO[Option[E]]
 
   //------------------------------------------------------------------------
   /**
