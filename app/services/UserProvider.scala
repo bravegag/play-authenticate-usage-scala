@@ -10,7 +10,7 @@ import com.feth.play.module.pa.user.AuthUserIdentity
 import dao.UserDao
 
 class UserProvider @Inject() (auth : PlayAuthenticate, userDao: UserDao) {
-  import dao.BlockUntilDoneHelper._
+  import dao.ExecHelper._
 
   //------------------------------------------------------------------------
   // public

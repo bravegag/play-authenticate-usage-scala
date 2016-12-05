@@ -5,6 +5,7 @@ import ExecutionContext.Implicits.global
 import play.api.db.slick._
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
+import generated._
 import generated.Tables._
 import profile.api._
 
