@@ -3,8 +3,6 @@ package dao
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import play.api.db.slick._
-import slick.driver.JdbcProfile
-
 import scala.concurrent.Future
 import generated._
 import generated.Tables._
