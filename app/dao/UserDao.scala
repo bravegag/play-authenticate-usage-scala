@@ -56,4 +56,9 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                                            "t2.provider_username = ${providerUserName})""".as[UserRow].headOption
     db.run(action)
   }
+
+  //------------------------------------------------------------------------
+  def findByFirstAndLast(firstName: String, lastName: String): Future[Seq[UserRow]] = {
+    db.run(super.filter(_.firstName === firstName).filter(_.lastName === lastName).result)
+  }
 }

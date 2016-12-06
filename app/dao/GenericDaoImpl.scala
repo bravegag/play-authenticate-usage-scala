@@ -48,8 +48,7 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
     * @tparam C
     * @return entities that satisfy the filter expression.
     */
-  override def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] =
-    db.run(tableQuery.filter(expr).result)
+  override def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]) : Query[T, E, Seq] = tableQuery.filter(expr)
 
   //------------------------------------------------------------------------
   /**
