@@ -4,10 +4,12 @@ import scala.concurrent._
 import ExecutionContext.Implicits.global
 import play.api.db.slick._
 import slick.driver.JdbcProfile
+
 import scala.concurrent.Future
 import generated._
 import generated.Tables._
 import profile.api._
+import slick.lifted.CanBeQueryCondition
 
 /**
   * Generic DAO implementation
@@ -37,6 +39,17 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
     * @return all entities in this model
     */
   override def findAll(): Future[Seq[E]] = db.run(tableQuery.result)
+
+  //------------------------------------------------------------------------
+  /**
+    * Returns entities that satisfy the filter expression.
+    * @param expr input filter expression
+    * @param wt
+    * @tparam C
+    * @return entities that satisfy the filter expression.
+    */
+  override def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] =
+    db.run(tableQuery.filter(expr).result)
 
   //------------------------------------------------------------------------
   /**

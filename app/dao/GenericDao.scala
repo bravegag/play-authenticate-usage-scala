@@ -7,6 +7,7 @@ import scala.concurrent.{Await, Future}
 import generated._
 import generated.Tables._
 import profile.api._
+import slick.lifted.CanBeQueryCondition
 
 import scala.concurrent.duration.Duration
 
@@ -37,6 +38,16 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @return all entities in this model
     */
   def findAll(): Future[Seq[E]]
+
+  //------------------------------------------------------------------------
+  /**
+    * Returns entities that satisfy the filter expression.
+    * @param expr input filter expression
+    * @param wt
+    * @tparam C
+    * @return entities that satisfy the filter expression.
+    */
+  def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]]
 
   //------------------------------------------------------------------------
   /**
