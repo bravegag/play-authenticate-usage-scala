@@ -2,14 +2,14 @@ package dao
 
 import play.api.db.slick._
 import slick.driver.JdbcProfile
-
 import scala.concurrent.{Await, Future}
 import generated._
 import generated.Tables._
 import profile.api._
+import shapeless.{MkFieldLens, Witness}
+import shapeless.tag.@@
 import slick.lifted.CanBeQueryCondition
 import slick.profile.BasicProfile
-
 import scala.concurrent.duration.Duration
 
 /**
@@ -86,7 +86,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
 /**
   * Generic DAO strong entity definition
   */
-trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK], PK] extends GenericDao[T, E, PK] {
+trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK, E], PK] extends GenericDao[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -95,7 +95,7 @@ trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEn
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  def createAndFetch(entity: E): Future[Option[E]]
+  def createAndFetch(entity: E)(implicit mkLens: MkFieldLens.Aux[E, Symbol @@ Witness.`"id"`.T, PK]): Future[Option[E]]
 }
 
 /**

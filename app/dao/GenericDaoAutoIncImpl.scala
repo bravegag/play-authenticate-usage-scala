@@ -7,11 +7,13 @@ import scala.concurrent.Future
 import generated._
 import generated.Tables._
 import profile.api._
+import shapeless.{MkFieldLens, Witness}
+import shapeless.tag.@@
 
 /**
   * Generic Strong DAO implementation
   */
-abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK], PK: BaseColumnType]
+abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK, E], PK: BaseColumnType]
     (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDaoImpl[T, E, PK](dbConfigProvider, tableQuery)
       with GenericDaoAutoInc[T, E, PK] {
   //------------------------------------------------------------------------
@@ -22,7 +24,7 @@ abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E
     * @param entity entity to create, input id is ignored
     * @return newly created entity with updated id
     */
-  override def createAndFetch(entity: E): Future[Option[E]] = {
+  override def createAndFetch(entity: E)(implicit mkLens: MkFieldLens.Aux[E, Symbol @@ Witness.`"id"`.T, PK]): Future[Option[E]] = {
     val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
     db.run((insertQuery += entity).flatMap(row => findById(row.id)))
   }

@@ -4,19 +4,18 @@
 
 CREATE TABLE "user" (
 	id BIGSERIAL,
-	last_name VARCHAR(50),
-	middle_name VARCHAR(50),
 	first_name VARCHAR(50),
+	middle_name VARCHAR(50),
+	last_name VARCHAR(50),
 	date_of_birth DATE,
-	telephone VARCHAR(100),
 	location_id BIGINT,
-	username VARCHAR(100),
-	email VARCHAR(100),
+	username VARCHAR(100) NOT NULL,
+	email VARCHAR(100) NOT NULL,
 	password VARCHAR(100) DEFAULT NULL,
 	salt VARCHAR(100) DEFAULT NULL,
-	last_login TIMESTAMP,
-	active BOOLEAN,
-	email_validated BOOLEAN,	
+	last_login TIMESTAMP DEFAULT NULL,
+	active BOOLEAN NOT NULL DEFAULT FALSE,
+	email_validated BOOLEAN,
 	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (id)
 );

@@ -97,9 +97,8 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param value Database column value SqlType(varchar), Length(255,true)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class SecurityPermissionRow(id: Long, value: String, modified: Option[java.sql.Timestamp]) extends AutoIncEntity[Long] with Permission {
-    override def copyWithNewId(id : Long) = this.copy(id = id)
-  }
+  case class SecurityPermissionRow(id: Long, value: String, modified: Option[java.sql.Timestamp]) extends AutoIncEntity[Long, SecurityPermissionRow] with Permission
+
   /** GetResult implicit for fetching SecurityPermissionRow objects using plain SQL queries */
   implicit def GetResultSecurityPermissionRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[SecurityPermissionRow] = GR{
     prs => import prs._
@@ -124,9 +123,8 @@ trait Tables {
   /** Entity class storing rows of table SecurityRole
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(varchar), Length(255,true) */
-  case class SecurityRoleRow(id: Long, name: String) extends AutoIncEntity[Long] with Role {
-    override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
-  }
+  case class SecurityRoleRow(id: Long, name: String) extends AutoIncEntity[Long, SecurityRoleRow] with Role
+
   /** GetResult implicit for fetching SecurityRoleRow objects using plain SQL queries */
   implicit def GetResultSecurityRoleRow(implicit e0: GR[Long], e1: GR[String]): GR[SecurityRoleRow] = GR{
     prs => import prs._
@@ -202,9 +200,7 @@ trait Tables {
    *  @param active Database column active SqlType(bool), Default(None)
    *  @param emailValidated Database column email_validated SqlType(bool), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserRow(id: Long, lastName: Option[String] = None, middleName: Option[String] = None, firstName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, telephone: Option[String] = None, locationId: Option[Long] = None, username: Option[String] = None, email: Option[String] = None, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Option[Boolean] = None, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends AutoIncEntity[Long] with Subject {
-    override def copyWithNewId(id : Long) : Entity[Long] = this.copy(id = id)
-
+  case class UserRow(id: Long, lastName: Option[String] = None, middleName: Option[String] = None, firstName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, telephone: Option[String] = None, locationId: Option[Long] = None, username: Option[String] = None, email: Option[String] = None, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Option[Boolean] = None, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends AutoIncEntity[Long, UserRow] with Subject {
     override def identifier: String = id.toString
 
     // TODO: implement
