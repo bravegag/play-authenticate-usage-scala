@@ -7,9 +7,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import dao.UserDao
 import play.api.mvc._
 import play.Configuration
-import play.mvc.Http
 import services.UserProvider
-import scala.collection.JavaConversions
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -17,6 +15,8 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Application @Inject() (implicit configuration: Configuration, deadbolt: DeadboltActions,
       auth: PlayAuthenticate, userProvider: UserProvider, userDao: UserDao) extends Controller {
+  import utils.PlayConversions._
+
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -25,19 +25,17 @@ class Application @Inject() (implicit configuration: Configuration, deadbolt: De
   }
 
   //-------------------------------------------------------------------
-  def restricted = deadbolt.Restrict(List(Array(USER_ROLE)))() { request =>
+  def restricted = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
     Future {
-      val session : Http.Session = new Http.Session(JavaConversions.mapAsJavaMap(request.session.data))
-      val user = userProvider.getUser(session)
+      val user = userProvider.getUser(request.session)
       Ok(views.html.restricted(userProvider, user))
     }
   }
 
   //-------------------------------------------------------------------
-  def profile = deadbolt.Restrict(List(Array(USER_ROLE)))() { request =>
+  def profile = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
     Future {
-      val session : Http.Session = new Http.Session(JavaConversions.mapAsJavaMap(request.session.data))
-      val user = userProvider.getUser(session)
+      val user = userProvider.getUser(request.session)
       Ok(views.html.profile(auth, userProvider, user.get))
     }
   }
@@ -51,11 +49,4 @@ class Application @Inject() (implicit configuration: Configuration, deadbolt: De
 */
 	  Ok("TODO: migrate")
   }
-
-  //-------------------------------------------------------------------
-  // members
-  //-------------------------------------------------------------------
-  val FLASH_MESSAGE_KEY = "message"
-  val FLASH_ERROR_KEY = "error"
-  val USER_ROLE = "user"
 }
