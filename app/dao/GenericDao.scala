@@ -6,8 +6,6 @@ import scala.concurrent.{Await, Future}
 import generated._
 import generated.Tables._
 import profile.api._
-import shapeless.{MkFieldLens, Witness}
-import shapeless.tag.@@
 import slick.lifted.CanBeQueryCondition
 import slick.profile.BasicProfile
 import scala.concurrent.duration.Duration
@@ -87,6 +85,9 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
   * Generic DAO strong entity definition
   */
 trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK, E], PK] extends GenericDao[T, E, PK] {
+  import shapeless._
+  import tag.@@
+
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

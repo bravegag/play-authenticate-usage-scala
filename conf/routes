@@ -4,10 +4,10 @@
 
 # Home page
 GET     /                                   controllers.Application.index
-#GET     /restricted                         controllers.Application.restricted
+GET     /restricted                         controllers.Application.restricted
 GET     /assets/javascript/routes.js        controllers.Application.jsRoutes
 
-#GET     /profile                            controllers.Application.profile
+GET     /profile                            controllers.Application.profile
 
 #GET     /login                              controllers.Application.login
 #POST    /login                              controllers.Application.doLogin

@@ -1,8 +1,8 @@
 package generated
 
-import shapeless._, tag.@@
-import shapeless._
-import tag.$at$at
+import be.objectify.deadbolt.scala.models._
+import dao.UserDao
+import generated.Tables.UserRow
 
 /**
   * Identifyable base for all Model types, it is also a Product
@@ -22,6 +22,8 @@ trait Entity[PK] {
   * @tparam E Actual case class EntityRow type
   */
 trait AutoIncEntity[PK, E <: AutoIncEntity[PK, E]] extends Entity[PK] { self: E =>
+  import shapeless._
+  import tag.@@
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -46,25 +48,29 @@ trait IdentifyableTable[PK] {
   def id : slick.lifted.Rep[PK]
 }
 
-/*
-abstract class BaseUser[PK] @Inject()(userDao: UserDao) extends AutoIncEntity[PK] with Subject { self: UserRow =>
-  import ExecHelper._
+/**
+  * User adapter object that offers implicit conversion from generated UserRow to
+  * be.objectify.deadbolt.scala.models.Subject
+  */
+object UserAdapter {
+  implicit def toSubject(user : UserRow)(implicit userDao: UserDao) : Subject = new Subject {
+    import dao.ExecHelper._
 
-  //------------------------------------------------------------------------
-  // public
-  //------------------------------------------------------------------------
-  override def identifier: String = id.toString
+    //------------------------------------------------------------------------
+    // public
+    //------------------------------------------------------------------------
+    override def identifier: String = user.id.toString
 
-  //------------------------------------------------------------------------
-  override def roles : List[Role] = {
-    val roles = userDao.getRoles(self)
-    roles.toList
-  }
+    //------------------------------------------------------------------------
+    override def roles : List[Role] = {
+      val roles = userDao.getRoles(user)
+      roles.toList
+    }
 
-  //------------------------------------------------------------------------
-  override def permissions : List[Permission] = {
-    val permissions = userDao.getPermissions(self)
-    permissions.toList
+    //------------------------------------------------------------------------
+    override def permissions : List[Permission] = {
+      val permissions = userDao.getPermissions(user)
+      permissions.toList
+    }
   }
 }
-*/

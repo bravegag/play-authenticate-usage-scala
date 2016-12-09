@@ -7,8 +7,6 @@ import scala.concurrent.Future
 import generated._
 import generated.Tables._
 import profile.api._
-import shapeless.{MkFieldLens, Witness}
-import shapeless.tag.@@
 
 /**
   * Generic Strong DAO implementation
@@ -16,6 +14,9 @@ import shapeless.tag.@@
 abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK, E], PK: BaseColumnType]
     (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDaoImpl[T, E, PK](dbConfigProvider, tableQuery)
       with GenericDaoAutoInc[T, E, PK] {
+  import shapeless._
+  import tag.@@
+
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
