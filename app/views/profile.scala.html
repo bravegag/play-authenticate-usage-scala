@@ -1,9 +1,9 @@
 @import services.UserProvider
 @import generated._
-@import dao._
 @import generated.Tables._
-@import utils._
 @import generated.UserRowAdapter._
+@import dao._
+@import utils._
 
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userProvider: UserProvider, localUser: UserRow)(implicit messages: Messages, userDao: UserDao)
 
