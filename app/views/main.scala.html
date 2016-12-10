@@ -1,9 +1,9 @@
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
-@import services.UserProvider
+@import services.UserService
 @import be.objectify.deadbolt.scala.views.html._
 
-@(userProvider: UserProvider, title: String, nav: String = "")(content: Html)
+@(userService: UserService, title: String, nav: String = "")(content: Html)
 
 <!DOCTYPE html>
 <html>

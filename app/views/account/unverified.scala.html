@@ -1,0 +1,10 @@
+@import services.UserService
+@(userService: UserService)(implicit messages: Messages)
+
+@main(userService, Messages("playauthenticate.verify.account.title")) {
+
+	<h1>@Messages("playauthenticate.verify.account.title")</h1>
+	<p>
+	@Messages("playauthenticate.verify.account.before") <a href="@routes.Account.verifyEmail">@Messages("playauthenticate.verify.account.first")</a>.<br/>
+	</p>
+}

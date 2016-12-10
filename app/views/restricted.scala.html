@@ -1,10 +1,10 @@
-@import services.UserProvider
+@import services.UserService
 @import generated._
 @import generated.Tables._
 
-@(userProvider: UserProvider, localUser: Option[UserRow] = None)(implicit messages: Messages)
+@(userService: UserService, localUser: Option[UserRow] = None)(implicit messages: Messages)
 
-@main(userProvider, Messages("playauthenticate.navigation.restricted"), "restricted") {
+@main(userService, Messages("playauthenticate.navigation.restricted"), "restricted") {
 
 <h1>@Messages("playauthenticate.navigation.restricted")</h1>
 <p>

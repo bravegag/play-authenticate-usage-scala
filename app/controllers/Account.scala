@@ -10,6 +10,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Controller, Flash}
 import play.core.j.JavaHelpers
 import play.data.FormFactory
+import providers.MyUsernamePasswordAuthProvider
 import services.UserService
 
 import scala.concurrent._
@@ -22,6 +23,7 @@ class Account @Inject() (implicit
                          auth: PlayAuthenticate,
                          userProvider: UserService,
                          userDao: UserDao,
+                         authProvider: MyUsernamePasswordAuthProvider,
                          formFactory: FormFactory) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
   // public
@@ -37,7 +39,7 @@ class Account @Inject() (implicit
           (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
         } else
         if (user.email != null && !user.email.trim.isEmpty) {
-          myUsrPaswProvider.sendVerifyEmailMailingAfterSignup(user, context)
+          authProvider.sendVerifyEmailMailingAfterSignup(user, context)
           (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
         } else {
           (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
@@ -45,4 +47,26 @@ class Account @Inject() (implicit
       Redirect(routes.Application.profile).flashing(tuple)
     }
   }
+
+  //-------------------------------------------------------------------
+  def changePassword = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+      val Some(user: UserRow) = userProvider.getUser(context.session)
+
+      val result =
+        if (!user.emailValidated.get) {
+          Ok(views.html.account.unverified(userProvider))
+        } else {
+          Ok(views.html.account.password_change(userProvider, PASSWORD_CHANGE_FORM))
+        }
+      result
+    }
+  }
+
+  //-------------------------------------------------------------------
+  // members
+  //-------------------------------------------------------------------
+  private var PASSWORD_CHANGE_FORM = null
 }

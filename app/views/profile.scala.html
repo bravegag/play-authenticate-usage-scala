@@ -1,15 +1,15 @@
-@import services.UserProvider
+@import services.UserService
 @import generated._
 @import generated.Tables._
 @import generated.UserRowAdapter._
 @import dao._
 @import utils._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userProvider: UserProvider, localUser: UserRow)(implicit messages: Messages, userDao: UserDao)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit messages: Messages, userDao: UserDao)
 
 @import com.feth.play.module.pa.views.html._
 
-@main(userProvider, Messages("playauthenticate.profile.title"),"profile") {
+@main(userService, Messages("playauthenticate.profile.title"),"profile") {
 
 <h1>@Messages("playauthenticate.profile.title")</h1>
 <p>
