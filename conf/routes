@@ -30,7 +30,7 @@ GET     /profile                            controllers.Application.profile
 #GET     /accounts/password/change           controllers.Account.changePassword
 #POST    /accounts/password/change           controllers.Account.doChangePassword
 
-#GET     /accounts/verify                    controllers.Account.verifyEmail
+GET     /accounts/verify                    controllers.Account.verifyEmail
 
 #GET     /accounts/add                       controllers.Account.link
 

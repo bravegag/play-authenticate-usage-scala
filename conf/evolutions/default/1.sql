@@ -15,7 +15,7 @@ CREATE TABLE "user" (
 	salt VARCHAR(100) DEFAULT NULL,
 	last_login TIMESTAMP DEFAULT NULL,
 	active BOOLEAN NOT NULL DEFAULT FALSE,
-	email_validated BOOLEAN,
+	email_validated BOOLEAN NOT NULL DEFAULT FALSE,
 	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (id)
 );

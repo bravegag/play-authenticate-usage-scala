@@ -9,7 +9,7 @@ import com.feth.play.module.pa.user.AuthUserIdentity
 import dao.UserDao
 import generated.Tables._
 
-class UserProvider @Inject() (auth : PlayAuthenticate, userDao: UserDao) {
+class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
   import dao.ExecHelper._
 
   //------------------------------------------------------------------------
