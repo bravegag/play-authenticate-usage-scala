@@ -8,6 +8,7 @@ import dao.UserDao
 import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Controller, Flash}
+import play.core.j.JavaHelpers
 import play.data.FormFactory
 import services.UserService
 
@@ -22,22 +23,21 @@ class Account @Inject() (implicit
                          userProvider: UserService,
                          userDao: UserDao,
                          formFactory: FormFactory) extends Controller with I18nSupport {
-  import utils.PlayConversions._
-
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
   def verifyEmail = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
     Future {
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(response)
-      val Some(user: UserRow) = userProvider.getUser(request.session)
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+      val Some(user: UserRow) = userProvider.getUser(context.session)
       val tuple =
         if (user.emailValidated.get) {
           // E-Mail has been validated already
           (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
         } else
         if (user.email != null && !user.email.trim.isEmpty) {
-          myUsrPaswProvider.sendVerifyEmailMailingAfterSignup(user, ctx)
+          myUsrPaswProvider.sendVerifyEmailMailingAfterSignup(user, context)
           (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
         } else {
           (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))

@@ -2,13 +2,14 @@ package services
 
 import com.feth.play.module.pa.PlayAuthenticate
 import play.mvc.Http.Session
-import javax.inject.Inject
+import javax.inject._
 
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.user.AuthUserIdentity
 import dao.UserDao
 import generated.Tables._
 
+@Singleton
 class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
   import dao.ExecHelper._
 

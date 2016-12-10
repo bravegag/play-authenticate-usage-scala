@@ -8,6 +8,7 @@ import play.api.mvc._
 import services.UserService
 import dao.UserDao
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.core.j.JavaHelpers
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -19,7 +20,6 @@ class Application @Inject() (implicit
                              auth: PlayAuthenticate,
                              userService: UserService,
                              userDao: UserDao) extends Controller with I18nSupport {
-  import utils.PlayConversions._
 
   //-------------------------------------------------------------------
   // public
@@ -31,7 +31,8 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def restricted = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
     Future {
-      val localUser = userService.getUser(request.session)
+      val context = JavaHelpers.createJavaContext(request)
+      val localUser = userService.getUser(context.session)
       Ok(views.html.restricted(userService, localUser))
     }
   }
@@ -39,7 +40,8 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def profile = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
     Future {
-      val localUser = userService.getUser(request.session)
+      val context = JavaHelpers.createJavaContext(request)
+      val localUser = userService.getUser(context.session)
       Ok(views.html.profile(auth, userService, localUser.get))
     }
   }
