@@ -103,6 +103,7 @@ trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEn
   * Blocks the future until done implicitly
   */
 object ExecHelper {
+  import scala.concurrent.ExecutionContext.Implicits.global
   /**
     * Returns the result of executing the action and retrieving the Future result
     * @param action The action to be executed

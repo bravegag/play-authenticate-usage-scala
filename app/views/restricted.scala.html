@@ -1,13 +1,13 @@
-@import play.Configuration
 @import services.UserProvider
+@import generated._
 @import generated.Tables._
 
-@(userProvider: UserProvider, localUser: Option[UserRow] = None)(implicit current: Configuration)
+@(userProvider: UserProvider, localUser: Option[UserRow] = None)(implicit messages: Messages)
 
-@main(userProvider, current.getString("playauthenticate.navigation.restricted"), "restricted") {
+@main(userProvider, Messages("playauthenticate.navigation.restricted"), "restricted") {
 
-<h1>@current.getString("playauthenticate.navigation.restricted")</h1>
+<h1>@Messages("playauthenticate.navigation.restricted")</h1>
 <p>
-    @current.getString("playauthenticate.restricted.secrets")
+    @Messages("playauthenticate.restricted.secrets")
 </p>
 }

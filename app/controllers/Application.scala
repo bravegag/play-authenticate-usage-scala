@@ -6,16 +6,15 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import dao.UserDao
 import play.api.mvc._
-import play.Configuration
-import play.mvc.Result
 import services.UserProvider
+import play.api.i18n.{I18nSupport, MessagesApi}
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
 @Singleton
-class Application @Inject() (implicit configuration: Configuration, deadbolt: DeadboltActions,
-      auth: PlayAuthenticate, userProvider: UserProvider, userDao: UserDao) extends Controller {
+class Application @Inject() (implicit val messagesApi: MessagesApi, deadbolt: DeadboltActions, auth: PlayAuthenticate,
+                             userProvider: UserProvider, userDao: UserDao) extends Controller with I18nSupport {
   import utils.PlayConversions._
 
   //-------------------------------------------------------------------

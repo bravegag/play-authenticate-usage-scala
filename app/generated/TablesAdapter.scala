@@ -2,7 +2,7 @@ package generated
 
 import be.objectify.deadbolt.scala.models._
 import dao.UserDao
-import generated.Tables.UserRow
+import generated.Tables.{LinkedAccountRow, UserRow}
 
 /**
   * Identifyable base for all Model types, it is also a Product
@@ -49,15 +49,20 @@ trait IdentifyableTable[PK] {
 }
 
 /**
-  * User adapter object that offers implicit conversion from generated UserRow to
-  * be.objectify.deadbolt.scala.models.Subject
+  * User adapter trait and object that offer implicit conversion from generated
+  * UserRow to be.objectify.deadbolt.scala.models.Subject and other inline
+  * operations available
   */
-object UserAdapter {
-  implicit def toSubject(user : UserRow)(implicit userDao: UserDao) : Subject = new Subject {
+trait UserRowAdapter extends Subject {
+  //------------------------------------------------------------------------
+  def providers : Seq[String]
+}
+
+object UserRowAdapter {
+  //------------------------------------------------------------------------
+  implicit def toSubject(user : UserRow)(implicit userDao: UserDao) : UserRowAdapter = new UserRowAdapter {
     import dao.ExecHelper._
 
-    //------------------------------------------------------------------------
-    // public
     //------------------------------------------------------------------------
     override def identifier: String = user.id.toString
 
@@ -71,6 +76,12 @@ object UserAdapter {
     override def permissions : List[Permission] = {
       val permissions = userDao.getPermissions(user)
       permissions.toList
+    }
+
+    //------------------------------------------------------------------------
+    override def providers : Seq[String] = {
+      val providers : Seq[LinkedAccountRow] = userDao.getLinkedAccounts(user)
+      providers.map(_.providerKey)
     }
   }
 }

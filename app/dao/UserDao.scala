@@ -36,6 +36,16 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   //------------------------------------------------------------------------
+  def getLinkedAccounts(user: UserRow) : Future[Seq[LinkedAccountRow]] = {
+    val action = (for {
+      linkedAccount <- LinkedAccount
+      user <- User if linkedAccount.userId === user.id
+    } yield linkedAccount).result
+
+    db.run(action)
+  }
+
+  //------------------------------------------------------------------------
   def findActiveByProviderKeyAndEmail(providerKey: String, email: String): Future[Option[UserRow]] = {
     val action = sql"""SELECT t1.* FROM \"user\" t1 " +
                        "WHERE t1.active=true AND " +
@@ -47,7 +57,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   //------------------------------------------------------------------------
-  def findActiveByProviderKeyUserName(providerKey: String, providerUserName: String): Future[Option[UserRow]] = {
+  def findActiveByProviderKeyAndUsername(providerKey: String, providerUserName: String): Future[Option[UserRow]] = {
     val action = sql"""SELECT t1.* FROM \"user\" t1 " +
                        "WHERE t1.active=true AND "
                              "EXISTS (SELECT * FROM linked_account t2 " +

@@ -1,13 +1,13 @@
 package services
 
-import javax.annotation.Nullable
 import com.feth.play.module.pa.PlayAuthenticate
-import generated.Tables._
 import play.mvc.Http.Session
 import javax.inject.Inject
+
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.user.AuthUserIdentity
 import dao.UserDao
+import generated.Tables._
 
 class UserProvider @Inject() (auth : PlayAuthenticate, userDao: UserDao) {
   import dao.ExecHelper._
@@ -15,13 +15,12 @@ class UserProvider @Inject() (auth : PlayAuthenticate, userDao: UserDao) {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  @Nullable
   def getUser(session: Session) : Option[UserRow] = {
     val currentAuthUser = Option(auth.getUser(session))
     currentAuthUser match {
       case None => None
       case Some(identity: UsernamePasswordAuthUser) => userDao.findActiveByProviderKeyAndEmail(identity.getProvider, identity.getEmail)
-      case Some(identity: AuthUserIdentity) => userDao.findActiveByProviderKeyUserName(identity.getProvider, identity.getId)
+      case Some(identity: AuthUserIdentity) => userDao.findActiveByProviderKeyAndUsername(identity.getProvider, identity.getId)
     }
   }
 }
