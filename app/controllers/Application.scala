@@ -1,14 +1,12 @@
 package controllers
 
 import javax.inject._
-
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
-import dao.UserDao
+import dao._
 import play.api.mvc._
 import services.UserProvider
-import play.api.i18n.{I18nSupport, MessagesApi}
-
+import play.api.i18n._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
