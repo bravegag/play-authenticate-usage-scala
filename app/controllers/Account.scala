@@ -65,26 +65,26 @@ class Account @Inject() (implicit
     }
   }
 
-  //-------------------------------------------------------------------
-  def doChangePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+    //-------------------------------------------------------------------
+    def doChangePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
+      Future {
+        val context = JavaHelpers.createJavaContext(request)
+        com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
 
-      val filledForm = Account.PasswordChangeForm.bindFromRequest
-      if (filledForm.hasErrors) {
-        // User did not select whether to link or not link
-        BadRequest(views.html.account.password_change(userService, filledForm))
-      } else {
-        val Some(user: UserRow) = userService.getUser(context.session)
-        val newPassword = filledForm.get.password
-        userService.changePassword(user, new MyUsernamePasswordAuthUser(newPassword), true)
-        Redirect(routes.Application.profile).flashing(
-          Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
-        )
+        val filledForm = Account.PasswordChangeForm.bindFromRequest
+        if (filledForm.hasErrors) {
+          // User did not select whether to link or not link
+          BadRequest(views.html.account.password_change(userService, filledForm))
+        } else {
+          val Some(user: UserRow) = userService.getUser(context.session)
+          val newPassword = filledForm.get.password
+          userService.changePassword(user, new MyUsernamePasswordAuthUser(newPassword), true)
+          Redirect(routes.Application.profile).flashing(
+            Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
+          )
+        }
       }
     }
-  }
 }
 
 /**
