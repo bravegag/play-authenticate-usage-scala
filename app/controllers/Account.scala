@@ -9,10 +9,8 @@ import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Controller, Flash}
 import play.core.j.JavaHelpers
-import play.data.validation.Constraints.{MinLength, Required}
 import play.api.data._
 import play.api.data.Forms._
-import play.data.FormFactory
 import providers.{MyUsernamePasswordAuthProvider, MyUsernamePasswordAuthUser}
 import services.UserService
 
@@ -24,10 +22,9 @@ class Account @Inject() (implicit
                          val messagesApi: MessagesApi,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
-                         userProvider: UserService,
                          userDao: UserDao,
-                         authProvider: MyUsernamePasswordAuthProvider,
-                         formFactory: FormFactory) extends Controller with I18nSupport {
+                         userService: UserService,
+                         authProvider: MyUsernamePasswordAuthProvider) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -35,7 +32,7 @@ class Account @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val Some(user: UserRow) = userProvider.getUser(context.session)
+      val Some(user: UserRow) = userService.getUser(context.session)
       val tuple =
         if (user.emailValidated.get) {
           // E-Mail has been validated already
@@ -56,13 +53,13 @@ class Account @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val Some(user: UserRow) = userProvider.getUser(context.session)
+      val Some(user: UserRow) = userService.getUser(context.session)
 
       val result =
         if (!user.emailValidated.get) {
-          Ok(views.html.account.unverified(userProvider))
+          Ok(views.html.account.unverified(userService))
         } else {
-          Ok(views.html.account.password_change(userProvider, Account.PasswordChangeForm))
+          Ok(views.html.account.password_change(userService, Account.PasswordChangeForm))
         }
       result
     }
@@ -77,11 +74,11 @@ class Account @Inject() (implicit
       val filledForm = Account.PasswordChangeForm.bindFromRequest
       if (filledForm.hasErrors) {
         // User did not select whether to link or not link
-        BadRequest(views.html.account.password_change(userProvider, filledForm))
+        BadRequest(views.html.account.password_change(userService, filledForm))
       } else {
-        val Some(user: UserRow) = userProvider.getUser(context.session)
+        val Some(user: UserRow) = userService.getUser(context.session)
         val newPassword = filledForm.get.password
-        user.changePassword(new MyUsernamePasswordAuthUser(newPassword), true)
+        userService.changePassword(user, new MyUsernamePasswordAuthUser(newPassword), true)
         Redirect(routes.Application.profile).flashing(
           Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
         )

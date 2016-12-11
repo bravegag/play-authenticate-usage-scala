@@ -16,12 +16,17 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def getUser(session: Session) : Option[UserRow] = {
+  def getUser(session: Session): Option[UserRow] = {
     val currentAuthUser = Option(auth.getUser(session))
     currentAuthUser match {
       case None => None
       case Some(identity: UsernamePasswordAuthUser) => userDao.findActiveByProviderKeyAndEmail(identity.getProvider, identity.getEmail)
       case Some(identity: AuthUserIdentity) => userDao.findActiveByProviderKeyAndUsername(identity.getProvider, identity.getId)
     }
+  }
+
+  //------------------------------------------------------------------------
+  def changePassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
+    // TODO: implement
   }
 }
