@@ -27,8 +27,8 @@ GET     /profile                            controllers.Application.profile
 #GET     /accounts/password/reset/:token     controllers.Signup.resetPassword(token: String)
 #POST    /accounts/password/reset            controllers.Signup.doResetPassword
 
-#GET     /accounts/password/change           controllers.Account.changePassword
-#POST    /accounts/password/change           controllers.Account.doChangePassword
+GET     /accounts/password/change           controllers.Account.changePassword
+POST    /accounts/password/change           controllers.Account.doChangePassword
 
 GET     /accounts/verify                    controllers.Account.verifyEmail
 
