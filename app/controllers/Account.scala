@@ -28,7 +28,7 @@ class Account @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def verifyEmail = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
+  def verifyEmail = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -36,20 +36,20 @@ class Account @Inject() (implicit
       val tuple =
         if (user.emailValidated.get) {
           // E-Mail has been validated already
-          (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
+          (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
         } else
         if (user.email != null && !user.email.trim.isEmpty) {
           authProvider.sendVerifyEmailMailingAfterSignup(user, context)
-          (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
+          (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
         } else {
-          (ApplicationKeys.FlashMessage -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
+          (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
         }
       Redirect(routes.Application.profile).flashing(tuple)
     }
   }
 
   //-------------------------------------------------------------------
-  def changePassword = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
+  def changePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -70,3 +70,8 @@ class Account @Inject() (implicit
   //-------------------------------------------------------------------
   private var PASSWORD_CHANGE_FORM = null
 }
+
+/**
+  * Account companion object
+  */
+object Account

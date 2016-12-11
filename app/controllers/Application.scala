@@ -29,7 +29,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def restricted = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
+  def restricted = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.getUser(context.session)
@@ -38,7 +38,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def profile = deadbolt.Restrict(List(Array(ApplicationKeys.UserRole)))() { request =>
+  def profile = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.getUser(context.session)
@@ -62,4 +62,14 @@ class Application @Inject() (implicit
 */
 	  Ok("TODO: migrate")
   }
+}
+
+/**
+  * Application companion object containing key constants
+  */
+object Application {
+  //-------------------------------------------------------------------
+  val FLASH_MESSAGE_KEY = "message"
+  val FLASH_ERROR_KEY = "error"
+  val USER_ROLE_KEY = "user"
 }

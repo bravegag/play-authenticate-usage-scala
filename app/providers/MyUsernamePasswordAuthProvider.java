@@ -180,7 +180,7 @@ public class MyUsernamePasswordAuthProvider
 		if (user == null) {
 			return LoginResult.NOT_FOUND;
 		} else {
-			if (!user.emailValidated()) {
+			if (!Boolean.valueOf(user.emailValidated().get().toString())) {
 				return LoginResult.USER_UNVERIFIED;
 			} else {
 				for (final Tables.LinkedAccountRow acc : user.linkedAccounts) {
@@ -241,7 +241,7 @@ public class MyUsernamePasswordAuthProvider
 	@Override
 	protected String onLoginUserNotFound(final Context context) {
 		context.flash()
-				.put(controllers.ApplicationKeys.FlashError(),
+				.put(controllers.Application.FLASH_ERROR_KEY(),
 						Messages.get("playauthenticate.password.login.unknown_user_or_pw"));
 		return super.onLoginUserNotFound(context);
 	}
