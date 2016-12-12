@@ -37,8 +37,8 @@ GET     /accounts/add                       controllers.Account.link
 GET     /accounts/link                      controllers.Account.askLink
 POST    /accounts/link                      controllers.Account.doLink
 
-#GET     /accounts/merge                     controllers.Account.askMerge
-#POST    /accounts/merge                     controllers.Account.doMerge
+GET     /accounts/merge                     controllers.Account.askMerge
+POST    /accounts/merge                     controllers.Account.doMerge
 
 #GET     /login/password/forgot              controllers.Signup.forgotPassword(email: String ?= "")
 #POST    /login/password/forgot              controllers.Signup.doForgotPassword

@@ -12,7 +12,7 @@ import play.core.j.JavaHelpers
 import providers.{MyUsernamePasswordAuthProvider, MyUsernamePasswordAuthUser}
 import services.UserService
 import views.account.form._
-import views.html.account.link
+import views.html.account._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -136,6 +136,67 @@ class Account @Inject() (implicit
           }
           // TODO: figure out the Result incompatibility
           auth.link(context, link)
+          ???
+        }
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------
+  def askMerge = deadbolt.SubjectPresent()() { request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+
+      // this is the currently logged in user
+      val userA = auth.getUser(context.session)
+
+      // this is the user that was selected for a login
+      val userB = auth.getMergeUser(context.session)
+
+      if (userB == null) {
+        // user to merge with could not be found, silently redirect to login
+        Redirect(routes.Application.index)
+
+      } else {
+        // You could also get the local user object here via
+        // User.findByAuthUserIdentity(newUser)
+        Ok(views.html.account.ask_merge(userService, acceptForm.Instance, userA, userB))
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------
+  def doMerge = deadbolt.SubjectPresent()() { implicit request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+
+      // this is the currently logged in user
+      val userA = auth.getUser(context.session)
+
+      // this is the user that was selected for a login
+      val userB = auth.getMergeUser(context.session)
+
+      if (userB == null) {
+        // user to merge with could not be found, silently redirect to login
+        Redirect(routes.Application.index)
+      } else {
+        val filledForm = acceptForm.Instance.bindFromRequest
+        if (filledForm.hasErrors) {
+          // User did not select whether to merge or not merge
+          BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))
+        }
+        else {
+          // User made a choice :)
+          val merge = filledForm.get.accept
+          if (merge) {
+            // TODO: figure out where to put this i.e. flash
+            //Application.FLASH_MESSAGE_KEY -> messageApi.preferred(request)("playauthenticate.accounts.merge.success")
+          }
+
+          // TODO: figure out the Result incompatibility
+          auth.merge(context, merge)
           ???
         }
       }
