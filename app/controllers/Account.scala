@@ -130,13 +130,11 @@ class Account @Inject() (implicit
         } else {
           // User made a choice :)
           val link = filledForm.get.accept
-          if (link) {
-            // TODO: figure out where to put this i.e. flash
-            //Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success")
+          val result = JavaHelpers.createResult(context, auth.link(context, link))
+          link match {
+            case true => result.flashing(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
+            case false => result
           }
-          // TODO: figure out the Result incompatibility
-          auth.link(context, link)
-          ???
         }
       }
     }
@@ -190,14 +188,11 @@ class Account @Inject() (implicit
         else {
           // User made a choice :)
           val merge = filledForm.get.accept
-          if (merge) {
-            // TODO: figure out where to put this i.e. flash
-            //Application.FLASH_MESSAGE_KEY -> messageApi.preferred(request)("playauthenticate.accounts.merge.success")
+          val result = JavaHelpers.createResult(context, auth.merge(context, merge))
+          merge match {
+            case true => result.flashing(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.merge.success"))
+            case false => result
           }
-
-          // TODO: figure out the Result incompatibility
-          auth.merge(context, merge)
-          ???
         }
       }
     }
