@@ -12,6 +12,7 @@ import play.core.j.JavaHelpers
 import providers.{MyUsernamePasswordAuthProvider, MyUsernamePasswordAuthUser}
 import services.UserService
 import views.account.form._
+import views.html.account.link
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -23,9 +24,20 @@ class Account @Inject() (implicit
                          auth: PlayAuthenticate,
                          userDao: UserDao,
                          userService: UserService,
-                         authProvider: MyUsernamePasswordAuthProvider) extends Controller with I18nSupport {
+                         authProvider: MyUsernamePasswordAuthProvider,
+                         acceptForm: AcceptForm,
+                         passwordChangeForm: PasswordChangeForm) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
   // public
+  //-------------------------------------------------------------------
+  def link = deadbolt.SubjectPresent()() { request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+      Ok(views.html.account.link(userService, auth))
+    }
+  }
+
   //-------------------------------------------------------------------
   def verifyEmail = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
     Future {
@@ -58,7 +70,7 @@ class Account @Inject() (implicit
         if (!user.emailValidated.get) {
           Ok(views.html.account.unverified(userService))
         } else {
-          Ok(views.html.account.password_change(userService, PasswordChangeForm.Instance))
+          Ok(views.html.account.password_change(userService, passwordChangeForm.Instance))
         }
       result
     }
@@ -70,7 +82,7 @@ class Account @Inject() (implicit
         val context = JavaHelpers.createJavaContext(request)
         com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
 
-        val filledForm = PasswordChangeForm.Instance.bindFromRequest
+        val filledForm = passwordChangeForm.Instance.bindFromRequest
         if (filledForm.hasErrors) {
           // User did not select whether to link or not link
           BadRequest(views.html.account.password_change(userService, filledForm))
