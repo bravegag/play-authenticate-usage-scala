@@ -9,10 +9,9 @@ import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Controller, Flash}
 import play.core.j.JavaHelpers
-import play.api.data._
-import play.api.data.Forms._
 import providers.{MyUsernamePasswordAuthProvider, MyUsernamePasswordAuthUser}
 import services.UserService
+import views.account.form._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -59,7 +58,7 @@ class Account @Inject() (implicit
         if (!user.emailValidated.get) {
           Ok(views.html.account.unverified(userService))
         } else {
-          Ok(views.html.account.password_change(userService, Account.PasswordChangeForm))
+          Ok(views.html.account.password_change(userService, PasswordChangeForm.Instance))
         }
       result
     }
@@ -71,7 +70,7 @@ class Account @Inject() (implicit
         val context = JavaHelpers.createJavaContext(request)
         com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
 
-        val filledForm = Account.PasswordChangeForm.bindFromRequest
+        val filledForm = PasswordChangeForm.Instance.bindFromRequest
         if (filledForm.hasErrors) {
           // User did not select whether to link or not link
           BadRequest(views.html.account.password_change(userService, filledForm))
@@ -90,13 +89,4 @@ class Account @Inject() (implicit
 /**
   * Account companion object
   */
-object Account {
-  //-------------------------------------------------------------------
-  case class PasswordChange(password: String, repeatPassword: String)
-  val PasswordChangeForm = Form(
-    mapping(
-      "password" -> text(minLength = 5),
-      "repeatPassword" -> text(minLength = 5)
-    )(PasswordChange.apply)(PasswordChange.unapply)
-  )
-}
+object Account
