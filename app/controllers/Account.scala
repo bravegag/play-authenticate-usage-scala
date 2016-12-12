@@ -55,6 +55,7 @@ class Account @Inject() (implicit
         } else {
           (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
         }
+
       Redirect(routes.Application.profile).flashing(tuple)
     }
   }
@@ -69,6 +70,7 @@ class Account @Inject() (implicit
       val result =
         if (!user.emailValidated.get) {
           Ok(views.html.account.unverified(userService))
+
         } else {
           Ok(views.html.account.password_change(userService, passwordChangeForm.Instance))
         }
@@ -86,6 +88,7 @@ class Account @Inject() (implicit
         if (filledForm.hasErrors) {
           // User did not select whether to link or not link
           BadRequest(views.html.account.password_change(userService, filledForm))
+
         } else {
           val Some(user: UserRow) = userService.getUser(context.session)
           val newPassword = filledForm.get.password
@@ -106,6 +109,7 @@ class Account @Inject() (implicit
       if (user == null) {
         // account to link could not be found, silently redirect to login
         Redirect(routes.Application.index)
+
       } else {
         Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
       }
@@ -179,13 +183,14 @@ class Account @Inject() (implicit
       if (userB == null) {
         // user to merge with could not be found, silently redirect to login
         Redirect(routes.Application.index)
+
       } else {
         val filledForm = acceptForm.Instance.bindFromRequest
         if (filledForm.hasErrors) {
           // User did not select whether to merge or not merge
           BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))
-        }
-        else {
+
+        } else {
           // User made a choice :)
           val merge = filledForm.get.accept
           val result = JavaHelpers.createResult(context, auth.merge(context, merge))
