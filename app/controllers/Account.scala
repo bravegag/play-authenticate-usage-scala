@@ -96,6 +96,51 @@ class Account @Inject() (implicit
         }
       }
     }
+
+  //-------------------------------------------------------------------
+  def askLink = deadbolt.SubjectPresent()() { request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+      val user = this.auth.getLinkUser(context.session)
+      if (user == null) {
+        // account to link could not be found, silently redirect to login
+        Redirect(routes.Application.index)
+      } else {
+        Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------
+  def doLink = deadbolt.SubjectPresent()() { implicit request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+      val user = this.auth.getLinkUser(context.session)
+      if (user == null) {
+        // account to link could not be found, silently redirect to login
+        Redirect(routes.Application.index)
+
+      } else {
+        val filledForm = acceptForm.Instance.bindFromRequest
+        if (filledForm.hasErrors) {
+          BadRequest(views.html.account.ask_link(userService, filledForm, user))
+
+        } else {
+          // User made a choice :)
+          val link = filledForm.get.accept
+          if (link) {
+            // TODO: figure out where to put this i.e. flash
+            //Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success")
+          }
+          // TODO: figure out the Result incompatibility
+          auth.link(context, link)
+          ???
+        }
+      }
+    }
+  }
 }
 
 /**
