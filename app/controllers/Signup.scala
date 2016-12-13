@@ -184,6 +184,26 @@ class Signup @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
+  // private
+  //-------------------------------------------------------------------
+  /**
+    * Returns a token object if valid, null otherwise
+    * @param token
+    * @param type
+    * @return a token object if valid, null otherwise
+    */
+  private def tokenIsValid(token: String, `type`: TokenAction.Type) = {
+    var result = null
+    if (token != null && !token.trim.isEmpty) {
+      val ta = TokenAction.findByToken(token, `type`)
+      if (ta != null && ta.isValid) {
+        result = ta
+      }
+    }
+    result
+  }
+
+  //-------------------------------------------------------------------
   // members
   //-------------------------------------------------------------------
   private val FORGOT_PASSWORD_FORM : Form[Any] = null
