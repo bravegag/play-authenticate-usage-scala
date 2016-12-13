@@ -1,0 +1,13 @@
+@import services.UserService
+
+@(userService: UserService, providerKey: String)(implicit messages: Messages)
+
+@main(userService, Messages("playauthenticate.oauth.access.denied.title")) {
+
+	<h1>@Messages("playauthenticate.oauth.access.denied.title")</h1>
+	<p>
+		@Messages("playauthenticate.oauth.access.denied.explanation")<br/>
+	</p>
+	<p>
+		@Messages("playauthenticate.oauth.access.denied.alternative") <a href="@routes.Application.signup">@Messages("playauthenticate.oauth.access.denied.alternative.cta")</a>.
+}

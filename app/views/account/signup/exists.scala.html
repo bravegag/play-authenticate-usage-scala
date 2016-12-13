@@ -1,0 +1,8 @@
+@import services.UserService
+
+@(userService: UserService)(implicit messages: Messages)
+
+@main(userService, Messages("playauthenticate.user.exists.title")) {
+	<h1>@Messages("playauthenticate.user.exists.title")</h1>
+	<p>@Messages("playauthenticate.user.exists.message")</p>
+}

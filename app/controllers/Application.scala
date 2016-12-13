@@ -9,6 +9,7 @@ import services.UserService
 import dao.UserDao
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
+import providers.MyUsernamePasswordAuthProvider
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -19,7 +20,8 @@ class Application @Inject() (implicit
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,
-                             userDao: UserDao) extends Controller with I18nSupport {
+                             userDao: UserDao,
+                             authProvider: MyUsernamePasswordAuthProvider) extends Controller with I18nSupport {
 
   //-------------------------------------------------------------------
   // public
@@ -46,21 +48,52 @@ class Application @Inject() (implicit
     }
   }
 
-/*
-  TODO: migrate
   //-------------------------------------------------------------------
   def login() = Action {
-    Ok(views.html.login(auth, userProvider, provider.getLoginForm))
+    Ok(views.html.login(auth, userService, authProvider.getLoginForm))
   }
-*/
+
+  //-------------------------------------------------------------------
+  def doLogin = Action { implicit request =>
+    val context = JavaHelpers.createJavaContext(request)
+    val localUser = userService.getUser(context.session)
+    val filledForm = authProvider.getLoginForm.bindFromRequest
+    if (filledForm.hasErrors) {
+      // User did not fill everything properly
+      BadRequest(views.html.login(auth, userService, filledForm))
+    }
+    else {
+      // Everything was filled
+      JavaHelpers.createResult(context, authProvider.handleLogin(context))
+    }
+  }
+
+  //-------------------------------------------------------------------
+  def signup = Action {
+    Ok(views.html.signup(auth, userService, authProvider.getSignupForm))
+  }
+
   //-------------------------------------------------------------------
   def jsRoutes() = Action {
-  	// TODO: migrate
-/*
     Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
       routes.javascript.Signup.forgotPassword)).as("text/javascript")
-*/
-	  Ok("TODO: migrate")
+  }
+
+  //-------------------------------------------------------------------
+  def doSignup = Action { implicit request =>
+    val context = JavaHelpers.createJavaContext(request)
+    com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+    val filledForm = authProvider.getSignupForm.bindFromRequest
+    if (filledForm.hasErrors) {
+      // User did not fill everything properly
+      BadRequest(views.html.signup(auth, userService, filledForm))
+
+    } else {
+      // Everything was filled
+      // do something with your part of the form before handling the user
+      // signup
+      JavaHelpers.createResult(context, authProvider.handleSignup(context))
+    }
   }
 }
 

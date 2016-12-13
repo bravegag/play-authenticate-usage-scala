@@ -29,4 +29,9 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
   def changePassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
     // TODO: implement
   }
+
+  //------------------------------------------------------------------------
+  def findByEmail(email: String): Option[UserRow] = {
+    userDao.filter(email === _.email).headOption
+  }
 }
