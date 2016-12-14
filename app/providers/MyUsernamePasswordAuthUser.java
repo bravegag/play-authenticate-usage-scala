@@ -3,6 +3,7 @@ package providers;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.NameIdentity;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
+import views.form.Signup;
 
 public class MyUsernamePasswordAuthUser extends UsernamePasswordAuthUser
 		implements NameIdentity {
@@ -13,9 +14,9 @@ public class MyUsernamePasswordAuthUser extends UsernamePasswordAuthUser
 	private static final long serialVersionUID = 1L;
 	private final String name;
 
-	public MyUsernamePasswordAuthUser(final MySignup signup) {
-		super(signup.password, signup.email);
-		this.name = signup.getName();
+	public MyUsernamePasswordAuthUser(final Signup signup) {
+		super(signup.password(), signup.email());
+		this.name = signup.username();
 	}
 
 	/**

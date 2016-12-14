@@ -1,6 +1,7 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
+import scala.collection.mutable.ArrayBuffer
 
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
@@ -8,12 +9,9 @@ import dao.UserDao
 import play.api.mvc._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
-import providers.{MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthProvider, MyUsernamePasswordAuthUser}
+import providers._
 import services.UserService
-import play.api.data.Form
-import play.api.data.Forms._
-import play.mvc.Result
-import views.html.account.signup.{exists, oAuthDenied}
+import views.account.signup.form._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -26,7 +24,9 @@ class Signup @Inject() (implicit
                         auth: PlayAuthenticate,
                         userService: UserService,
                         userDao: UserDao,
-                        authProvider: MyUsernamePasswordAuthProvider) extends Controller with I18nSupport {
+                        authProvider: MyUsernamePasswordAuthProvider,
+                        forgotPasswordForm: ForgotPasswordForm,
+                        passwordResetForm: PasswordResetForm) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -40,9 +40,9 @@ class Signup @Inject() (implicit
   def forgotPassword(email: String) = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-    var form = FORGOT_PASSWORD_FORM
+    var form = forgotPasswordForm.Instance
     if (email != null && !email.trim.isEmpty) {
-      form = FORGOT_PASSWORD_FORM.fill(new MyUsernamePasswordAuthProvider.MyIdentity(email))
+      form = forgotPasswordForm.Instance.fill(ForgotPassword(email))
     }
     Ok(views.html.account.signup.password_forgot(userService, form))
   }
@@ -51,12 +51,11 @@ class Signup @Inject() (implicit
   def doForgotPassword = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-    val filledForm = FORGOT_PASSWORD_FORM.bindFromRequest
+    val filledForm = forgotPasswordForm.Instance.bindFromRequest
     if (filledForm.hasErrors) {
       // User did not fill in his/her email
       BadRequest(views.html.account.signup.password_forgot(userService, filledForm))
-    }
-    else {
+    } else {
       // The email address given *BY AN UNKNWON PERSON* to the form - we
       // should find out if we actually have a user with this email
       // address and whether password login is enabled for him/her. Also
@@ -65,11 +64,13 @@ class Signup @Inject() (implicit
       // We don't want to expose whether a given email address is signed
       // up, so just say an email has been sent, even though it might not
       // be true - that's protecting our user privacy.
-      flash(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
+      var flashValues = ArrayBuffer[(String, String)]()
+      flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
 
-      // TODO: handle Option correctly
-      val Some(user) = userService.findByEmail(email)
-      if (user != null) {
+      val userOption = userService.findByEmail(email)
+      if (userOption.isDefined) {
+        val Some(user) = userOption
+
         // yep, we have a user with this email that is active - we do
         // not know if the user owning that account has requested this
         // reset, though.
@@ -86,13 +87,13 @@ class Signup @Inject() (implicit
           // with the password reset, as a "bad" user could then sign
           // up with a fake email via OAuth and get it verified by an
           // a unsuspecting user that clicks the link.
-          flash(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
+          flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
 
           // You might want to re-send the verification email here...
-          provider.sendVerifyEmailMailingAfterSignup(user, context)
+          authProvider.sendVerifyEmailMailingAfterSignup(user, context)
         }
       }
-      Redirect(routes.Application.index)
+      Redirect(routes.Application.index).flashing(flashValues: _*)
     }
   }
 
@@ -105,7 +106,7 @@ class Signup @Inject() (implicit
       BadRequest(views.html.account.signup.no_token_or_invalid(userService))
 
     } else {
-      Ok(views.html.account.signup.password_reset(userService, PASSWORD_RESET_FORM.fill(new Signup.PasswordReset(token))))
+      Ok(views.html.account.signup.password_reset(userService, passwordResetForm.Instance.fill(PasswordReset("", "", token))))
     }
   }
 
@@ -113,7 +114,7 @@ class Signup @Inject() (implicit
   def doResetPassword = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-    val filledForm = PASSWORD_RESET_FORM.bindFromRequest
+    val filledForm = passwordResetForm.Instance.bindFromRequest
     if (filledForm.hasErrors) {
       BadRequest(views.html.account.signup.password_reset(userService, filledForm))
 
@@ -124,29 +125,30 @@ class Signup @Inject() (implicit
       if (ta == null) {
         BadRequest(views.html.account.signup.no_token_or_invalid(userService))
       } else {
+        var flashValues = ArrayBuffer[(String, String)]()
         val u = ta.targetUser
-        try
+        try {
           // Pass true for the second parameter if you want to
           // automatically create a password and the exception never to
           // happen
           u.resetPassword(new MyUsernamePasswordAuthUser(newPassword), false)
-
+        }
         catch {
-          case re: RuntimeException => {
-            flash(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
+          case e: RuntimeException => {
+            flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
           }
         }
         val login = authProvider.isLoginAfterPasswordReset
         if (login) {
           // automatically log in
-          flash(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
+          flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
           auth.loginAndRedirect(context, new MyLoginUsernamePasswordAuthUser(u.email))
 
         } else {
           // send the user to the login page
-          flash(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+          flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
         }
-        Redirect(routes.Application.login)
+        Redirect(routes.Application.login).flashing(flashValues: _*)
       }
     }
   }
@@ -203,16 +205,9 @@ class Signup @Inject() (implicit
     }
     result
   }
-
-  //-------------------------------------------------------------------
-  // members
-  //-------------------------------------------------------------------
-  private val FORGOT_PASSWORD_FORM : Form[Any] = null
-  private val FORGOT_PASSWORD_FORM : Form[Any] = null
 }
 
 /**
   * Signup companion object
   */
 object Signup
-

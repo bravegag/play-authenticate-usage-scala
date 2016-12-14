@@ -4,21 +4,17 @@ import com.feth.play.module.mail.Mailer.Mail.Body;
 import com.feth.play.module.mail.Mailer.MailerFactory;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.UsernamePassword;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import controllers.routes;
 import generated.Tables;
 import play.Logger;
 import play.data.Form;
-import play.data.FormFactory;
-import play.data.validation.Constraints.Email;
-import play.data.validation.Constraints.MinLength;
-import play.data.validation.Constraints.Required;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
 import play.mvc.Http.Context;
+import views.form.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,7 +27,7 @@ import java.util.UUID;
 @Singleton
 public class MyUsernamePasswordAuthProvider
 		extends
-		UsernamePasswordAuthProvider<String, MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthUser, MyUsernamePasswordAuthProvider.MyLogin, MyUsernamePasswordAuthProvider.MySignup> {
+		UsernamePasswordAuthProvider<String, MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthUser, Login, Signup> {
 
 	private static final String SETTING_KEY_VERIFICATION_LINK_SECURE = SETTING_KEY_MAIL
 			+ "." + "verificationLink.secure";
@@ -51,100 +47,30 @@ public class MyUsernamePasswordAuthProvider
 		return needed;
 	}
 
-	public static class MyIdentity {
-
-		public MyIdentity() {
-		}
-
-		public MyIdentity(final String email) {
-			this.email = email;
-		}
-
-		@Required
-		@Email
-		public String email;
-
-	}
-
-	public static class MyLogin extends MyIdentity
-			implements
-			UsernamePassword {
-
-		@Required
-		@MinLength(5)
-		protected String password;
-
-		@Override
-		public String getEmail() {
-			return email;
-		}
-
-		public void setEmail(String email) {
-			this.email = email;
-		}
-
-		@Override
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-	}
-
-	public static class MySignup extends MyLogin {
-
-		@Required
-		@MinLength(5)
-		private String repeatPassword;
-
-		@Required
-		private String name;
-
-		public String validate() {
-			if (password == null || !password.equals(repeatPassword)) {
-				return Messages
-						.get("playauthenticate.password.signup.error.passwords_not_same");
-			}
-			return null;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getRepeatPassword() {
-			return repeatPassword;
-		}
-
-		public void setRepeatPassword(String repeatPassword) {
-			this.repeatPassword = repeatPassword;
-		}
-	}
-
-	private final Form<MySignup> SIGNUP_FORM;
-	private final Form<MyLogin> LOGIN_FORM;
+	final SignupForm signupForm;
+	final LoginForm loginForm;
 
 	@Inject
-	public MyUsernamePasswordAuthProvider(final PlayAuthenticate auth, final FormFactory formFactory,
-                                          final ApplicationLifecycle lifecycle, MailerFactory mailerFactory) {
+	public MyUsernamePasswordAuthProvider(
+			final PlayAuthenticate auth,
+			final ApplicationLifecycle lifecycle,
+			MailerFactory mailerFactory,
+			SignupForm signupForm,
+			LoginForm loginForm) {
 		super(auth, lifecycle, mailerFactory);
 
-		this.SIGNUP_FORM = formFactory.form(MySignup.class);
-		this.LOGIN_FORM = formFactory.form(MyLogin.class);
+		this.signupForm = signupForm;
+		this.loginForm = loginForm;
 	}
 
-	public Form<MySignup> getSignupForm() {
-		return SIGNUP_FORM;
+	// TODO: figure this out
+	public Form<Signup> getSignupForm() {
+		return null; // signupForm.Instance();
 	}
 
-	public Form<MyLogin> getLoginForm() {
-		return LOGIN_FORM;
+	// TODO: figure this out
+	public Form<Login> getLoginForm() {
+		return null; // loginForm.Instance();
 	}
 
 	@Override
@@ -212,13 +138,13 @@ public class MyUsernamePasswordAuthProvider
 
 	@Override
 	protected MyUsernamePasswordAuthUser buildSignupAuthUser(
-			final MySignup signup, final Context ctx) {
+			final Signup signup, final Context ctx) {
 		return new MyUsernamePasswordAuthUser(signup);
 	}
 
 	@Override
 	protected MyLoginUsernamePasswordAuthUser buildLoginAuthUser(
-			final MyLogin login, final Context ctx) {
+			final Login login, final Context ctx) {
 		return new MyLoginUsernamePasswordAuthUser(login.getPassword(),
 				login.getEmail());
 	}
