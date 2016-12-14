@@ -12,9 +12,7 @@ class MyResolver extends Resolver {
   //------------------------------------------------------------------------
   def login: Call = {
     // Your login page
-    // TODO: migrate
-    //routes.Application.login
-    routes.Application.index
+    routes.Application.login
   }
 
   //------------------------------------------------------------------------
@@ -31,31 +29,23 @@ class MyResolver extends Resolver {
   def auth(provider: String): Call = {
     // You can provide your own authentication implementation,
     // however the default should be sufficient for most cases
-    // TODO: migrate
-    //com.feth.play.module.pa.controllers.routes.Authenticate.authenticate(provider)
-    routes.Application.index
+    com.feth.play.module.pa.controllers.routes.Authenticate.authenticate(provider)
   }
 
   //------------------------------------------------------------------------
   def askMerge: Call = {
-    // TODO: migrate
-    //routes.Account.askMerge
-    routes.Application.index
+    routes.Account.askMerge
   }
 
   //------------------------------------------------------------------------
   def askLink: Call = {
-    // TODO: migrate
-    //routes.Account.askLink
-    routes.Application.index
+    routes.Account.askLink
   }
 
   //------------------------------------------------------------------------
   override def onException(e: AuthException): Call = {
     if (e.isInstanceOf[AccessDeniedException]) {
-      // TODO: migrate
-      //routes.Signup.oAuthDenied(e.asInstanceOf[AccessDeniedException].getProviderKey)
-      routes.Application.index
+      routes.Signup.oAuthDenied(e.asInstanceOf[AccessDeniedException].getProviderKey)
     }
     // more custom problem handling here...
     super.onException(e)
