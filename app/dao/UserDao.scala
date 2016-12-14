@@ -66,4 +66,9 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                                            "t2.provider_username = ${providerUserName})""".as[UserRow].headOption
     db.run(action)
   }
+
+  //------------------------------------------------------------------------
+  def findByEmail(email: String): Future[Seq[UserRow]] = {
+    filter(_.email === email)
+  }
 }

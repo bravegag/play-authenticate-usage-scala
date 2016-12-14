@@ -32,6 +32,6 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
 
   //------------------------------------------------------------------------
   def findByEmail(email: String): Option[UserRow] = {
-    userDao.filter(_.email === email).headOption
+    userDao.findByEmail(email).headOption
   }
 }
