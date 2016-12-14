@@ -1,6 +1,7 @@
 @import services.UserService
+@import play.api.mvc._
 
-@(userService: UserService)(implicit messages: Messages)
+@(userService: UserService)(implicit request: RequestHeader, messages: Messages)
 
 @main(userService, Messages("playauthenticate.token.error.title")) {
 	<h1>@Messages("playauthenticate.token.error.title")</h1>

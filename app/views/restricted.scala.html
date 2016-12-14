@@ -1,8 +1,9 @@
 @import services.UserService
 @import generated._
 @import generated.Tables._
+@import play.api.mvc._
 
-@(userService: UserService, localUser: Option[UserRow] = None)(implicit messages: Messages)
+@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: RequestHeader, messages: Messages)
 
 @main(userService, Messages("playauthenticate.navigation.restricted"), "restricted") {
 

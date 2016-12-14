@@ -1,6 +1,7 @@
 @import services.UserService
+@import play.api.mvc._
 
-@(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit messages: Messages)
+@(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: RequestHeader, messages: Messages)
 
 @main(userService, Messages("playauthenticate.link.account.title")) {
     

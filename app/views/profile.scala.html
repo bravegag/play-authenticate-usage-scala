@@ -4,8 +4,9 @@
 @import generated.UserRowAdapter._
 @import dao._
 @import utils._
+@import play.api.mvc._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit messages: Messages, userDao: UserDao)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit request: RequestHeader, messages: Messages, userDao: UserDao)
 
 @import com.feth.play.module.pa.views.html._
 

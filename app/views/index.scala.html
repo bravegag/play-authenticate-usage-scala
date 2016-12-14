@@ -1,8 +1,9 @@
 @import play.api.Play.current
 @import play.Configuration
 @import services.UserService
+@import play.api.mvc._
 
-@(userService: UserService)(implicit messages: Messages)
+@(userService: UserService)(implicit request: RequestHeader, messages: Messages)
 
 @main(userService, Messages("playauthenticate.index.title")) {
 <!-- Main jumbotron for a primary marketing message or call to action -->

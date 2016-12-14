@@ -1,6 +1,7 @@
 @import services.UserService
+@import play.api.mvc._
 
-@(userService: UserService, providerKey: String)(implicit messages: Messages)
+@(userService: UserService, providerKey: String)(implicit request: RequestHeader, messages: Messages)
 
 @main(userService, Messages("playauthenticate.oauth.access.denied.title")) {
 

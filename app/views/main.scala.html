@@ -1,8 +1,10 @@
 @import play.api.Play.current
 @import services.UserService
+@import play.api.mvc._
 @import be.objectify.deadbolt.scala.views.html._
+@import play.core.j.JavaHelpers
 
-@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit messages: Messages)
+@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit request: RequestHeader, messages: Messages)
 
 <!DOCTYPE html>
 <html lang="@lang().code()">
@@ -50,9 +52,9 @@
 
             @subjectPresentOr() {
             <ul class="nav navbar-nav navbar-right">
-                @defining(userProvider.getUser(session())) { user =>
+                @defining(userService.getUser(JavaHelpers.createJavaContext(request).session())) { user =>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.get.username <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
                         <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
@@ -72,18 +74,19 @@
 
 
 <div class="container">
-    @if(flash.contains(Application.FLASH_ERROR_KEY)) {
+    @request.flash.get(Application.FLASH_ERROR_KEY).map { errorMessage =>
     <div class="alert alert-danger" role="alert">
         <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
                         Close</span></button>
-        @flash().get(Application.FLASH_ERROR_KEY)
+        errorMessage
     </div>
     }
-    @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
+
+    @request.flash.get(Application.FLASH_MESSAGE_KEY).map { errorMessage =>
     <div class="alert alert-success" role="alert">
         <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
                         Close</span></button>
-        @flash().get(Application.FLASH_MESSAGE_KEY)
+        errorMessage
     </div>
     }
     @content

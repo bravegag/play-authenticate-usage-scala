@@ -1,7 +1,8 @@
 @import services.UserService
 @import views.account.form._
+@import play.api.mvc._
 
-@(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit messages: Messages)
+@(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: RequestHeader, messages: Messages)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }

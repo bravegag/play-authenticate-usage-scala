@@ -17,6 +17,7 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Application @Inject() (implicit
                              val messagesApi: MessagesApi,
+                             session: Session,
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,
@@ -26,12 +27,12 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def index = Action {
+  def index = Action { implicit request =>
     Ok(views.html.index(userService))
   }
 
   //-------------------------------------------------------------------
-  def restricted = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
+  def restricted = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.getUser(context.session)
@@ -40,7 +41,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def profile = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
+  def profile = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.getUser(context.session)
@@ -49,7 +50,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def login() = Action {
+  def login() = Action { implicit request =>
     Ok(views.html.login(auth, userService, authProvider.getLoginForm))
   }
 
@@ -69,12 +70,12 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def signup = Action {
+  def signup = Action { implicit request =>
     Ok(views.html.signup(auth, userService, authProvider.getSignupForm))
   }
 
   //-------------------------------------------------------------------
-  def jsRoutes() = Action {
+  def jsRoutes() = Action { implicit request =>
     Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
       routes.javascript.Signup.forgotPassword)).as("text/javascript")
   }

@@ -21,6 +21,7 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Signup @Inject() (implicit
                         val messagesApi: MessagesApi,
+                        session: Session,
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
                         userService: UserService,
@@ -29,14 +30,14 @@ class Signup @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def unverified = Action { request =>
+  def unverified = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     Ok(views.html.account.signup.unverified(userService))
   }
 
   //-------------------------------------------------------------------
-  def forgotPassword(email: String) = Action { request =>
+  def forgotPassword(email: String) = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     var form = FORGOT_PASSWORD_FORM
@@ -47,7 +48,7 @@ class Signup @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def doForgotPassword = Action { request =>
+  def doForgotPassword = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     val filledForm = FORGOT_PASSWORD_FORM.bindFromRequest
@@ -96,7 +97,7 @@ class Signup @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def resetPassword(token: String) = Action { request =>
+  def resetPassword(token: String) = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     val ta = tokenIsValid(token, Type.PASSWORD_RESET)
@@ -109,7 +110,7 @@ class Signup @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def doResetPassword = Action { request =>
+  def doResetPassword = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     val filledForm = PASSWORD_RESET_FORM.bindFromRequest
@@ -151,21 +152,21 @@ class Signup @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def oAuthDenied(getProviderKey: String) = Action { request =>
+  def oAuthDenied(getProviderKey: String) = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     Ok(views.html.account.signup.oAuthDenied(userService, getProviderKey))
   }
 
   //-------------------------------------------------------------------
-  def exists = Action { request =>
+  def exists = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     Ok(views.html.account.signup.exists(userService))
   }
 
   //-------------------------------------------------------------------
-  def verify(token: String) = Action { request =>
+  def verify(token: String) = Action { implicit request =>
     val context = JavaHelpers.createJavaContext(request)
     com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
     val ta = tokenIsValid(token, Type.EMAIL_VERIFICATION)

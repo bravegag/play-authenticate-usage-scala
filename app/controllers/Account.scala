@@ -7,7 +7,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import dao.UserDao
 import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Controller, Flash}
+import play.api.mvc.{Controller, Flash, Session}
 import play.core.j.JavaHelpers
 import providers.{MyUsernamePasswordAuthProvider, MyUsernamePasswordAuthUser}
 import services.UserService
@@ -20,6 +20,7 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Account @Inject() (implicit
                          val messagesApi: MessagesApi,
+                         session: Session,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
                          userDao: UserDao,
@@ -30,7 +31,7 @@ class Account @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def link = deadbolt.SubjectPresent()() { request =>
+  def link = deadbolt.SubjectPresent()() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -39,7 +40,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
+  def verifyEmail = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -61,7 +62,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def changePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { request =>
+  def changePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -101,7 +102,7 @@ class Account @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def askLink = deadbolt.SubjectPresent()() { request =>
+  def askLink = deadbolt.SubjectPresent()() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -145,7 +146,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def askMerge = deadbolt.SubjectPresent()() { request =>
+  def askMerge = deadbolt.SubjectPresent()() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())

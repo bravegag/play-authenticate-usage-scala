@@ -1,6 +1,7 @@
 @import services.UserService
+@import play.api.mvc._
 
-@(userProvider: UserService)(implicit messages: Messages)
+@(userProvider: UserService)(implicit request: RequestHeader, messages: Messages)
 
 @main(userProvider, Messages("playauthenticate.verify.email.title")) {
 
