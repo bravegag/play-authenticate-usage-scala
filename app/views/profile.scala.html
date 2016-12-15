@@ -5,8 +5,9 @@
 @import dao._
 @import utils._
 @import play.api.mvc._
+@import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit request: RequestHeader, messages: Messages, userDao: UserDao)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messages: Messages, userDao: UserDao)
 
 @import com.feth.play.module.pa.views.html._
 

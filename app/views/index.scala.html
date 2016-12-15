@@ -2,8 +2,9 @@
 @import play.Configuration
 @import services.UserService
 @import play.api.mvc._
+@import be.objectify.deadbolt.scala._
 
-@(userService: UserService)(implicit request: RequestHeader, messages: Messages)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messages: Messages)
 
 @main(userService, Messages("playauthenticate.index.title")) {
 <!-- Main jumbotron for a primary marketing message or call to action -->

@@ -2,8 +2,9 @@
 @import generated._
 @import generated.Tables._
 @import play.api.mvc._
+@import be.objectify.deadbolt.scala._
 
-@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: RequestHeader, messages: Messages)
+@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: AuthenticatedRequest[Any], messages: Messages)
 
 @main(userService, Messages("playauthenticate.navigation.restricted"), "restricted") {
 

@@ -1,8 +1,9 @@
 @import services.UserService
 @import views.account.form._
 @import play.api.mvc._
+@import be.objectify.deadbolt.scala._
 
-@(userService: UserService, acceptForm: Form[Accept], newAccount: com.feth.play.module.pa.user.AuthUser)(implicit request: RequestHeader, messages: Messages)
+@(userService: UserService, acceptForm: Form[Accept], newAccount: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messages: Messages)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }

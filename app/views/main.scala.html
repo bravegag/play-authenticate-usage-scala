@@ -5,7 +5,7 @@
 @import play.core.j.JavaHelpers
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit lang: Lang, request: RequestHeader, messages: Messages)
+@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit lang: Lang, request: AuthenticatedRequest[Any], messages: Messages)
 
 <!DOCTYPE html>
 <html lang="@lang.code">

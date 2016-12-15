@@ -1,7 +1,8 @@
 @import services.UserService
 @import play.api.mvc._
+@import be.objectify.deadbolt.scala._
 
-@(userService: UserService)(implicit request: RequestHeader, messages: Messages)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messages: Messages)
 
 @main(userService, Messages("playauthenticate.token.error.title")) {
 	<h1>@Messages("playauthenticate.token.error.title")</h1>

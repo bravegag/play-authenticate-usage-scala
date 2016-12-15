@@ -30,8 +30,10 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def index = Action { implicit request =>
-    Ok(views.html.index(userService))
+  def index = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      Ok(views.html.index(userService))
+    }
   }
 
   //-------------------------------------------------------------------
@@ -53,50 +55,60 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def login() = Action { implicit request =>
-    Ok(views.html.login(auth, userService, loginForm.Instance))
-  }
-
-  //-------------------------------------------------------------------
-  def doLogin = Action { implicit request =>
-    val context = JavaHelpers.createJavaContext(request)
-    val localUser = userService.getUser(context.session)
-    val filledForm = loginForm.Instance.bindFromRequest
-    if (filledForm.hasErrors) {
-      // User did not fill everything properly
-      BadRequest(views.html.login(auth, userService, filledForm))
-    }
-    else {
-      // Everything was filled
-      JavaHelpers.createResult(context, authProvider.handleLogin(context))
+  def login() = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      Ok(views.html.login(auth, userService, loginForm.Instance))
     }
   }
 
   //-------------------------------------------------------------------
-  def signup = Action { implicit request =>
-    Ok(views.html.signup(auth, userService, signupForm.Instance))
+  def doLogin = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      val localUser = userService.getUser(context.session)
+      val filledForm = loginForm.Instance.bindFromRequest
+      if (filledForm.hasErrors) {
+        // User did not fill everything properly
+        BadRequest(views.html.login(auth, userService, filledForm))
+      }
+      else {
+        // Everything was filled
+        JavaHelpers.createResult(context, authProvider.handleLogin(context))
+      }
+    }
   }
 
   //-------------------------------------------------------------------
-  def jsRoutes() = Action { implicit request =>
-    Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
-      routes.javascript.Signup.forgotPassword)).as("text/javascript")
+  def signup = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      Ok(views.html.signup(auth, userService, signupForm.Instance))
+    }
   }
 
   //-------------------------------------------------------------------
-  def doSignup = Action { implicit request =>
-    val context = JavaHelpers.createJavaContext(request)
-    com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-    val filledForm = signupForm.Instance.bindFromRequest
-    if (filledForm.hasErrors) {
-      // User did not fill everything properly
-      BadRequest(views.html.signup(auth, userService, filledForm))
+  def jsRoutes() = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
+        routes.javascript.Signup.forgotPassword)).as("text/javascript")
+    }
+  }
 
-    } else {
-      // Everything was filled
-      // do something with your part of the form before handling the user
-      // signup
-      JavaHelpers.createResult(context, authProvider.handleSignup(context))
+  //-------------------------------------------------------------------
+  def doSignup = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      val context = JavaHelpers.createJavaContext(request)
+      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+      val filledForm = signupForm.Instance.bindFromRequest
+      if (filledForm.hasErrors) {
+        // User did not fill everything properly
+        BadRequest(views.html.signup(auth, userService, filledForm))
+
+      } else {
+        // Everything was filled
+        // do something with your part of the form before handling the user
+        // signup
+        JavaHelpers.createResult(context, authProvider.handleSignup(context))
+      }
     }
   }
 }
