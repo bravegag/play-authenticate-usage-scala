@@ -9,7 +9,7 @@ import services.UserService
 import dao.UserDao
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
-import providers.MyUsernamePasswordAuthProvider
+import providers.AuthenticationProvider
 import views.form._
 
 import scala.concurrent._
@@ -23,7 +23,7 @@ class Application @Inject() (implicit
                              auth: PlayAuthenticate,
                              userService: UserService,
                              userDao: UserDao,
-                             authProvider: MyUsernamePasswordAuthProvider,
+                             authProvider: AuthenticationProvider,
                              signupForm: SignupForm,
                              loginForm: LoginForm) extends Controller with I18nSupport {
 

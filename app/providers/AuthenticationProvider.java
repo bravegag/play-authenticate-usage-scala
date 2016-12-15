@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
-public class MyUsernamePasswordAuthProvider extends UsernamePasswordAuthProvider<String,
-        MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthUser, Login, Signup> {
+public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
+        DefaultUserAuthentication, UserAuthentication, Login, Signup> {
     //-------------------------------------------------------------------
     // public
     //-------------------------------------------------------------------
     @Inject
-    public MyUsernamePasswordAuthProvider(
+    public AuthenticationProvider(
             final PlayAuthenticate auth,
             final ApplicationLifecycle lifecycle,
             MailerFactory mailerFactory,
@@ -94,7 +94,7 @@ public class MyUsernamePasswordAuthProvider extends UsernamePasswordAuthProvider
 
     //-------------------------------------------------------------------
     @Override
-    protected SignupResult signupUser(final MyUsernamePasswordAuthUser user) {
+    protected SignupResult signupUser(final UserAuthentication user) {
         final Tables.UserRow user = User.findByUsernamePasswordIdentity(user);
         if (user != null) {
             if (Boolean.valueOf(user.emailValidated().get().toString())) {
@@ -119,7 +119,7 @@ public class MyUsernamePasswordAuthProvider extends UsernamePasswordAuthProvider
     //-------------------------------------------------------------------
     @Override
     protected LoginResult loginUser(
-            final MyLoginUsernamePasswordAuthUser authUser) {
+            final DefaultUserAuthentication authUser) {
         final Tables.UserRow user = User.findByUsernamePasswordIdentity(authUser);
         if (user == null) {
             return LoginResult.NOT_FOUND;
@@ -161,29 +161,29 @@ public class MyUsernamePasswordAuthProvider extends UsernamePasswordAuthProvider
 
     //-------------------------------------------------------------------
     @Override
-    protected MyUsernamePasswordAuthUser buildSignupAuthUser(final Signup signup,
-                                                             final Context ctx) {
-        return new MyUsernamePasswordAuthUser(signup);
+    protected UserAuthentication buildSignupAuthUser(final Signup signup,
+                                                     final Context ctx) {
+        return new UserAuthentication(signup);
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected MyLoginUsernamePasswordAuthUser buildLoginAuthUser(final Login login, final Context ctx) {
-        return new MyLoginUsernamePasswordAuthUser(login.getPassword(), login.getEmail());
+    protected DefaultUserAuthentication buildLoginAuthUser(final Login login, final Context ctx) {
+        return new DefaultUserAuthentication(login.getPassword(), login.getEmail());
     }
 
 
     //-------------------------------------------------------------------
     @Override
-    protected MyLoginUsernamePasswordAuthUser transformAuthUser(final MyUsernamePasswordAuthUser authUser,
-                                                                final Context context) {
-        return new MyLoginUsernamePasswordAuthUser(authUser.getEmail());
+    protected DefaultUserAuthentication transformAuthUser(final UserAuthentication authUser,
+                                                          final Context context) {
+        return new DefaultUserAuthentication(authUser.getEmail());
     }
 
     //-------------------------------------------------------------------
     @Override
     protected String getVerifyEmailMailingSubject(
-            final MyUsernamePasswordAuthUser user, final Context ctx) {
+            final UserAuthentication user, final Context ctx) {
         return Messages.get("playauthenticate.password.verify_signup.subject");
     }
 
@@ -198,7 +198,7 @@ public class MyUsernamePasswordAuthProvider extends UsernamePasswordAuthProvider
     //-------------------------------------------------------------------
     @Override
     protected Body getVerifyEmailMailingBody(final String token,
-                                             final MyUsernamePasswordAuthUser user, final Context ctx) {
+                                             final UserAuthentication user, final Context ctx) {
         final boolean isSecure = getConfiguration().getBoolean(
                 SETTING_KEY_VERIFICATION_LINK_SECURE);
         final String url = routes.Signup.verify(token).absoluteURL(
@@ -220,7 +220,7 @@ public class MyUsernamePasswordAuthProvider extends UsernamePasswordAuthProvider
     //-------------------------------------------------------------------
     @Override
     protected String generateVerificationRecord(
-            final MyUsernamePasswordAuthUser user) {
+            final UserAuthentication user) {
         return generateVerificationRecord(User.findByAuthUserIdentity(user));
     }
 

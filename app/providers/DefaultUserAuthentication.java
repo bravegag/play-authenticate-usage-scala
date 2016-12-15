@@ -2,7 +2,7 @@ package providers;
 
 import com.feth.play.module.pa.providers.password.*;
 
-public class MyLoginUsernamePasswordAuthUser extends DefaultUsernamePasswordAuthUser {
+public class DefaultUserAuthentication extends DefaultUsernamePasswordAuthUser {
 	//-------------------------------------------------------------------
 	// public
 	//-------------------------------------------------------------------
@@ -10,13 +10,13 @@ public class MyLoginUsernamePasswordAuthUser extends DefaultUsernamePasswordAuth
 	 * For logging the user in automatically
 	 * @param email
 	 */
-	public MyLoginUsernamePasswordAuthUser(final String email) {
+	public DefaultUserAuthentication(final String email) {
 		this(null, email);
 	}
 
 	//-------------------------------------------------------------------
-	public MyLoginUsernamePasswordAuthUser(final String clearPassword,
-                                           final String email) {
+	public DefaultUserAuthentication(final String clearPassword,
+                                     final String email) {
 		super(clearPassword, email);
 		expiration = System.currentTimeMillis() + 1000 * DEFAULT_SESSION_TIMEOUT;
 	}
