@@ -177,11 +177,11 @@ class Signup @Inject() (implicit
     } else {
       val email = ta.targetUser.email
       User.verify(ta.targetUser)
-      flash(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
+      val flashValues = (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
       if (userService.getUser(context.session) != null) {
-        Redirect(routes.Application.index)
+        Redirect(routes.Application.index).flashing(flashValues)
       } else {
-        Redirect(routes.Application.login)
+        Redirect(routes.Application.login).flashing(flashValues)
       }
     }
   }
