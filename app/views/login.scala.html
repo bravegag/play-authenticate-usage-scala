@@ -46,7 +46,7 @@
       @Messages("playauthenticate.login.oauth")
       @* Display list of available providers *@
       @_providerPartial(playAuth, skipCurrent=false)
-      @providerAvailable("basic") { available: Boolean =>
+      @providerAvailable("basic") { available: java.lang.Boolean =>
           @if(available) {
               <br>
               <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")">@Messages("playauthenticate.login.basic")</a>
