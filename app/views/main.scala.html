@@ -4,10 +4,10 @@
 @import be.objectify.deadbolt.scala.views.html._
 @import play.core.j.JavaHelpers
 
-@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit request: RequestHeader, messages: Messages)
+@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit lang: Lang, request: RequestHeader, messages: Messages)
 
 <!DOCTYPE html>
-<html lang="@lang().code()">
+<html lang="@lang.code">
 <head>
     <title>@title</title>
 
