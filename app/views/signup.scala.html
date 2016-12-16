@@ -1,8 +1,9 @@
 @import services.UserService
 @import play.api.mvc._
-@import be.objectify.deadbolt.scala._
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import play.core.j.PlayMagicForJava._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messages: Messages)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: play.data.Form[views.form.Signup])(implicit request: AuthenticatedRequest[Any])
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -23,7 +24,7 @@
 
             @if(signupForm.hasGlobalErrors) {
 		        <p class="alert alert-danger">
-		          @signupForm.globalError.get.message
+		          @signupForm.globalError.message
 		     	</p>
             }
 
@@ -32,9 +33,9 @@
                 '_label -> Messages("playauthenticate.signup.name")
              )
 
-             @_emailPartial(signupForm)
+             @_emailPartialJava(signupForm)
 
-             @_passwordPartial(signupForm)
+             @_passwordPartialJava(signupForm)
 
             <button type="submit" class="btn btn-default">@Messages("playauthenticate.signup.now")</button>
     	}

@@ -9,7 +9,7 @@ import services.UserService
 import dao.UserDao
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
-import providers.AuthenticationProvider
+import providers.AuthProvider
 import views.form._
 
 import scala.concurrent._
@@ -23,9 +23,8 @@ class Application @Inject() (implicit
                              auth: PlayAuthenticate,
                              userService: UserService,
                              userDao: UserDao,
-                             authProvider: AuthenticationProvider,
-                             signupForm: SignupForm,
-                             loginForm: LoginForm) extends Controller with I18nSupport {
+                             authProvider: AuthProvider,
+                             formFactory: LoginSignupFormFactory) extends Controller with I18nSupport {
 
   //-------------------------------------------------------------------
   // public
@@ -57,7 +56,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def login() = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(views.html.login(auth, userService, loginForm.Instance))
+      Ok(views.html.login(auth, userService, formFactory.getLoginForm))
     }
   }
 
@@ -66,7 +65,7 @@ class Application @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.getUser(context.session)
-      val filledForm = loginForm.Instance.bindFromRequest
+      val filledForm = formFactory.getLoginForm.bindFromRequest(context.request())
       if (filledForm.hasErrors) {
         // User did not fill everything properly
         BadRequest(views.html.login(auth, userService, filledForm))
@@ -81,7 +80,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def signup = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(views.html.signup(auth, userService, signupForm.Instance))
+      Ok(views.html.signup(auth, userService, formFactory.getSignupForm))
     }
   }
 
@@ -98,7 +97,7 @@ class Application @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val filledForm = signupForm.Instance.bindFromRequest
+      val filledForm = formFactory.getSignupForm.bindFromRequest(context.request())
       if (filledForm.hasErrors) {
         // User did not fill everything properly
         BadRequest(views.html.signup(auth, userService, filledForm))

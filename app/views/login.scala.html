@@ -1,8 +1,9 @@
 @import services.UserService
 @import play.api.mvc._
-@import be.objectify.deadbolt.scala._
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import play.core.j.PlayMagicForJava._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[_])(implicit request: AuthenticatedRequest[Any], messages: Messages)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: play.data.Form[views.form.Login])(implicit request: AuthenticatedRequest[Any])
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -24,11 +25,11 @@
 
         @if(loginForm.hasGlobalErrors) {
           	<p class="alert alert-danger">
-	          @loginForm.globalError.get.message
+	          @loginForm.globalError.message
 	     	</p>
         }
 
-        @_emailPartial(loginForm)
+        @_emailPartialJava(loginForm)
 
         @inputPassword(
           loginForm("password"),

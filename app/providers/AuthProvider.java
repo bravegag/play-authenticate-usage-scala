@@ -25,33 +25,30 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
-public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
-        DefaultUserAuthentication, UserAuthentication, Login, Signup> {
+public class AuthProvider extends UsernamePasswordAuthProvider<String,
+        SecuredUserLoginAuth, SecuredUserSignupAuth, Login, Signup> {
     //-------------------------------------------------------------------
     // public
     //-------------------------------------------------------------------
     @Inject
-    public AuthenticationProvider(
+    public AuthProvider(
             final PlayAuthenticate auth,
             final ApplicationLifecycle lifecycle,
             MailerFactory mailerFactory,
-            SignupForm signupForm,
-            LoginForm loginForm) {
+            LoginSignupFormFactory formFactory) {
         super(auth, lifecycle, mailerFactory);
-        this.signupForm = signupForm;
-        this.loginForm = loginForm;
+        this.loginForm = formFactory.getLoginForm();
+        this.signupForm = formFactory.getSignupForm();
     }
 
     //-------------------------------------------------------------------
-    // TODO: figure this out
-    public Form<Signup> getSignupForm() {
-        return null;
-    }
-
-    //-------------------------------------------------------------------
-    // TODO: figure this out
     public Form<Login> getLoginForm() {
-        return null;
+        return loginForm;
+    }
+
+    //-------------------------------------------------------------------
+    public Form<Signup> getSignupForm() {
+        return signupForm;
     }
 
     //-------------------------------------------------------------------
@@ -94,7 +91,7 @@ public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected SignupResult signupUser(final UserAuthentication user) {
+    protected SignupResult signupUser(final SecuredUserSignupAuth user) {
         final Tables.UserRow user = User.findByUsernamePasswordIdentity(user);
         if (user != null) {
             if (Boolean.valueOf(user.emailValidated().get().toString())) {
@@ -119,7 +116,7 @@ public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
     //-------------------------------------------------------------------
     @Override
     protected LoginResult loginUser(
-            final DefaultUserAuthentication authUser) {
+            final SecuredUserLoginAuth authUser) {
         final Tables.UserRow user = User.findByUsernamePasswordIdentity(authUser);
         if (user == null) {
             return LoginResult.NOT_FOUND;
@@ -161,29 +158,29 @@ public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected UserAuthentication buildSignupAuthUser(final Signup signup,
-                                                     final Context ctx) {
-        return new UserAuthentication(signup);
+    protected SecuredUserSignupAuth buildSignupAuthUser(final Signup signup,
+                                                        final Context ctx) {
+        return new SecuredUserSignupAuth(signup);
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected DefaultUserAuthentication buildLoginAuthUser(final Login login, final Context ctx) {
-        return new DefaultUserAuthentication(login.getPassword(), login.getEmail());
+    protected SecuredUserLoginAuth buildLoginAuthUser(final Login login, final Context ctx) {
+        return new SecuredUserLoginAuth(login.getPassword(), login.getEmail());
     }
 
 
     //-------------------------------------------------------------------
     @Override
-    protected DefaultUserAuthentication transformAuthUser(final UserAuthentication authUser,
-                                                          final Context context) {
-        return new DefaultUserAuthentication(authUser.getEmail());
+    protected SecuredUserLoginAuth transformAuthUser(final SecuredUserSignupAuth authUser,
+                                                     final Context context) {
+        return new SecuredUserLoginAuth(authUser.getEmail());
     }
 
     //-------------------------------------------------------------------
     @Override
     protected String getVerifyEmailMailingSubject(
-            final UserAuthentication user, final Context ctx) {
+            final SecuredUserSignupAuth user, final Context ctx) {
         return Messages.get("playauthenticate.password.verify_signup.subject");
     }
 
@@ -198,7 +195,7 @@ public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
     //-------------------------------------------------------------------
     @Override
     protected Body getVerifyEmailMailingBody(final String token,
-                                             final UserAuthentication user, final Context ctx) {
+                                             final SecuredUserSignupAuth user, final Context ctx) {
         final boolean isSecure = getConfiguration().getBoolean(
                 SETTING_KEY_VERIFICATION_LINK_SECURE);
         final String url = routes.Signup.verify(token).absoluteURL(
@@ -220,7 +217,7 @@ public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
     //-------------------------------------------------------------------
     @Override
     protected String generateVerificationRecord(
-            final UserAuthentication user) {
+            final SecuredUserSignupAuth user) {
         return generateVerificationRecord(User.findByAuthUserIdentity(user));
     }
 
@@ -362,6 +359,6 @@ public class AuthenticationProvider extends UsernamePasswordAuthProvider<String,
 
     private static final String EMAIL_TEMPLATE_FALLBACK_LANGUAGE = "en";
 
-    private final SignupForm signupForm;
-    private final LoginForm loginForm;
+    private final Form<Signup> signupForm;
+    private final Form<Login> loginForm;
 }

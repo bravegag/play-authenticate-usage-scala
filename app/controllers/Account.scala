@@ -6,13 +6,12 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import dao.UserDao
 import generated.Tables.UserRow
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Controller, Flash, Session}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Controller, Session}
 import play.core.j.JavaHelpers
-import providers.{AuthenticationProvider, UserAuthentication}
+import providers.{AuthProvider, SecuredUserSignupAuth}
 import services.UserService
 import views.account.form._
-import views.html.account._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -25,7 +24,7 @@ class Account @Inject() (implicit
                          auth: PlayAuthenticate,
                          userDao: UserDao,
                          userService: UserService,
-                         authProvider: AuthenticationProvider,
+                         authProvider: AuthProvider,
                          acceptForm: AcceptForm,
                          passwordChangeForm: PasswordChangeForm) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
@@ -93,7 +92,7 @@ class Account @Inject() (implicit
         } else {
           val Some(user: UserRow) = userService.getUser(context.session)
           val newPassword = filledForm.get.password
-          userService.changePassword(user, new UserAuthentication(newPassword), true)
+          userService.changePassword(user, new SecuredUserSignupAuth(newPassword), true)
           Redirect(routes.Application.profile).flashing(
             Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
           )
