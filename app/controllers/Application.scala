@@ -18,7 +18,6 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Application @Inject() (implicit
                              val messagesApi: MessagesApi,
-                             session: Session,
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,

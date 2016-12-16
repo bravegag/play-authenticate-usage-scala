@@ -23,19 +23,19 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
 
   //------------------------------------------------------------------------
   def roles(user: UserRow) : List[Role] = {
-    val roles = userDao.getRoles(user)
+    val roles = userDao.roles(user)
     roles.toList
   }
 
   //------------------------------------------------------------------------
   def permissions(user: UserRow) : List[Permission] = {
-    val permissions = userDao.getPermissions(user)
+    val permissions = userDao.permissions(user)
     permissions.toList
   }
 
   //------------------------------------------------------------------------
   def providers(user: UserRow) : Seq[String] = {
-    val providers : Seq[LinkedAccountRow] = userDao.getLinkedAccounts(user)
+    val providers : Seq[LinkedAccountRow] = userDao.linkedAccounts(user)
     providers.map(_.providerKey)
   }
 

@@ -19,7 +19,6 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Signup @Inject() (implicit
                         val messagesApi: MessagesApi,
-                        session: Session,
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
                         userService: UserService,

@@ -16,7 +16,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def getRoles(user: UserRow) : Future[Seq[Role]] = {
+  def roles(user: UserRow) : Future[Seq[Role]] = {
     val action = (for {
       role <- SecurityRole
       userRole <- UserSecurityRole if role.id === userRole.securityRoleId
@@ -27,7 +27,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   //------------------------------------------------------------------------
-  def getPermissions(user: UserRow) : Future[Seq[Permission]] = {
+  def permissions(user: UserRow) : Future[Seq[Permission]] = {
     val action = (for {
       permission <- SecurityPermission
       userPermission <- UserSecurityPermission if permission.id === userPermission.securityPermissionId
@@ -38,7 +38,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   //------------------------------------------------------------------------
-  def getLinkedAccounts(user: UserRow) : Future[Seq[LinkedAccountRow]] = {
+  def linkedAccounts(user: UserRow) : Future[Seq[LinkedAccountRow]] = {
     val action = (for {
       linkedAccount <- LinkedAccount
       user <- User if linkedAccount.userId === user.id
