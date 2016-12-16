@@ -21,7 +21,9 @@ object Generator extends App {
   val model = db.run(PostgresDriver.createModel(Some(MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW"))))))
   // customize code generator
   val codegenFuture : Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
-    override def code = "import be.objectify.deadbolt.scala.models._\n" + super.code
+    override def code = "import be.objectify.deadbolt.scala.models._\n" +
+                        "import dao.generic._\n" +
+                        super.code
 
     override def Table = new Table(_) {
       override def EntityType = new EntityTypeDef {
@@ -39,11 +41,11 @@ object Generator extends App {
           ).mkString(", ")
           if(classEnabled){
             /* `rowList` contains the names of the generated "Row" case classes we
-                wish to have extend our `AutoIncEntity` trait. */
+                wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
-              case "UserRow" => parents ++ Seq("AutoIncEntity[Long, %s]".format(name))
-              case "SecurityRoleRow" => parents ++ Seq("AutoIncEntity[Long, %s]".format(name), "Role")
-              case "SecurityPermissionRow"  => parents ++ Seq("AutoIncEntity[Long, %s]".format(name), "Permission")
+              case "UserRow" => parents ++ Seq("EntityAutoInc[Long, %s]".format(name))
+              case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[Long, %s]".format(name), "Role")
+              case "SecurityPermissionRow"  => parents ++ Seq("EntityAutoInc[Long, %s]".format(name), "Permission")
               case _ => parents
             }
 
