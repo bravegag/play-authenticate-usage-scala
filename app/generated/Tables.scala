@@ -10,6 +10,7 @@ trait Tables {
   val profile: slick.driver.JdbcProfile
   import profile.api._
   import be.objectify.deadbolt.scala.models._
+  import dao.generic._
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{GetResult => GR}
@@ -93,7 +94,7 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param value Database column value SqlType(varchar), Length(255,true)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class SecurityPermissionRow(id: Long, value: String, modified: Option[java.sql.Timestamp]) extends AutoIncEntity[Long, SecurityPermissionRow] with Permission
+  case class SecurityPermissionRow(id: Long, value: String, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, SecurityPermissionRow] with Permission
   /** GetResult implicit for fetching SecurityPermissionRow objects using plain SQL queries */
   implicit def GetResultSecurityPermissionRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[SecurityPermissionRow] = GR{
     prs => import prs._
@@ -118,7 +119,7 @@ trait Tables {
   /** Entity class storing rows of table SecurityRole
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(varchar), Length(255,true) */
-  case class SecurityRoleRow(id: Long, name: String) extends AutoIncEntity[Long, SecurityRoleRow] with Role
+  case class SecurityRoleRow(id: Long, name: String) extends EntityAutoInc[Long, SecurityRoleRow] with Role
   /** GetResult implicit for fetching SecurityRoleRow objects using plain SQL queries */
   implicit def GetResultSecurityRoleRow(implicit e0: GR[Long], e1: GR[String]): GR[SecurityRoleRow] = GR{
     prs => import prs._
@@ -191,7 +192,7 @@ trait Tables {
    *  @param active Database column active SqlType(bool), Default(false)
    *  @param emailValidated Database column email_validated SqlType(bool), Default(None)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserRow(id: Long, firstName: Option[String] = None, middleName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, locationId: Option[Long] = None, username: String, email: String, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Boolean = false, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends AutoIncEntity[Long, UserRow]
+  case class UserRow(id: Long, firstName: Option[String] = None, middleName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, locationId: Option[Long] = None, username: String, email: String, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Boolean = false, emailValidated: Option[Boolean] = None, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, UserRow]
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
   implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Option[Long]], e4: GR[String], e5: GR[Option[java.sql.Timestamp]], e6: GR[Boolean], e7: GR[Option[Boolean]]): GR[UserRow] = GR{
     prs => import prs._

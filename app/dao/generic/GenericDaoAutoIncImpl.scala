@@ -1,8 +1,6 @@
 package dao.generic
 
-import generated.Tables._
 import generated.Tables.profile.api._
-import generated._
 import play.api.db.slick._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,7 +9,7 @@ import scala.concurrent.{Future, _}
 /**
   * Generic Strong DAO implementation
   */
-abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E <: AutoIncEntity[PK, E], PK: BaseColumnType]
+abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E <: EntityAutoInc[PK, E], PK: BaseColumnType]
     (dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDaoImpl[T, E, PK](dbConfigProvider, tableQuery)
       with GenericDaoAutoInc[T, E, PK] {
   import shapeless._
