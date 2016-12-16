@@ -1,7 +1,8 @@
 package dao.generic
 
 /**
-  * Identifyable base for all Strong Entity Model types
+  * Identifyable base for all Strong Entity Model types i.e. every Strong entity is expected to have a
+  * primary key column with name "id"
   * @tparam PK Primary key type
   * @tparam E Actual case class EntityRow type
   */
