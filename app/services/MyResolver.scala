@@ -10,35 +10,35 @@ class MyResolver extends Resolver {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def login: Call = {
+  override def login: Call = {
     // Your login page
     routes.Application.login
   }
 
   //------------------------------------------------------------------------
-  def afterAuth: Call = {
+  override def afterAuth: Call = {
     // The user will be redirected to this page after authentication
     // if no original URL was saved
     routes.Application.index
   }
 
   //------------------------------------------------------------------------
-  def afterLogout: Call = routes.Application.index
+  override def afterLogout: Call = routes.Application.index
 
   //------------------------------------------------------------------------
-  def auth(provider: String): Call = {
+  override def auth(provider: String): Call = {
     // You can provide your own authentication implementation,
     // however the default should be sufficient for most cases
     com.feth.play.module.pa.controllers.routes.Authenticate.authenticate(provider)
   }
 
   //------------------------------------------------------------------------
-  def askMerge: Call = {
+  override def askMerge: Call = {
     routes.Account.askMerge
   }
 
   //------------------------------------------------------------------------
-  def askLink: Call = {
+  override def askLink: Call = {
     routes.Account.askLink
   }
 
