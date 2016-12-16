@@ -3,13 +3,13 @@
 @import generated.Tables._
 @import generated.UserRowAdapter._
 @import dao._
-@import utils._
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messages: Messages, userDao: UserDao)
 
 @import com.feth.play.module.pa.views.html._
+@import utils.FormatUtils._
 
 @main(userService, Messages("playauthenticate.profile.title"),"profile") {
 
@@ -48,7 +48,7 @@
     @currentAuth(playAuth) { auth =>
     @Messages("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
     @if(auth.expires() != -1){
-        @Messages("playauthenticate.profile.session", auth.getId(), FormatUtils.formatTimestamp(auth.expires()))
+        @Messages("playauthenticate.profile.session", auth.getId(), auth.expires())
     } else {
         @Messages("playauthenticate.profile.session_endless", auth.getId())
     }

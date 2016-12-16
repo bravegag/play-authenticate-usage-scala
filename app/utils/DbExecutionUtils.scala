@@ -11,6 +11,10 @@ import scala.concurrent.duration.Duration
   */
 object DbExecutionUtils {
   import scala.concurrent.ExecutionContext.Implicits.global
+
+  //------------------------------------------------------------------------
+  // public
+  //------------------------------------------------------------------------
   /**
     * Returns the result of executing the action and retrieving the Future result
     * @param action The action to be executed
@@ -21,6 +25,7 @@ object DbExecutionUtils {
     */
   implicit def exec[E, P <: BasicProfile](action: DBIO[E])(implicit db: P#Backend#Database) = Await.result(db.run(action), Duration.Inf)
 
+  //------------------------------------------------------------------------
   /**
     * Returns the result of executing and waiting the given Future
     * @param f Future to execute and wait for

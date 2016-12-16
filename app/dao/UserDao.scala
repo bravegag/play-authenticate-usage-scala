@@ -13,7 +13,6 @@ import profile.api._
 @Singleton
 class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     extends GenericDaoAutoIncImpl[User, UserRow, Long] (dbConfigProvider, User) {
-
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
