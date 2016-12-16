@@ -22,7 +22,6 @@ class Account @Inject() (implicit
                          session: Session,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
-                         userDao: UserDao,
                          userService: UserService,
                          authProvider: AuthProvider,
                          acceptForm: AcceptForm,

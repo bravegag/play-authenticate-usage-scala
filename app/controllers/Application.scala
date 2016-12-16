@@ -22,7 +22,6 @@ class Application @Inject() (implicit
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,
-                             userDao: UserDao,
                              authProvider: AuthProvider,
                              formFactory: LoginSignupFormFactory) extends Controller with I18nSupport {
 
@@ -49,7 +48,7 @@ class Application @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.getUser(context.session)
-      Ok(views.html.profile(auth, userService, localUser.get))
+      Ok(views.html.profile(auth, localUser.get))
     }
   }
 

@@ -1,12 +1,11 @@
 @import services.UserService
+@import services.PluggableUserService._
 @import generated._
 @import generated.Tables._
-@import generated.UserRowAdapter._
-@import dao._
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messages: Messages, userDao: UserDao)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messages: Messages, userService: UserService)
 
 @import com.feth.play.module.pa.views.html._
 @import utils.FormatUtils._
