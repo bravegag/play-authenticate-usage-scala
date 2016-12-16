@@ -23,7 +23,9 @@ class MyResolver extends Resolver {
   }
 
   //------------------------------------------------------------------------
-  override def afterLogout: Call = routes.Application.index
+  override def afterLogout: Call = {
+    routes.Application.index
+  }
 
   //------------------------------------------------------------------------
   override def auth(provider: String): Call = {
@@ -43,11 +45,13 @@ class MyResolver extends Resolver {
   }
 
   //------------------------------------------------------------------------
-  override def onException(e: AuthException): Call = {
-    if (e.isInstanceOf[AccessDeniedException]) {
-      routes.Signup.oAuthDenied(e.asInstanceOf[AccessDeniedException].getProviderKey)
+  override def onException(authException: AuthException): Call = {
+    authException match {
+      case accessDeniedException: AccessDeniedException => routes.Signup.oAuthDenied(accessDeniedException.getProviderKey)
+      case _ => // ignore
     }
+
     // more custom problem handling here...
-    super.onException(e)
+    super.onException(authException)
   }
 }
