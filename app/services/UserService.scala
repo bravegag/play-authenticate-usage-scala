@@ -11,7 +11,7 @@ import generated.Tables._
 
 @Singleton
 class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
-  import dao.ExecHelper._
+  import utils.DbExecutionUtils._
 
   //------------------------------------------------------------------------
   // public

@@ -61,7 +61,7 @@ trait UserRowAdapter extends Subject {
 object UserRowAdapter {
   //------------------------------------------------------------------------
   implicit def toSubject(user : UserRow)(implicit userDao: UserDao) : UserRowAdapter = new UserRowAdapter {
-    import dao.ExecHelper._
+    import utils.DbExecutionUtils._
 
     //------------------------------------------------------------------------
     override def identifier: String = user.id.toString
