@@ -1,7 +1,10 @@
 package dao
 
 import javax.inject._
+
 import be.objectify.deadbolt.scala.models._
+import dao.generic.GenericDaoAutoIncImpl
+
 import scala.concurrent.Future
 import generated.Tables._
 import play.api.db.slick.DatabaseConfigProvider

@@ -1,12 +1,13 @@
-package dao
+package dao.generic
 
+import generated.Tables._
+import generated.Tables.profile.api._
+import generated._
 import play.api.db.slick._
 import slick.driver.JdbcProfile
-import scala.concurrent._
-import generated._
-import generated.Tables._
-import profile.api._
 import slick.lifted.CanBeQueryCondition
+
+import scala.concurrent._
 
 /**
   * Generic DAO definition

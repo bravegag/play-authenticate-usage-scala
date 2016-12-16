@@ -1,12 +1,12 @@
-package dao
+package dao.generic
 
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-import play.api.db.slick._
-import scala.concurrent.Future
-import generated._
 import generated.Tables._
-import profile.api._
+import generated.Tables.profile.api._
+import generated._
+import play.api.db.slick._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, _}
 
 /**
   * Generic Strong DAO implementation

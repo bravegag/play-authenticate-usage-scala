@@ -1,9 +1,10 @@
-package dao
+package dao.generic
+
+import generated.Tables._
+import generated.Tables.profile.api._
+import generated._
 
 import scala.concurrent._
-import generated._
-import generated.Tables._
-import profile.api._
 
 /**
   * Generic DAO strong entity definition
