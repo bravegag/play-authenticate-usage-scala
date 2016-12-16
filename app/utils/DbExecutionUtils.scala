@@ -23,7 +23,8 @@ object DbExecutionUtils {
     * @tparam P Concrete Profile type
     * @return the result of executing the action and retrieving the Future result
     */
-  implicit def exec[E, P <: BasicProfile](action: DBIO[E])(implicit db: P#Backend#Database) = Await.result(db.run(action), Duration.Inf)
+  implicit def execute[E, P <: BasicProfile](action: DBIO[E])(implicit db: P#Backend#Database) =
+    Await.result(db.run(action), Duration.Inf)
 
   //------------------------------------------------------------------------
   /**
@@ -32,5 +33,5 @@ object DbExecutionUtils {
     * @tparam E concrete Entity result type
     * @return the result of executing and waiting the given Future
     */
-  implicit def exec[E](f: Future[E]) = Await.result(f, Duration.Inf)
+  implicit def execute[E](f: Future[E]) = Await.result(f, Duration.Inf)
 }
