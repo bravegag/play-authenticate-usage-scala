@@ -44,7 +44,7 @@ class Account @Inject() (implicit
       val Some(user: UserRow) = userService.findInSession(context.session)
       val tuple =
         if (user.emailValidated.get) {
-          // E-Mail has been validated already
+          // email has been validated already
           (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
         } else
         if (user.email != null && !user.email.trim.isEmpty) {
@@ -118,7 +118,7 @@ class Account @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val user = this.auth.getLinkUser(context.session)
+      val user = auth.getLinkUser(context.session)
       if (user == null) {
         // account to link could not be found, silently redirect to login
         Redirect(routes.Application.index)
