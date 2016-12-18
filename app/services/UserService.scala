@@ -1,14 +1,18 @@
 package services
 
+import java.sql.Timestamp
+
 import com.feth.play.module.pa.PlayAuthenticate
 import play.mvc.Http.Session
 import javax.inject._
+import java.util.Date
 
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
-import com.feth.play.module.pa.user.AuthUserIdentity
+import com.feth.play.module.pa.user._
 import dao._
-import generated.Tables.{ UserRow, LinkedAccountRow }
+import dao.generic.EntityAutoInc
+import generated.Tables.{LinkedAccountRow, UserRow}
 
 @Singleton
 class UserService @Inject()(auth : PlayAuthenticate,
@@ -20,10 +24,25 @@ class UserService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def create(authUser: UsernamePasswordAuthUser) : UserRow = {
-    // TODO: implement
-    val user = UserRow()
-    user
+  def create(authUser: AuthUser) : UserRow = {
+    val lastLogin = new Timestamp(new Date().getTime)
+    val active = true
+    val emptyUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
+      None, Option(lastLogin), active, None, None)
+    val newUser = authUser match {
+      case identity : FirstLastNameIdentity => {
+        emptyUser.copy(firstName = Option(identity.getFirstName),
+          lastName = Option(identity.getLastName))
+      }
+      case identity : EmailIdentity => {
+        emptyUser.copy(email = identity.getEmail, emailValidated = Option(false))
+      }
+      case identity : NameIdentity => {
+        Option(identity.getName).map { username : String =>
+          emptyUser.copy(username = username) }.getOrElse(emptyUser)
+      }
+    }
+    userDao.createAndFetch(newUser)
   }
 
   //------------------------------------------------------------------------

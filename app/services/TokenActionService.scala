@@ -1,5 +1,6 @@
 package services
 
+import java.sql.Timestamp
 import java.util.Date
 import javax.inject.{Inject, Singleton}
 
@@ -17,8 +18,11 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
   // public
   //------------------------------------------------------------------------
   def create(user: UserRow, `type`: TokenAction.Type, token: String) : TokenActionRow = {
-    // TODO: implement
-    val tokenAction = TokenActionRow()
+    val created = new Timestamp(new Date().getTime)
+    val expires = new Timestamp(created.getTime + VERIFICATION_TIME * 1000)
+    val tokenAction = TokenActionRow(Some(user.id), Some(token), Some(`type`.toString),
+      Some(created), Some(expires))
+    tokenActionDao.create(tokenAction)
     tokenAction
   }
 
@@ -36,4 +40,13 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
   def targetUser(tokenAction: TokenActionRow): Option[UserRow] = {
     userDao.findById(tokenAction.userId.get)
   }
+
+  //------------------------------------------------------------------------
+  // private
+  //------------------------------------------------------------------------
+  /**
+    * Verification time frame (until the user clicks on the link in the email)
+    * in seconds. Defaults to one week
+    */
+  private val VERIFICATION_TIME = 7 * 24 * 3600
 }
