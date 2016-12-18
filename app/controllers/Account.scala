@@ -43,7 +43,7 @@ class Account @Inject() (implicit
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
       val Some(user: UserRow) = userService.findInSession(context.session)
       val tuple =
-        if (user.emailValidated.get) {
+        if (user.emailValidated) {
           // email has been validated already
           (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
         } else
@@ -65,7 +65,7 @@ class Account @Inject() (implicit
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
       val Some(user: UserRow) = userService.findInSession(context.session)
       val result =
-        if (!user.emailValidated.get) {
+        if (!user.emailValidated) {
           Ok(views.html.account.unverified(userService))
 
         } else {

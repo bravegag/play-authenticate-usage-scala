@@ -20,8 +20,8 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
   def create(user: UserRow, `type`: TokenAction.Type, token: String) : TokenActionRow = {
     val created = new Timestamp(new Date().getTime)
     val expires = new Timestamp(created.getTime + VERIFICATION_TIME * 1000)
-    val tokenAction = TokenActionRow(Some(user.id), Some(token), Some(`type`.toString),
-      Some(created), Some(expires))
+    val tokenAction = TokenActionRow(user.id, token, `type`.toString,
+      created, expires, None)
     tokenActionDao.create(tokenAction)
     tokenAction
   }
@@ -33,12 +33,12 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
 
   //------------------------------------------------------------------------
   def isValid(tokenAction: TokenActionRow): Boolean = {
-    tokenAction.expires.get.after(new Date())
+    tokenAction.expires.after(new Date())
   }
 
   //------------------------------------------------------------------------
   def targetUser(tokenAction: TokenActionRow): Option[UserRow] = {
-    userDao.findById(tokenAction.userId.get)
+    userDao.findById(tokenAction.userId)
   }
 
   //------------------------------------------------------------------------

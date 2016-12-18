@@ -84,7 +84,7 @@ class Signup @Inject() (implicit
           // reset, though.
           val provider = this.authProvider
           // User exists
-          if (user.emailValidated.get) {
+          if (user.emailValidated) {
             provider.sendPasswordResetMailing(user, context)
             // In case you actually want to let (the unknown person)
             // know whether a user was found/an email was sent, use,

@@ -6,6 +6,7 @@ import be.objectify.deadbolt.scala.models._
 import dao.generic.GenericDaoAutoIncImpl
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import generated.Tables._
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
@@ -15,6 +16,17 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     extends GenericDaoAutoIncImpl[User, UserRow, Long] (dbConfigProvider, User) {
   //------------------------------------------------------------------------
   // public
+  //------------------------------------------------------------------------
+  def create(inputUser: UserRow, inputSecurityRole: SecurityRoleRow,
+             inputLinkedAccount: LinkedAccountRow) : Future[UserRow] = {
+    val insertion = (for {
+      user <- (User returning User.map(_.id) into ((row, id) => row.copy(id = id)) += inputUser)
+      linkedAccount <- (LinkedAccount += inputLinkedAccount.copy(userId = user.id))
+      userSecurityRole <- (UserSecurityRole += UserSecurityRoleRow(user.id, inputSecurityRole.id, None))
+    } yield user).transactionally
+    db.run(insertion)
+  }
+
   //------------------------------------------------------------------------
   def roles(user: UserRow) : Future[Seq[Role]] = {
     val action = (for {

@@ -16,7 +16,7 @@ CREATE TABLE "user" (
 	last_login TIMESTAMP DEFAULT NULL,
 	active BOOLEAN NOT NULL DEFAULT FALSE,
 	email_validated BOOLEAN NOT NULL DEFAULT FALSE,
-	modified TIMESTAMP NOT NULL DEFAULT now(),
+	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (id)
 );
 
@@ -37,36 +37,36 @@ CREATE TABLE security_role (
 CREATE TABLE user_security_role (
 	user_id BIGINT NOT NULL,
 	security_role_id BIGINT NOT NULL,
-	modified TIMESTAMP NOT NULL DEFAULT now(),
+	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (user_id, security_role_id),
 	FOREIGN KEY (user_id) REFERENCES "user"(id),
 	FOREIGN KEY (security_role_id) REFERENCES security_role(id)
 );
 
-CREATE TYPE token_type as ENUM ('EV', 'PR');
+CREATE TYPE token_type AS ENUM ('EV', 'PR');
 
 CREATE TABLE token_action (
 	user_id BIGINT,
 	token VARCHAR(255) UNIQUE NOT NULL,
-	type VARCHAR(2) token_type NOT NULL,
+	"type" token_type NOT NULL,
 	created TIMESTAMP NOT NULL,
 	expires TIMESTAMP NOT NULL,
-	modified TIMESTAMP NOT NULL DEFAULT now(),
+	modified TIMESTAMP DEFAULT now(),
 	FOREIGN KEY (user_id) REFERENCES "user"(id),
-	CHECK (type IN ('EV', 'PR'))
+	CHECK ("type" IN ('EV', 'PR'))
 );
 
 CREATE TABLE security_permission (
 	id BIGSERIAL,
   	value VARCHAR(255) NOT NULL,
-	modified TIMESTAMP NOT NULL DEFAULT now(),
+	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE user_security_permission (
 	user_id BIGINT,
 	security_permission_id BIGINT,
-	modified TIMESTAMP NOT NULL DEFAULT now(),
+	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (user_id, security_permission_id),
 	FOREIGN KEY (user_id) REFERENCES "user"(id),
 	FOREIGN KEY (security_permission_id) REFERENCES security_permission(id)	

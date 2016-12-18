@@ -2,6 +2,7 @@ package dao
 
 import javax.inject._
 
+import com.feth.play.module.pa.user.AuthUser
 import dao.generic._
 
 import scala.concurrent.Future
@@ -14,6 +15,14 @@ class LinkedAccountDao @Inject()(protected val dbConfigProvider: DatabaseConfigP
   extends GenericDaoImpl[LinkedAccount, LinkedAccountRow, Long] (dbConfigProvider, LinkedAccount) {
   //------------------------------------------------------------------------
   // public
+  //------------------------------------------------------------------------
+  def create(user: UserRow, authUser: AuthUser) : LinkedAccountRow = {
+    // TODO: investigate why here it was passing authUser.getId as password
+    val newLinkedAccount = LinkedAccountRow(user.id, authUser.getId, authUser.getProvider, None)
+    create(newLinkedAccount)
+    newLinkedAccount
+  }
+
   //------------------------------------------------------------------------
   def findByProviderKey(user: UserRow, providerKey: String): Future[Seq[LinkedAccountRow]] = {
     filter(linkedAccount => linkedAccount.userId === user.id &&

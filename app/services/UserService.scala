@@ -6,19 +6,20 @@ import com.feth.play.module.pa.PlayAuthenticate
 import play.mvc.Http.Session
 import javax.inject._
 import java.util.Date
+import controllers.Application
 
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.user._
 import dao._
-import dao.generic.EntityAutoInc
 import generated.Tables.{LinkedAccountRow, UserRow}
 
 @Singleton
 class UserService @Inject()(auth : PlayAuthenticate,
                             userDao: UserDao,
                             linkedAccountDao: LinkedAccountDao,
-                            tokenActionDao: TokenActionDao) {
+                            tokenActionDao: TokenActionDao,
+                            securityRoleDao: SecurityRoleDao) {
   import utils.DbExecutionUtils._
 
   //------------------------------------------------------------------------
@@ -27,11 +28,12 @@ class UserService @Inject()(auth : PlayAuthenticate,
   def create(authUser: AuthUser) : UserRow = {
     val lastLogin = new Timestamp(new Date().getTime)
     val active = true
+    val emailValidated = false
     val emptyUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
-      None, Option(lastLogin), active, None, None)
-    val newUser = authUser match {
+      None, Option(lastLogin), active, emailValidated, None)
+    val userToCreate = authUser match {
       case identity : EmailIdentity => {
-        emptyUser.copy(email = identity.getEmail, emailValidated = Option(false))
+        emptyUser.copy(email = identity.getEmail, emailValidated = false)
       }
       case identity : FirstLastNameIdentity => {
         emptyUser.copy(username = Option(identity.getName).getOrElse("N/A"),
@@ -41,7 +43,16 @@ class UserService @Inject()(auth : PlayAuthenticate,
         emptyUser.copy(username = Option(identity.getName).getOrElse("N/A"))
       }
     }
-    userDao.createAndFetch(newUser)
+
+    // initialize security role
+    val securityRole = securityRoleDao.findByName(Application.USER_ROLE_KEY).get
+
+    // initialize linked account
+    val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None)
+
+    val newUser = userDao.create(userToCreate, securityRole, linkedAccount)
+
+    newUser
   }
 
   //------------------------------------------------------------------------
@@ -100,7 +111,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
 
   //------------------------------------------------------------------------
   def verify(user: UserRow) : Unit = {
-    val updated = user.copy(emailValidated = Some(true))
+    val updated = user.copy(emailValidated = true)
     userDao.update(updated)
     tokenActionDao.deleteByUser(user, TokenAction.EMAIL_VERIFICATION)
   }

@@ -100,7 +100,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     protected SignupResult signupUser(final SecuredUserSignupAuth signupAuthUser) {
         final Tables.UserRow user = userService.findByAuthUser(signupAuthUser).get();
         if (user != null) {
-            if (Boolean.valueOf(user.emailValidated().get().toString())) {
+            if (user.emailValidated()) {
                 // This user exists, has its email validated and is active
                 return SignupResult.USER_EXISTS;
             } else {
@@ -127,7 +127,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
         if (user == null) {
             return LoginResult.NOT_FOUND;
         } else {
-            if (!Boolean.valueOf(user.emailValidated().get().toString())) {
+            if (!user.emailValidated()) {
                 return LoginResult.USER_UNVERIFIED;
             } else {
                 List<Tables.LinkedAccountRow> linkedAccounts = JavaConversions.seqAsJavaList(userService.linkedAccounts(user));
