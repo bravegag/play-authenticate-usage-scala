@@ -22,10 +22,10 @@ trait Tables {
 
   /** Entity class storing rows of table LinkedAccount
    *  @param userId Database column user_id SqlType(int8)
-   *  @param providerUsername Database column provider_username SqlType(varchar), Length(255,true)
+   *  @param providerPassword Database column provider_username SqlType(varchar), Length(255,true)
    *  @param providerKey Database column provider_key SqlType(varchar), Length(255,true)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class LinkedAccountRow(userId: Long, providerUsername: String, providerKey: String, modified: Option[java.sql.Timestamp])
+  case class LinkedAccountRow(userId: Long, providerPassword: String, providerKey: String, modified: Option[java.sql.Timestamp])
   /** GetResult implicit for fetching LinkedAccountRow objects using plain SQL queries */
   implicit def GetResultLinkedAccountRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[LinkedAccountRow] = GR{
     prs => import prs._
@@ -33,14 +33,14 @@ trait Tables {
   }
   /** Table description of table linked_account. Objects of this class serve as prototypes for rows in queries. */
   class LinkedAccount(_tableTag: Tag) extends profile.api.Table[LinkedAccountRow](_tableTag, "linked_account") {
-              def * = (userId, providerUsername, providerKey, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
+              def * = (userId, providerPassword, providerKey, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(userId), Rep.Some(providerUsername), Rep.Some(providerKey), modified).shaped.<>({r=>import r._; _1.map(_=> LinkedAccountRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(userId), Rep.Some(providerPassword), Rep.Some(providerKey), modified).shaped.<>({ r=>import r._; _1.map(_=> LinkedAccountRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column provider_username SqlType(varchar), Length(255,true) */
-    val providerUsername: Rep[String] = column[String]("provider_username", O.Length(255,varying=true))
+    val providerPassword: Rep[String] = column[String]("provider_password", O.Length(255,varying=true))
     /** Database column provider_key SqlType(varchar), Length(255,true) */
     val providerKey: Rep[String] = column[String]("provider_key", O.Length(255,varying=true))
     /** Database column modified SqlType(timestamp) */
@@ -48,7 +48,7 @@ trait Tables {
 
     /** Foreign key referencing User (database name linked_account_user_id_fkey) */
     lazy val userFk = foreignKey("linked_account_user_id_fkey", userId, User)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-              }
+  }
   /** Collection-like TableQuery object for table LinkedAccount */
   lazy val LinkedAccount = new TableQuery(tag => new LinkedAccount(tag))
 

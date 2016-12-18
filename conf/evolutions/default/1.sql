@@ -22,8 +22,8 @@ CREATE TABLE "user" (
 
 CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
-	provider_username VARCHAR(255) NOT NULL,
 	provider_key VARCHAR(255) NOT NULL,
+	provider_password VARCHAR(255) NOT NULL,
 	modified TIMESTAMP DEFAULT now(),
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );

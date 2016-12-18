@@ -7,11 +7,11 @@ import javax.inject._
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.user.AuthUserIdentity
-import dao.UserDao
+import dao._
 import generated.Tables._
 
 @Singleton
-class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
+class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao, linkedAccountDao: LinkedAccountDao) {
   import utils.DbExecutionUtils._
 
   //------------------------------------------------------------------------
@@ -41,7 +41,22 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao) {
 
   //------------------------------------------------------------------------
   def changePassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
-    // TODO: implement
+    val option = linkedAccountDao.findByProviderKey(user, authUser.getProvider).headOption
+    val linkedAccount: LinkedAccountRow = option match {
+      case Some(linkedAccount) => linkedAccount
+      case None => {
+        if (create) {
+          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getProvider, authUser.getId, None)
+          linkedAccountDao.create(newLinkedAccount)
+          linkedAccount
+
+        } else {
+          throw new RuntimeException("Account not enabled for password usage")
+        }
+      }
+    }
+    val update = linkedAccount.copy(providerPassword = authUser.getHashedPassword)
+    linkedAccountDao.update(update)
   }
 
   //------------------------------------------------------------------------

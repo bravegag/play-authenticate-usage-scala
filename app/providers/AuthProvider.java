@@ -126,7 +126,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
             } else {
                 for (final Tables.LinkedAccountRow acc : user.linkedAccounts) {
                     if (getKey().equals(acc.providerKey())) {
-                        if (authUser.checkPassword(acc.providerUsername(),
+                        if (authUser.checkPassword(acc.providerPassword(),
                                 authUser.getPassword())) {
                             // Password was correct
                             return LoginResult.USER_LOGGED_IN;
