@@ -20,6 +20,13 @@ class UserService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
+  def create(authUser: UsernamePasswordAuthUser) : UserRow = {
+    // TODO: implement
+    val user = UserRow()
+    user
+  }
+
+  //------------------------------------------------------------------------
   def identifier(user: UserRow): String = {
     user.id.toString
   }
@@ -40,6 +47,11 @@ class UserService @Inject()(auth : PlayAuthenticate,
   def providers(user: UserRow) : Seq[String] = {
     val providers : Seq[LinkedAccountRow] = userDao.linkedAccounts(user)
     providers.map(_.providerKey)
+  }
+
+  //------------------------------------------------------------------------
+  def linkedAccounts(user: UserRow) : Seq[LinkedAccountRow] = {
+    userDao.linkedAccounts(user)
   }
 
   //------------------------------------------------------------------------
@@ -80,9 +92,14 @@ class UserService @Inject()(auth : PlayAuthenticate,
     val currentAuthUser = Option(auth.getUser(session))
     currentAuthUser match {
       case None => None
-      case Some(identity: UsernamePasswordAuthUser) => userDao.findActiveByProviderKeyAndEmail(identity.getProvider, identity.getEmail)
-      case Some(identity: AuthUserIdentity) => userDao.findActiveByProviderKeyAndUsername(identity.getProvider, identity.getId)
+      case Some(authUser: UsernamePasswordAuthUser) => findByAuthUser(authUser)
+      case Some(userIdentity: AuthUserIdentity) => userDao.findActiveByProviderKeyAndUsername(userIdentity.getProvider, userIdentity.getId)
     }
+  }
+
+  //------------------------------------------------------------------------
+  def findByAuthUser(authUser: UsernamePasswordAuthUser): Option[UserRow] = {
+    userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
   }
 
   //------------------------------------------------------------------------

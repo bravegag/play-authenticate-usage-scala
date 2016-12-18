@@ -3,8 +3,7 @@ package providers;
 import com.feth.play.module.mail.Mailer.Mail.Body;
 import com.feth.play.module.mail.Mailer.MailerFactory;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
+import com.feth.play.module.pa.providers.password.*;
 import controllers.routes;
 import generated.Tables;
 import play.Logger;
@@ -14,7 +13,8 @@ import play.i18n.Messages;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
 import play.mvc.Http.Context;
-import services.TokenActionService;
+import scala.collection.JavaConversions;
+import services.*;
 import views.form.*;
 import dao.TokenAction;
 
@@ -36,12 +36,15 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     public AuthProvider(
             PlayAuthenticate auth,
             ApplicationLifecycle lifecycle,
+            UserService userService,
             TokenActionService tokenActionService,
             MailerFactory mailerFactory,
             LoginSignupFormFactory formFactory) {
         super(auth, lifecycle, mailerFactory);
         this.loginForm = formFactory.getLoginForm();
         this.signupForm = formFactory.getSignupForm();
+        this.userService = userService;
+        this.tokenActionService = tokenActionService;
     }
 
     //-------------------------------------------------------------------
@@ -94,8 +97,8 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected SignupResult signupUser(final SecuredUserSignupAuth user) {
-        final Tables.UserRow user = User.findByUsernamePasswordIdentity(user);
+    protected SignupResult signupUser(final SecuredUserSignupAuth signupAuthUser) {
+        final Tables.UserRow user = userService.findByAuthUser(signupAuthUser).get();
         if (user != null) {
             if (Boolean.valueOf(user.emailValidated().get().toString())) {
                 // This user exists, has its email validated and is active
@@ -108,7 +111,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
         }
         // The user either does not exist or is inactive - create a new one
         @SuppressWarnings("unused")
-        final Tables.UserRow newUser = User.create(user);
+        final Tables.UserRow newUser = userService.create(signupAuthUser);
         // Usually the email should be verified before allowing login, however
         // if you return
         // return SignupResult.USER_CREATED;
@@ -120,16 +123,17 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     @Override
     protected LoginResult loginUser(
             final SecuredUserLoginAuth authUser) {
-        final Tables.UserRow user = User.findByUsernamePasswordIdentity(authUser);
+        final Tables.UserRow user = userService.findByAuthUser(authUser).get();
         if (user == null) {
             return LoginResult.NOT_FOUND;
         } else {
             if (!Boolean.valueOf(user.emailValidated().get().toString())) {
                 return LoginResult.USER_UNVERIFIED;
             } else {
-                for (final Tables.LinkedAccountRow acc : user.linkedAccounts) {
-                    if (getKey().equals(acc.providerKey())) {
-                        if (authUser.checkPassword(acc.providerPassword(),
+                List<Tables.LinkedAccountRow> linkedAccounts = JavaConversions.seqAsJavaList(userService.linkedAccounts(user));
+                for (final Tables.LinkedAccountRow linkedAccount : linkedAccounts) {
+                    if (getKey().equals(linkedAccount.providerKey())) {
+                        if (authUser.checkPassword(linkedAccount.providerPassword(),
                                 authUser.getPassword())) {
                             // Password was correct
                             return LoginResult.USER_LOGGED_IN;
@@ -221,21 +225,21 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     @Override
     protected String generateVerificationRecord(
             final SecuredUserSignupAuth user) {
-        return generateVerificationRecord(User.findByAuthUserIdentity(user));
+        return generateVerificationRecord(userService.findByAuthUser(user).get());
     }
 
     //-------------------------------------------------------------------
     protected String generateVerificationRecord(final Tables.UserRow user) {
         final String token = generateToken();
         // Do database actions, etc.
-        TokenAction.create(TokenAction.EMAIL_VERIFICATION(), token, user);
+        tokenActionService.create(user, TokenAction.EMAIL_VERIFICATION(), token);
         return token;
     }
 
     //-------------------------------------------------------------------
     protected String generatePasswordResetRecord(final Tables.UserRow user) {
         final String token = generateToken();
-        TokenAction.create(TokenAction.PASSWORD_RESET(), token, user);
+        tokenActionService.create(user, TokenAction.PASSWORD_RESET(), token);
         return token;
     }
 
@@ -364,4 +368,6 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     private final Form<Signup> signupForm;
     private final Form<Login> loginForm;
+    private final UserService userService;
+    private final TokenActionService tokenActionService;
 }

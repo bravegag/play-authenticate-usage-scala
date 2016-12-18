@@ -2,7 +2,7 @@ package services
 
 import be.objectify.deadbolt.scala.models._
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
-import generated.Tables.UserRow
+import generated.Tables.{LinkedAccountRow, UserRow}
 
 /**
   * UserRow adapter trait and object that offer implicit conversion from generated
@@ -23,6 +23,9 @@ trait PluggableUserService extends Subject {
 
   //------------------------------------------------------------------------
   def verify: Unit
+
+  //------------------------------------------------------------------------
+  def linkedAccounts : Seq[LinkedAccountRow]
 }
 
 object PluggableUserService {
@@ -60,6 +63,11 @@ object PluggableUserService {
     //------------------------------------------------------------------------
     def verify: Unit = {
       userService.verify(user)
+    }
+
+    //------------------------------------------------------------------------
+    override def linkedAccounts: Seq[LinkedAccountRow] = {
+      userService.linkedAccounts(user)
     }
   }
 }

@@ -16,6 +16,13 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
+  def create(user: UserRow, `type`: TokenAction.Type, token: String) : TokenActionRow = {
+    // TODO: implement
+    val tokenAction = TokenActionRow()
+    tokenAction
+  }
+
+  //------------------------------------------------------------------------
   def findByToken(token: String, `type`: TokenAction.Type): Option[TokenActionRow] = {
     tokenActionDao.findByToken(token, `type`).headOption
   }
