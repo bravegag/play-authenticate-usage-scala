@@ -30,16 +30,15 @@ class UserService @Inject()(auth : PlayAuthenticate,
     val emptyUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
       None, Option(lastLogin), active, None, None)
     val newUser = authUser match {
-      case identity : FirstLastNameIdentity => {
-        emptyUser.copy(firstName = Option(identity.getFirstName),
-          lastName = Option(identity.getLastName))
-      }
       case identity : EmailIdentity => {
         emptyUser.copy(email = identity.getEmail, emailValidated = Option(false))
       }
+      case identity : FirstLastNameIdentity => {
+        emptyUser.copy(username = Option(identity.getName).getOrElse("N/A"),
+          firstName = Option(identity.getFirstName), lastName = Option(identity.getLastName))
+      }
       case identity : NameIdentity => {
-        Option(identity.getName).map { username : String =>
-          emptyUser.copy(username = username) }.getOrElse(emptyUser)
+        emptyUser.copy(username = Option(identity.getName).getOrElse("N/A"))
       }
     }
     userDao.createAndFetch(newUser)
