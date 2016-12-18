@@ -46,14 +46,18 @@ object Generator extends App {
               case "UserRow" => parents ++ Seq("EntityAutoInc[Long, %s]".format(name))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[Long, %s]".format(name), "Role")
               case "SecurityPermissionRow"  => parents ++ Seq("EntityAutoInc[Long, %s]".format(name), "Permission")
-              // TODO: implement
-              //case "LinkedAccountRow"  => parents ++ Seq("Entity[Long]".format(name))
+              case "LinkedAccountRow"  => parents ++ Seq("Entity[Long]")
+              case "TokenActionRow"  => parents ++ Seq("Entity[Long]")
               case _ => parents
             }
 
             /* Use our modified parent class sequence in place of the old one. */
             val prns = (newParents.take(1).map(" extends "+_) ++ newParents.drop(1).map(" with "+_)).mkString("")
-            s"""case class $name($args)$prns"""
+            val newBody = name match {
+              case "LinkedAccountRow"  => "{ override def id = userId }"
+              case "TokenActionRow"  => "{ override def id = userId }"
+            }
+            s"""case class $name($args)$prns $newBody"""
           } else {
             s"""type $name = $types
               /** Constructor for $name providing default values if available in the database schema. */
@@ -77,16 +81,20 @@ object Generator extends App {
             case "User" => parents :+ "IdentifyableTable[Long]"
             case "SecurityRole"  => parents :+ "IdentifyableTable[Long]"
             case "SecurityPermission" => parents :+ "IdentifyableTable[Long]"
-            // TODO: implement
-            //case "LinkedAccount" => parents :+ "IdentifyableTable[Long]"
+            case "LinkedAccount" => parents :+ "IdentifyableTable[Long]"
+            case "TokenAction" => parents :+ "IdentifyableTable[Long]"
             case _ => parents
           }
 
           /* Use our modified parent class sequence in place of the old one. */
           val prns = newParents.map(" with " + _).mkString("")
           val args = model.name.schema.map(n => s"""Some("$n")""") ++ Seq("\""+model.name.table+"\"")
+          val newBody : Seq[Seq[String]] = name match {
+            case "LinkedAccount" => Seq("override def id = userId") +: body
+            case "TokenAction" => Seq("override def id = userId") +: body
+          }
           s"""class $name(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {
-            ${indent(body.map(_.mkString("\n")).mkString("\n\n"))}
+            ${indent(newBody.map(_.mkString("\n")).mkString("\n\n"))}
             }
           """.trim()
         }
