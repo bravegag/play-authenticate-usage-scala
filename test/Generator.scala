@@ -46,6 +46,8 @@ object Generator extends App {
               case "UserRow" => parents ++ Seq("EntityAutoInc[Long, %s]".format(name))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[Long, %s]".format(name), "Role")
               case "SecurityPermissionRow"  => parents ++ Seq("EntityAutoInc[Long, %s]".format(name), "Permission")
+              // TODO: implement
+              //case "LinkedAccountRow"  => parents ++ Seq("Entity[Long]".format(name))
               case _ => parents
             }
 
@@ -75,6 +77,8 @@ object Generator extends App {
             case "User" => parents :+ "IdentifyableTable[Long]"
             case "SecurityRole"  => parents :+ "IdentifyableTable[Long]"
             case "SecurityPermission" => parents :+ "IdentifyableTable[Long]"
+            // TODO: implement
+            //case "LinkedAccount" => parents :+ "IdentifyableTable[Long]"
             case _ => parents
           }
 

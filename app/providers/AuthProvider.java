@@ -14,7 +14,9 @@ import play.i18n.Messages;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
 import play.mvc.Http.Context;
+import services.TokenActionService;
 import views.form.*;
+import dao.TokenAction;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,8 +34,9 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     //-------------------------------------------------------------------
     @Inject
     public AuthProvider(
-            final PlayAuthenticate auth,
-            final ApplicationLifecycle lifecycle,
+            PlayAuthenticate auth,
+            ApplicationLifecycle lifecycle,
+            TokenActionService tokenActionService,
             MailerFactory mailerFactory,
             LoginSignupFormFactory formFactory) {
         super(auth, lifecycle, mailerFactory);
@@ -225,14 +228,14 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     protected String generateVerificationRecord(final Tables.UserRow user) {
         final String token = generateToken();
         // Do database actions, etc.
-        TokenAction.create(Type.EMAIL_VERIFICATION, token, user);
+        TokenAction.create(TokenAction.EMAIL_VERIFICATION(), token, user);
         return token;
     }
 
     //-------------------------------------------------------------------
     protected String generatePasswordResetRecord(final Tables.UserRow user) {
         final String token = generateToken();
-        TokenAction.create(Type.PASSWORD_RESET, token, user);
+        TokenAction.create(TokenAction.PASSWORD_RESET(), token, user);
         return token;
     }
 

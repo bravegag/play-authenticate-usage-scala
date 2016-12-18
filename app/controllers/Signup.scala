@@ -1,16 +1,17 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.collection.mutable.ArrayBuffer
 
+import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
-import dao.UserDao
 import play.api.mvc._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
 import providers._
-import services.UserService
+import services._
+import dao.TokenAction
+import generated.Tables.TokenActionRow
 import views.account.signup.form._
 
 import scala.concurrent._
@@ -22,10 +23,13 @@ class Signup @Inject() (implicit
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
                         userService: UserService,
-                        userDao: UserDao,
+                        tokenActionService: TokenActionService,
                         authProvider: AuthProvider,
                         forgotPasswordForm: ForgotPasswordForm,
                         passwordResetForm: PasswordResetForm) extends Controller with I18nSupport {
+  import services.PluggableUserService._
+  import services.PluggableTokenActionService._
+
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -107,7 +111,7 @@ class Signup @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val ta = tokenIsValid(token, Type.PASSWORD_RESET)
+      val ta = tokenIsValid(token, TokenAction.PASSWORD_RESET)
       if (ta == null) {
         BadRequest(views.html.account.signup.no_token_or_invalid(userService))
 
@@ -129,34 +133,35 @@ class Signup @Inject() (implicit
       } else {
         val token = filledForm.get.token
         val newPassword = filledForm.get.password
-        val ta = tokenIsValid(token, Type.PASSWORD_RESET)
-        if (ta == null) {
-          BadRequest(views.html.account.signup.no_token_or_invalid(userService))
-        } else {
-          var flashValues = ArrayBuffer[(String, String)]()
-          val u = ta.targetUser
-          try {
-            // Pass true for the second parameter if you want to
-            // automatically create a password and the exception never to
-            // happen
-            u.resetPassword(new SecuredUserSignupAuth(newPassword), false)
-          }
-          catch {
-            case e: RuntimeException => {
-              flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
+        val option = tokenIsValid(token, TokenAction.PASSWORD_RESET)
+        option match {
+          case Some(tokenAction) => {
+            var flashValues = ArrayBuffer[(String, String)]()
+            val Some(user) = tokenAction.targetUser
+            try {
+              // Pass true for the second parameter if you want to
+              // automatically create a password and the exception never to
+              // happen
+              user.resetPassword(new SecuredUserSignupAuth(newPassword), false)
             }
-          }
-          val login = authProvider.isLoginAfterPasswordReset
-          if (login) {
-            // automatically log in
-            flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
-            auth.loginAndRedirect(context, new SecuredUserLoginAuth(u.email))
+            catch {
+              case exception: RuntimeException => {
+                flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
+              }
+            }
+            val login = authProvider.isLoginAfterPasswordReset
+            if (login) {
+              // automatically log in
+              flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
+              auth.loginAndRedirect(context, new SecuredUserLoginAuth(user.email))
 
-          } else {
-            // send the user to the login page
-            flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+            } else {
+              // send the user to the login page
+              flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+            }
+            Redirect(routes.Application.login).flashing(flashValues: _*)
           }
-          Redirect(routes.Application.login).flashing(flashValues: _*)
+          case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
         }
       }
     }
@@ -185,18 +190,20 @@ class Signup @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val ta = tokenIsValid(token, Type.EMAIL_VERIFICATION)
-      if (ta == null) {
-        BadRequest(views.html.account.signup.no_token_or_invalid(userService))
-      } else {
-        val email = ta.targetUser.email
-        User.verify(ta.targetUser)
-        val flashValues = (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
-        if (userService.getUser(context.session) != null) {
-          Redirect(routes.Application.index).flashing(flashValues)
-        } else {
-          Redirect(routes.Application.login).flashing(flashValues)
+      val option = tokenIsValid(token, TokenAction.EMAIL_VERIFICATION)
+      option match {
+        case Some(tokenAction) => {
+          val Some(user) =  tokenAction.targetUser
+          val email = user.email
+          user.verify
+          val flashValues = (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
+          if (userService.findInSession(context.session) != null) {
+            Redirect(routes.Application.index).flashing(flashValues)
+          } else {
+            Redirect(routes.Application.login).flashing(flashValues)
+          }
         }
+        case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
       }
     }
   }
@@ -210,14 +217,23 @@ class Signup @Inject() (implicit
     * @param type
     * @return a token object if valid, null otherwise
     */
-  private def tokenIsValid(token: String, `type`: TokenAction.Type) = {
-    var result = null
-    if (token != null && !token.trim.isEmpty) {
-      val ta = TokenAction.findByToken(token, `type`)
-      if (ta != null && ta.isValid) {
-        result = ta
+  private def tokenIsValid(token: String, `type`: TokenAction.Type) : Option[TokenActionRow] = {
+    val result =
+      if (token != null && !token.trim.isEmpty) {
+        val option = tokenActionService.findByToken(token, `type`)
+        option match {
+          case Some(tokenAction) => {
+            if (tokenAction.isValid) {
+              Some(tokenAction)
+            } else {
+              None
+            }
+          }
+          case None => None
+        }
+      } else {
+        None
       }
-    }
     result
   }
 }

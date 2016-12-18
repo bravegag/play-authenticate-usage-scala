@@ -41,7 +41,7 @@ class Account @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val Some(user: UserRow) = userService.getUser(context.session)
+      val Some(user: UserRow) = userService.findInSession(context.session)
       val tuple =
         if (user.emailValidated.get) {
           // E-Mail has been validated already
@@ -63,8 +63,7 @@ class Account @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val Some(user: UserRow) = userService.getUser(context.session)
-
+      val Some(user: UserRow) = userService.findInSession(context.session)
       val result =
         if (!user.emailValidated.get) {
           Ok(views.html.account.unverified(userService))
@@ -88,7 +87,7 @@ class Account @Inject() (implicit
           BadRequest(views.html.account.password_change(userService, filledForm))
 
         } else {
-          val Some(user: UserRow) = userService.getUser(context.session)
+          val Some(user: UserRow) = userService.findInSession(context.session)
           val newPassword = filledForm.get.password
           userService.changePassword(user, new SecuredUserSignupAuth(newPassword), true)
           Redirect(routes.Application.profile).flashing(
@@ -103,7 +102,7 @@ class Account @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val user = this.auth.getLinkUser(context.session)
+      val user = auth.getLinkUser(context.session)
       if (user == null) {
         // account to link could not be found, silently redirect to login
         Redirect(routes.Application.index)

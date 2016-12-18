@@ -2,8 +2,7 @@ package dao
 
 import javax.inject._
 
-import be.objectify.deadbolt.scala.models._
-import dao.generic.GenericDaoImpl
+import dao.generic._
 
 import scala.concurrent.Future
 import generated.Tables._

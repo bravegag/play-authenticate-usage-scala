@@ -8,10 +8,13 @@ import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.user.AuthUserIdentity
 import dao._
-import generated.Tables._
+import generated.Tables.{ UserRow, LinkedAccountRow }
 
 @Singleton
-class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao, linkedAccountDao: LinkedAccountDao) {
+class UserService @Inject()(auth : PlayAuthenticate,
+                            userDao: UserDao,
+                            linkedAccountDao: LinkedAccountDao,
+                            tokenActionDao: TokenActionDao) {
   import utils.DbExecutionUtils._
 
   //------------------------------------------------------------------------
@@ -42,13 +45,13 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao, linkedAcc
   //------------------------------------------------------------------------
   def changePassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
     val option = linkedAccountDao.findByProviderKey(user, authUser.getProvider).headOption
-    val linkedAccount: LinkedAccountRow = option match {
+    val linkedAccount = option match {
       case Some(linkedAccount) => linkedAccount
       case None => {
         if (create) {
           val newLinkedAccount = LinkedAccountRow(user.id, authUser.getProvider, authUser.getId, None)
           linkedAccountDao.create(newLinkedAccount)
-          linkedAccount
+          newLinkedAccount
 
         } else {
           throw new RuntimeException("Account not enabled for password usage")
@@ -60,7 +63,20 @@ class UserService @Inject()(auth : PlayAuthenticate, userDao: UserDao, linkedAcc
   }
 
   //------------------------------------------------------------------------
-  def getUser(session: Session): Option[UserRow] = {
+  def resetPassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
+    changePassword(user, authUser, create)
+    tokenActionDao.deleteByUser(user, TokenAction.PASSWORD_RESET)
+  }
+
+  //------------------------------------------------------------------------
+  def verify(user: UserRow) : Unit = {
+    val updated = user.copy(emailValidated = Some(true))
+    userDao.update(updated)
+    tokenActionDao.deleteByUser(user, TokenAction.EMAIL_VERIFICATION)
+  }
+
+  //------------------------------------------------------------------------
+  def findInSession(session: Session): Option[UserRow] = {
     val currentAuthUser = Option(auth.getUser(session))
     currentAuthUser match {
       case None => None

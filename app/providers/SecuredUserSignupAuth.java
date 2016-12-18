@@ -2,7 +2,6 @@ package providers;
 
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.NameIdentity;
-import providers.AuthProvider.MySignup;
 import views.form.Signup;
 
 public class SecuredUserSignupAuth extends UsernamePasswordAuthUser implements NameIdentity {

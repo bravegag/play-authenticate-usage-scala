@@ -17,20 +17,16 @@ trait PluggableUserService extends Subject {
 
   //------------------------------------------------------------------------
   def changePassword(authUser: UsernamePasswordAuthUser, create: Boolean): Unit
+
+  //------------------------------------------------------------------------
+  def resetPassword(authUser: UsernamePasswordAuthUser, create: Boolean): Unit
+
+  //------------------------------------------------------------------------
+  def verify: Unit
 }
 
 object PluggableUserService {
-  implicit class toPluggable(user: UserRow)(implicit userService: UserService) extends PluggableUserService {
-    //------------------------------------------------------------------------
-    override def providers: Seq[String] = {
-      userService.providers(user)
-    }
-
-    //------------------------------------------------------------------------
-    override def changePassword(authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
-      userService.changePassword(user, authUser, create)
-    }
-
+  implicit class toPluggableUserService(user: UserRow)(implicit userService: UserService) extends PluggableUserService {
     //------------------------------------------------------------------------
     override def identifier: String = {
       userService.identifier(user)
@@ -44,6 +40,26 @@ object PluggableUserService {
     //------------------------------------------------------------------------
     override def permissions: List[Permission] = {
       userService.permissions(user)
+    }
+
+    //------------------------------------------------------------------------
+    override def providers: Seq[String] = {
+      userService.providers(user)
+    }
+
+    //------------------------------------------------------------------------
+    override def changePassword(authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
+      userService.changePassword(user, authUser, create)
+    }
+
+    //------------------------------------------------------------------------
+    override def resetPassword(authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
+      userService.resetPassword(user, authUser, create)
+    }
+
+    //------------------------------------------------------------------------
+    def verify: Unit = {
+      userService.verify(user)
     }
   }
 }

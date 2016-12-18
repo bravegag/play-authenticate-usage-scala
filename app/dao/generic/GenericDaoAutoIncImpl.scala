@@ -25,6 +25,6 @@ abstract class GenericDaoAutoIncImpl[T <: Table[E] with IdentifyableTable[PK], E
     */
   override def createAndFetch(entity: E)(implicit mkLens: MkFieldLens.Aux[E, Symbol @@ Witness.`"id"`.T, PK]): Future[Option[E]] = {
     val insertQuery = tableQuery returning tableQuery.map(_.id) into ((row, id) => row.copyWithNewId(id))
-    db.run((insertQuery += entity).flatMap(row => findById(row.id)))
+    db.run((insertQuery += entity).flatMap(row => tableQuery.filter(_.id === row.id).result.headOption))
   }
 }

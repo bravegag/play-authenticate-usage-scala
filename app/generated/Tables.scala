@@ -25,15 +25,17 @@ trait Tables {
    *  @param providerPassword Database column provider_username SqlType(varchar), Length(255,true)
    *  @param providerKey Database column provider_key SqlType(varchar), Length(255,true)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class LinkedAccountRow(userId: Long, providerPassword: String, providerKey: String, modified: Option[java.sql.Timestamp])
+  case class LinkedAccountRow(userId: Long, providerPassword: String, providerKey: String, modified: Option[java.sql.Timestamp]) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching LinkedAccountRow objects using plain SQL queries */
   implicit def GetResultLinkedAccountRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[LinkedAccountRow] = GR{
     prs => import prs._
     LinkedAccountRow.tupled((<<[Long], <<[String], <<[String], <<?[java.sql.Timestamp]))
   }
   /** Table description of table linked_account. Objects of this class serve as prototypes for rows in queries. */
-  class LinkedAccount(_tableTag: Tag) extends profile.api.Table[LinkedAccountRow](_tableTag, "linked_account") {
-              def * = (userId, providerPassword, providerKey, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
+  class LinkedAccount(_tableTag: Tag) extends profile.api.Table[LinkedAccountRow](_tableTag, "linked_account") with IdentifyableTable[Long] {
+    override def id = userId
+
+    def * = (userId, providerPassword, providerKey, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = (Rep.Some(userId), Rep.Some(providerPassword), Rep.Some(providerKey), modified).shaped.<>({ r=>import r._; _1.map(_=> LinkedAccountRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
@@ -145,7 +147,7 @@ trait Tables {
    *  @param `type` Database column type SqlType(varchar), Length(2,true), Default(None)
    *  @param created Database column created SqlType(timestamp), Default(None)
    *  @param expires Database column expires SqlType(timestamp), Default(None) */
-  case class TokenActionRow(userId: Option[Long] = None, token: Option[String] = None, `type`: Option[String] = None, created: Option[java.sql.Timestamp] = None, expires: Option[java.sql.Timestamp] = None)
+  case class TokenActionRow(userId: Option[Long] = None, token: Option[String] = None, `type`: Option[String] = None, created: Option[java.sql.Timestamp] = None, expires: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId.get }
   /** GetResult implicit for fetching TokenActionRow objects using plain SQL queries */
   implicit def GetResultTokenActionRow(implicit e0: GR[Option[Long]], e1: GR[Option[String]], e2: GR[Option[java.sql.Timestamp]]): GR[TokenActionRow] = GR{
     prs => import prs._
@@ -153,8 +155,10 @@ trait Tables {
   }
   /** Table description of table token_action. Objects of this class serve as prototypes for rows in queries.
    *  NOTE: The following names collided with Scala keywords and were escaped: type */
-  class TokenAction(_tableTag: Tag) extends profile.api.Table[TokenActionRow](_tableTag, "token_action") {
-              def * = (userId, token, `type`, created, expires) <> (TokenActionRow.tupled, TokenActionRow.unapply)
+  class TokenAction(_tableTag: Tag) extends profile.api.Table[TokenActionRow](_tableTag, "token_action") with IdentifyableTable[Long] {
+    override def id = userId.get
+
+    def * = (userId, token, `type`, created, expires) <> (TokenActionRow.tupled, TokenActionRow.unapply)
 
     /** Database column user_id SqlType(int8), Default(None) */
     val userId: Rep[Option[Long]] = column[Option[Long]]("user_id", O.Default(None))

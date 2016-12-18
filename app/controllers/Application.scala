@@ -6,7 +6,6 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import play.api.mvc._
 import services.UserService
-import dao.UserDao
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
 import providers.AuthProvider
@@ -37,7 +36,7 @@ class Application @Inject() (implicit
   def restricted = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
-      val localUser = userService.getUser(context.session)
+      val localUser = userService.findInSession(context.session)
       Ok(views.html.restricted(userService, localUser))
     }
   }
@@ -46,7 +45,7 @@ class Application @Inject() (implicit
   def profile = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
-      val localUser = userService.getUser(context.session)
+      val localUser = userService.findInSession(context.session)
       Ok(views.html.profile(auth, localUser.get))
     }
   }
@@ -62,7 +61,6 @@ class Application @Inject() (implicit
   def doLogin = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
-      val localUser = userService.getUser(context.session)
       val filledForm = formFactory.getLoginForm.bindFromRequest(context.request())
       if (filledForm.hasErrors) {
         // User did not fill everything properly
@@ -83,7 +81,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def jsRoutes() = deadbolt.WithAuthRequest()() { implicit request =>
+  def jsRoutes = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
       Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
         routes.javascript.Signup.forgotPassword)).as("text/javascript")
