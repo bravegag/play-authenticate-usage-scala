@@ -9,7 +9,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import services.UserService;
 
 @Singleton
-class MyHandlerCache @Inject() (auth: PlayAuthenticate,
+class MyHandlerCache @Inject() (implicit auth: PlayAuthenticate,
 																context: ExecutionContextProvider,
 																userService: UserService) extends HandlerCache {
 	//------------------------------------------------------------------------
@@ -23,5 +23,5 @@ class MyHandlerCache @Inject() (auth: PlayAuthenticate,
 	//------------------------------------------------------------------------
 	// private
 	//------------------------------------------------------------------------
-	private lazy val myDeadboltHandler = new MyDeadboltHandler(auth, context, userService)
+	private lazy val myDeadboltHandler = new MyDeadboltHandler()(auth, context, userService)
 }

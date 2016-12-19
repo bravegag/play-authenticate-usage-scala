@@ -1,7 +1,5 @@
 package security
 
-import javax.inject.{Inject, Singleton}
-
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler, ExecutionContextProvider}
 import com.feth.play.module.pa.PlayAuthenticate
@@ -12,7 +10,7 @@ import services.UserService
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class MyDeadboltHandler(auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService) extends DeadboltHandler {
+class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService) extends DeadboltHandler {
 	import services.PluggableUserService._
 
 	//------------------------------------------------------------------------
@@ -42,8 +40,7 @@ class MyDeadboltHandler(auth: PlayAuthenticate, context: ExecutionContextProvide
 		val context = JavaHelpers.createJavaContext(request)
     val authUser = auth.getUser(context)
 		// Caching might be a good idea here
-		val user = userService.findByAuthUser(authUser)
-		user
+		userService.findByAuthUser(authUser).map(toPluggableUserService(_))
 	}
 
 	//------------------------------------------------------------------------

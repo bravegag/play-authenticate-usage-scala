@@ -29,7 +29,7 @@ trait PluggableUserService extends Subject {
 }
 
 object PluggableUserService {
-  implicit class pluggableUserService(user: UserRow)(implicit userService: UserService) extends PluggableUserService {
+  implicit class toPluggableUserService(user: UserRow)(implicit userService: UserService) extends PluggableUserService {
     //------------------------------------------------------------------------
     override def identifier: String = {
       userService.identifier(user)
