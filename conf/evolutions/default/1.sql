@@ -86,9 +86,7 @@ CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE ON user_security
 CREATE TRIGGER update_modified_token_action BEFORE UPDATE ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_user_security_permission BEFORE UPDATE ON user_security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
-## Import data
-
-COPY security_role(name) FROM 'security_role.csv' DELIMITER ',' CSV;
+COPY security_role (name) FROM '/home/bravegag/code/play-authenticate-usage-scala/conf/evolutions/default/security_role.csv' DELIMITER ',' CSV;
 
 # --- !Downs
 
