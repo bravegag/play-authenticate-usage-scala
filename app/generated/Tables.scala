@@ -33,9 +33,9 @@ trait Tables {
   }
   /** Table description of table linked_account. Objects of this class serve as prototypes for rows in queries. */
   class LinkedAccount(_tableTag: Tag) extends profile.api.Table[LinkedAccountRow](_tableTag, "linked_account") with IdentifyableTable[Long] {
-    override def id = userId
+              override def id = userId
 
-              def * = (userId, providerKey, providerPassword, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
+    def * = (userId, providerKey, providerPassword, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = (Rep.Some(userId), Rep.Some(providerKey), Rep.Some(providerPassword), Rep.Some(modified)).shaped.<>({r=>import r._; _1.map(_=> LinkedAccountRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
@@ -62,7 +62,7 @@ trait Tables {
    *  @param revertScript Database column revert_script SqlType(text), Default(None)
    *  @param state Database column state SqlType(varchar), Length(255,true), Default(None)
    *  @param lastProblem Database column last_problem SqlType(text), Default(None) */
-  case class PlayEvolutionsRow(id: Int, hash: String, appliedAt: java.sql.Timestamp, applyScript: Option[String] = None, revertScript: Option[String] = None, state: Option[String] = None, lastProblem: Option[String] = None)
+  case class PlayEvolutionsRow(id: Int, hash: String, appliedAt: java.sql.Timestamp, applyScript: Option[String] = None, revertScript: Option[String] = None, state: Option[String] = None, lastProblem: Option[String] = None) 
   /** GetResult implicit for fetching PlayEvolutionsRow objects using plain SQL queries */
   implicit def GetResultPlayEvolutionsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[String]]): GR[PlayEvolutionsRow] = GR{
     prs => import prs._
@@ -96,24 +96,24 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param value Database column value SqlType(varchar), Length(255,true)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class SecurityPermissionRow(id: Long, value: String, modified: java.sql.Timestamp) extends EntityAutoInc[Long, SecurityPermissionRow] with Permission
+  case class SecurityPermissionRow(id: Long, value: String, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, SecurityPermissionRow] with Permission 
   /** GetResult implicit for fetching SecurityPermissionRow objects using plain SQL queries */
-  implicit def GetResultSecurityPermissionRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[SecurityPermissionRow] = GR{
+  implicit def GetResultSecurityPermissionRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[SecurityPermissionRow] = GR{
     prs => import prs._
-    SecurityPermissionRow.tupled((<<[Long], <<[String], <<[java.sql.Timestamp]))
+    SecurityPermissionRow.tupled((<<[Long], <<[String], <<?[java.sql.Timestamp]))
   }
   /** Table description of table security_permission. Objects of this class serve as prototypes for rows in queries. */
   class SecurityPermission(_tableTag: Tag) extends profile.api.Table[SecurityPermissionRow](_tableTag, "security_permission") with IdentifyableTable[Long] {
               def * = (id, value, modified) <> (SecurityPermissionRow.tupled, SecurityPermissionRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(value), Rep.Some(modified)).shaped.<>({r=>import r._; _1.map(_=> SecurityPermissionRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(value), modified).shaped.<>({r=>import r._; _1.map(_=> SecurityPermissionRow.tupled((_1.get, _2.get, _3)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
     /** Database column value SqlType(varchar), Length(255,true) */
     val value: Rep[String] = column[String]("value", O.Length(255,varying=true))
     /** Database column modified SqlType(timestamp) */
-    val modified: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("modified")
+    val modified: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("modified")
               }
   /** Collection-like TableQuery object for table SecurityPermission */
   lazy val SecurityPermission = new TableQuery(tag => new SecurityPermission(tag))
@@ -121,7 +121,7 @@ trait Tables {
   /** Entity class storing rows of table SecurityRole
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(varchar), Length(255,true) */
-  case class SecurityRoleRow(id: Long, name: String) extends EntityAutoInc[Long, SecurityRoleRow] with Role
+  case class SecurityRoleRow(id: Long, name: String) extends EntityAutoInc[Long, SecurityRoleRow] with Role 
   /** GetResult implicit for fetching SecurityRoleRow objects using plain SQL queries */
   implicit def GetResultSecurityRoleRow(implicit e0: GR[Long], e1: GR[String]): GR[SecurityRoleRow] = GR{
     prs => import prs._
@@ -148,23 +148,23 @@ trait Tables {
    *  @param created Database column created SqlType(timestamp)
    *  @param expires Database column expires SqlType(timestamp)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class TokenActionRow(userId: Long, token: String, `type`: String, created: java.sql.Timestamp, expires: java.sql.Timestamp, modified: Option[java.sql.Timestamp]) extends Entity[Long] { override def id = userId }
+  case class TokenActionRow(userId: Long = 0L, token: String, `type`: String, created: java.sql.Timestamp, expires: java.sql.Timestamp, modified: Option[java.sql.Timestamp]) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching TokenActionRow objects using plain SQL queries */
-  implicit def GetResultTokenActionRow(implicit e0: GR[Option[Long]], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[TokenActionRow] = GR{
+  implicit def GetResultTokenActionRow(implicit e0: GR[Option[Long]], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[TokenActionRow] = GR{
     prs => import prs._
     TokenActionRow.tupled((<<[Long], <<[String], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp], <<?[java.sql.Timestamp]))
   }
   /** Table description of table token_action. Objects of this class serve as prototypes for rows in queries.
    *  NOTE: The following names collided with Scala keywords and were escaped: type */
   class TokenAction(_tableTag: Tag) extends profile.api.Table[TokenActionRow](_tableTag, "token_action") with IdentifyableTable[Long] {
-    override def id = userId
+              override def id = userId
 
-              def * = (userId, token, `type`, created, expires, modified) <> (TokenActionRow.tupled, TokenActionRow.unapply)
+    def * = (userId, token, `type`, created, expires, modified) <> (TokenActionRow.tupled, TokenActionRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (userId, Rep.Some(token), Rep.Some(`type`), Rep.Some(created), Rep.Some(expires), Rep.Some(modified)).shaped.<>({r=>import r._; _2.map(_=> TokenActionRow.tupled((_1, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (userId, Rep.Some(token), Rep.Some(`type`), Rep.Some(created), Rep.Some(expires), modified).shaped.<>({r=>import r._; _2.map(_=> TokenActionRow.tupled((_1, _2.get, _3.get, _4.get, _5.get, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(int8), Default(None) */
-    val userId: Rep[Long] = column[Long]("user_id", O.Default(0L))
+    val userId: Rep[Long] = column[Long]("user_id")
     /** Database column token SqlType(varchar), Length(255,true) */
     val token: Rep[String] = column[String]("token", O.Length(255,varying=true))
     /** Database column type SqlType(token_type)
@@ -201,9 +201,9 @@ trait Tables {
    *  @param active Database column active SqlType(bool), Default(false)
    *  @param emailValidated Database column email_validated SqlType(bool), Default(false)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserRow(id: Long, firstName: Option[String] = None, middleName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, locationId: Option[Long] = None, username: String, email: String, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Boolean = false, emailValidated: Boolean = false, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, UserRow]
+  case class UserRow(id: Long, firstName: Option[String] = None, middleName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, locationId: Option[Long] = None, username: String, email: String, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Boolean = false, emailValidated: Boolean = false, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, UserRow] 
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
-  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Option[Long]], e4: GR[String], e5: GR[Option[java.sql.Timestamp]], e6: GR[Boolean], e7: GR[java.sql.Timestamp]): GR[UserRow] = GR{
+  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Option[Long]], e4: GR[String], e5: GR[Option[java.sql.Timestamp]], e6: GR[Boolean]): GR[UserRow] = GR{
     prs => import prs._
     UserRow.tupled((<<[Long], <<?[String], <<?[String], <<?[String], <<?[java.sql.Date], <<?[Long], <<[String], <<[String], <<?[String], <<?[String], <<?[java.sql.Timestamp], <<[Boolean], <<[Boolean], <<?[java.sql.Timestamp]))
   }
@@ -211,7 +211,7 @@ trait Tables {
   class User(_tableTag: Tag) extends profile.api.Table[UserRow](_tableTag, "user") with IdentifyableTable[Long] {
               def * = (id, firstName, middleName, lastName, dateOfBirth, locationId, username, email, password, salt, lastLogin, active, emailValidated, modified) <> (UserRow.tupled, UserRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), firstName, middleName, lastName, dateOfBirth, locationId, Rep.Some(username), Rep.Some(email), password, salt, lastLogin, Rep.Some(active), Rep.Some(emailValidated), Rep.Some(modified)).shaped.<>({r=>import r._; _1.map(_=> UserRow.tupled((_1.get, _2, _3, _4, _5, _6, _7.get, _8.get, _9, _10, _11, _12.get, _13.get, _14.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), firstName, middleName, lastName, dateOfBirth, locationId, Rep.Some(username), Rep.Some(email), password, salt, lastLogin, Rep.Some(active), Rep.Some(emailValidated), modified).shaped.<>({r=>import r._; _1.map(_=> UserRow.tupled((_1.get, _2, _3, _4, _5, _6, _7.get, _8.get, _9, _10, _11, _12.get, _13.get, _14)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
@@ -249,24 +249,24 @@ trait Tables {
    *  @param userId Database column user_id SqlType(int8)
    *  @param securityPermissionId Database column security_permission_id SqlType(int8)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserSecurityPermissionRow(userId: Long, securityPermissionId: Long, modified: java.sql.Timestamp)
+  case class UserSecurityPermissionRow(userId: Long, securityPermissionId: Long, modified: Option[java.sql.Timestamp]) 
   /** GetResult implicit for fetching UserSecurityPermissionRow objects using plain SQL queries */
-  implicit def GetResultUserSecurityPermissionRow(implicit e0: GR[Long], e1: GR[java.sql.Timestamp]): GR[UserSecurityPermissionRow] = GR{
+  implicit def GetResultUserSecurityPermissionRow(implicit e0: GR[Long], e1: GR[Option[java.sql.Timestamp]]): GR[UserSecurityPermissionRow] = GR{
     prs => import prs._
-    UserSecurityPermissionRow.tupled((<<[Long], <<[Long], <<[java.sql.Timestamp]))
+    UserSecurityPermissionRow.tupled((<<[Long], <<[Long], <<?[java.sql.Timestamp]))
   }
   /** Table description of table user_security_permission. Objects of this class serve as prototypes for rows in queries. */
   class UserSecurityPermission(_tableTag: Tag) extends profile.api.Table[UserSecurityPermissionRow](_tableTag, "user_security_permission") {
               def * = (userId, securityPermissionId, modified) <> (UserSecurityPermissionRow.tupled, UserSecurityPermissionRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(userId), Rep.Some(securityPermissionId), Rep.Some(modified)).shaped.<>({r=>import r._; _1.map(_=> UserSecurityPermissionRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(userId), Rep.Some(securityPermissionId), modified).shaped.<>({r=>import r._; _1.map(_=> UserSecurityPermissionRow.tupled((_1.get, _2.get, _3)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column security_permission_id SqlType(int8) */
     val securityPermissionId: Rep[Long] = column[Long]("security_permission_id")
     /** Database column modified SqlType(timestamp) */
-    val modified: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("modified")
+    val modified: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("modified")
 
     /** Primary key of UserSecurityPermission (database name user_security_permission_pkey) */
     val pk = primaryKey("user_security_permission_pkey", (userId, securityPermissionId))
@@ -283,9 +283,9 @@ trait Tables {
    *  @param userId Database column user_id SqlType(int8)
    *  @param securityRoleId Database column security_role_id SqlType(int8)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserSecurityRoleRow(userId: Long, securityRoleId: Long, modified: Option[java.sql.Timestamp])
+  case class UserSecurityRoleRow(userId: Long, securityRoleId: Long, modified: Option[java.sql.Timestamp]) 
   /** GetResult implicit for fetching UserSecurityRoleRow objects using plain SQL queries */
-  implicit def GetResultUserSecurityRoleRow(implicit e0: GR[Long], e1: GR[java.sql.Timestamp]): GR[UserSecurityRoleRow] = GR{
+  implicit def GetResultUserSecurityRoleRow(implicit e0: GR[Long], e1: GR[Option[java.sql.Timestamp]]): GR[UserSecurityRoleRow] = GR{
     prs => import prs._
     UserSecurityRoleRow.tupled((<<[Long], <<[Long], <<?[java.sql.Timestamp]))
   }
@@ -293,7 +293,7 @@ trait Tables {
   class UserSecurityRole(_tableTag: Tag) extends profile.api.Table[UserSecurityRoleRow](_tableTag, "user_security_role") {
               def * = (userId, securityRoleId, modified) <> (UserSecurityRoleRow.tupled, UserSecurityRoleRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(userId), Rep.Some(securityRoleId), Rep.Some(modified)).shaped.<>({r=>import r._; _1.map(_=> UserSecurityRoleRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(userId), Rep.Some(securityRoleId), modified).shaped.<>({r=>import r._; _1.map(_=> UserSecurityRoleRow.tupled((_1.get, _2.get, _3)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")

@@ -24,7 +24,7 @@ CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
 	provider_key VARCHAR(255) NOT NULL,
 	provider_password VARCHAR(255) NOT NULL,
-	modified TIMESTAMP NOT NULL DEFAULT now(),
+	modified TIMESTAMP DEFAULT now(),
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE user_security_role (
 CREATE TYPE token_type AS ENUM ('EV', 'PR');
 
 CREATE TABLE token_action (
-	user_id BIGINT,
+	user_id BIGINT NOT NULL,
 	token VARCHAR(255) UNIQUE NOT NULL,
 	"type" token_type NOT NULL,
 	created TIMESTAMP NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE security_permission (
 );
 
 CREATE TABLE user_security_permission (
-	user_id BIGINT,
+	user_id BIGINT NOT NULL,
 	security_permission_id BIGINT,
 	modified TIMESTAMP DEFAULT now(),
 	PRIMARY KEY (user_id, security_permission_id),

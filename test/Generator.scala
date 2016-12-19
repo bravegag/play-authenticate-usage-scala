@@ -56,6 +56,7 @@ object Generator extends App {
             val newBody = name match {
               case "LinkedAccountRow"  => "{ override def id = userId }"
               case "TokenActionRow"  => "{ override def id = userId }"
+              case _ => ""
             }
             s"""case class $name($args)$prns $newBody"""
           } else {
@@ -92,6 +93,7 @@ object Generator extends App {
           val newBody : Seq[Seq[String]] = name match {
             case "LinkedAccount" => Seq("override def id = userId") +: body
             case "TokenAction" => Seq("override def id = userId") +: body
+            case _ => body
           }
           s"""class $name(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {
             ${indent(newBody.map(_.mkString("\n")).mkString("\n\n"))}
