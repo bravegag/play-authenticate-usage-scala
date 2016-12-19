@@ -9,7 +9,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import services.UserService;
 
 @Singleton
-class MyHandlerCache @Inject() (implicit auth: PlayAuthenticate,
+class MyHandlerCache @Inject() (auth: PlayAuthenticate,
 																context: ExecutionContextProvider,
 																userService: UserService) extends HandlerCache {
 	//------------------------------------------------------------------------

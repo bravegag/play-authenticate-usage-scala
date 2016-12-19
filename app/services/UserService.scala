@@ -6,8 +6,8 @@ import com.feth.play.module.pa.PlayAuthenticate
 import play.mvc.Http.Session
 import javax.inject._
 import java.util.Date
-import controllers.Application
 
+import controllers.Application
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.user._
@@ -120,20 +120,26 @@ class UserService @Inject()(auth : PlayAuthenticate,
   def findInSession(session: Session): Option[UserRow] = {
     val currentAuthUser = Option(auth.getUser(session))
     currentAuthUser match {
-      case None => None
       case Some(authUser: UsernamePasswordAuthUser) => findByAuthUser(authUser)
       case Some(userIdentity: AuthUserIdentity) => findByAuthUser(userIdentity)
+      case _ => None
     }
   }
 
   //------------------------------------------------------------------------
   def findByAuthUser(authUser: UsernamePasswordAuthUser): Option[UserRow] = {
-    userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
+    Option(authUser) match {
+      case Some(authUser) => userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
+      case _ => None
+    }
   }
 
   //------------------------------------------------------------------------
-  def findByAuthUser(userIdentity: AuthUserIdentity): Option[UserRow] = {
-    userDao.findActiveByProviderKeyAndUsername(userIdentity.getProvider, userIdentity.getId)
+  def findByAuthUser(authUser: AuthUserIdentity): Option[UserRow] = {
+    Option(authUser) match {
+      case Some(authUser) => userDao.findActiveByProviderKeyAndUsername(authUser.getProvider, authUser.getId)
+      case _ => None
+    }
   }
 
   //------------------------------------------------------------------------

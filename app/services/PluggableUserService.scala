@@ -29,6 +29,12 @@ trait PluggableUserService extends Subject {
 }
 
 object PluggableUserService {
+  /**
+    * Enables converting from a UserRow to a PluggableUserService type and most importantly
+    * to a Subject.
+    * @param user the input user instance to convert to PluggableUserService
+    * @param userService the implicit userService instance needed for doing the actual conversion
+    */
   implicit class toPluggableUserService(user: UserRow)(implicit userService: UserService) extends PluggableUserService {
     //------------------------------------------------------------------------
     override def identifier: String = {
@@ -70,4 +76,14 @@ object PluggableUserService {
       userService.linkedAccounts(user)
     }
   }
+
+  /**
+    * Enables converting from Option[UseRow] to Option[PluggableUserService] or
+    * more importantly Option[Subject].
+    * @param t user instance
+    * @param ev evidence that can generate a PluggableUserService from a UserRow
+    * @tparam T UserRow type
+    * @return
+    */
+  implicit def toPluggableUserServiceOpt[T](t: Option[T])(implicit ev: T => PluggableUserService): Option[PluggableUserService] = t.map(ev)
 }

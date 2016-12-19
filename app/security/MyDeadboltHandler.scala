@@ -40,7 +40,8 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
 		val context = JavaHelpers.createJavaContext(request)
     val authUser = auth.getUser(context)
 		// Caching might be a good idea here
-		userService.findByAuthUser(authUser).map(toPluggableUserService(_))
+		val user = userService.findByAuthUser(authUser)
+		user
 	}
 
 	//------------------------------------------------------------------------

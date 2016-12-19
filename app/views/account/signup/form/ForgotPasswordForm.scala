@@ -3,13 +3,13 @@ package views.account.signup.form
 import javax.inject.{Inject, Singleton}
 
 import play.api.data.Form
-import play.api.data.Forms.{nonEmptyText, _}
-import play.api.i18n.Messages
+import play.api.data.Forms._
+import play.api.i18n.MessagesApi
 
 case class ForgotPassword(email: String)
 
 @Singleton
-class ForgotPasswordForm @Inject() (implicit val messages: Messages) {
+class ForgotPasswordForm @Inject() (implicit val messagesApi: MessagesApi) {
   val Instance = Form {
     mapping(
       "email" -> email
