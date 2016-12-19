@@ -10,16 +10,18 @@ import java.util.Date
 import controllers.Application
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
+import com.feth.play.module.pa.service.AbstractUserService
 import com.feth.play.module.pa.user._
 import dao._
 import generated.Tables.{LinkedAccountRow, UserRow}
+import models.User
 
 @Singleton
 class UserService @Inject()(auth : PlayAuthenticate,
                             userDao: UserDao,
                             linkedAccountDao: LinkedAccountDao,
                             tokenActionDao: TokenActionDao,
-                            securityRoleDao: SecurityRoleDao) {
+                            securityRoleDao: SecurityRoleDao) extends AbstractUserService(auth) {
   import utils.DbExecutionUtils._
 
   //------------------------------------------------------------------------
@@ -145,5 +147,44 @@ class UserService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   def findByEmail(email: String): Option[UserRow] = {
     userDao.findByEmail(email).headOption
+  }
+
+  //------------------------------------------------------------------------
+  override def getLocalIdentity(identity: AuthUserIdentity): AnyRef = {
+    // For production: Caching might be a good idea here...
+    // ...and don't forget to sync the cache when users get deactivated/deleted
+    val option = findByAuthUser(identity)
+    option match {
+      case Some(user) => user.id
+      case _ => null
+    }
+  }
+
+  //------------------------------------------------------------------------
+  override def merge(newAuthUser: AuthUser, oldAuthUser: AuthUser): AuthUser = {
+    if (!oldAuthUser.equals(newAuthUser)) {
+      val oldUser = findByAuthUser(oldAuthUser)
+      val newUser = findByAuthUser(newAuthUser)
+
+      // TODO: implement the merge
+      newAuthUser
+
+    } else {
+      oldAuthUser
+    }
+  }
+
+  //------------------------------------------------------------------------
+  override def link(oldUser: AuthUser, newUser: AuthUser): AuthUser = {
+    ???
+  }
+
+  //------------------------------------------------------------------------
+  override def save(authUser: AuthUser): AnyRef = {
+    val option = findByAuthUser(authUser)
+    option.map { user : UserRow =>
+      userDao.update(user.copy(lastLogin = Some(new Timestamp(new Date().getTime)))
+    }
+    authUser
   }
 }
