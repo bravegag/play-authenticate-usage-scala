@@ -14,7 +14,6 @@ import com.feth.play.module.pa.service.AbstractUserService
 import com.feth.play.module.pa.user._
 import dao._
 import generated.Tables.{LinkedAccountRow, UserRow}
-import models.User
 
 @Singleton
 class UserService @Inject()(auth : PlayAuthenticate,
@@ -154,10 +153,11 @@ class UserService @Inject()(auth : PlayAuthenticate,
     // For production: Caching might be a good idea here...
     // ...and don't forget to sync the cache when users get deactivated/deleted
     val option = findByAuthUser(identity)
-    option match {
-      case Some(user) => user.id
+    val result : AnyRef = option match {
+      case Some(user) => Long.box(user.id)
       case _ => null
     }
+    result
   }
 
   //------------------------------------------------------------------------
@@ -183,7 +183,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
   override def save(authUser: AuthUser): AnyRef = {
     val option = findByAuthUser(authUser)
     option.map { user : UserRow =>
-      userDao.update(user.copy(lastLogin = Some(new Timestamp(new Date().getTime)))
+      userDao.update(user.copy(lastLogin = Some(new Timestamp(new Date().getTime))))
     }
     authUser
   }
