@@ -13,7 +13,7 @@ trait PluggableTokenActionService {
 }
 
 object PluggableTokenActionService {
-  implicit class toPluggableTokenActionService(tokenAction: TokenActionRow)(implicit tokenActionService: TokenActionService) extends PluggableTokenActionService {
+  implicit class pluggableTokenActionService(tokenAction: TokenActionRow)(implicit tokenActionService: TokenActionService) extends PluggableTokenActionService {
     //------------------------------------------------------------------------
     override def isValid = {
       tokenActionService.isValid(tokenAction)

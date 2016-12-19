@@ -122,13 +122,18 @@ class UserService @Inject()(auth : PlayAuthenticate,
     currentAuthUser match {
       case None => None
       case Some(authUser: UsernamePasswordAuthUser) => findByAuthUser(authUser)
-      case Some(userIdentity: AuthUserIdentity) => userDao.findActiveByProviderKeyAndUsername(userIdentity.getProvider, userIdentity.getId)
+      case Some(userIdentity: AuthUserIdentity) => findByAuthUser(userIdentity)
     }
   }
 
   //------------------------------------------------------------------------
   def findByAuthUser(authUser: UsernamePasswordAuthUser): Option[UserRow] = {
     userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
+  }
+
+  //------------------------------------------------------------------------
+  def findByAuthUser(userIdentity: AuthUserIdentity): Option[UserRow] = {
+    userDao.findActiveByProviderKeyAndUsername(userIdentity.getProvider, userIdentity.getId)
   }
 
   //------------------------------------------------------------------------

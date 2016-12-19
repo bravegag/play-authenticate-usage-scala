@@ -1,4 +1,4 @@
-package service
+package services
 
 import com.feth.play.module.pa.Resolver
 import com.feth.play.module.pa.exceptions.AccessDeniedException
