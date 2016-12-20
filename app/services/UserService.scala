@@ -149,6 +149,12 @@ class UserService @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
+  override def save(authUser: AuthUser): Unit = {
+    // TODO: implement
+    ???
+  }
+
+  //------------------------------------------------------------------------
   override def getLocalIdentity(identity: AuthUserIdentity): AnyRef = {
     // For production: Caching might be a good idea here...
     // ...and don't forget to sync the cache when users get deactivated/deleted
@@ -194,7 +200,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
-  override def save(authUser: AuthUser): AnyRef = {
+  override def update(authUser: AuthUser): AnyRef = {
     val option = findByAuthUser(authUser)
     option.map { user : UserRow =>
       userDao.update(user.copy(lastLogin = Some(new Timestamp(new Date().getTime))))
