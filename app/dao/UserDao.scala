@@ -28,32 +28,32 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   //------------------------------------------------------------------------
-  def roles(user: UserRow) : Future[Seq[Role]] = {
+  def roles(inputUser: UserRow) : Future[Seq[Role]] = {
     val action = (for {
       role <- SecurityRole
       userRole <- UserSecurityRole if role.id === userRole.securityRoleId
-      user <- User if userRole.userId === user.id
+      user <- User if user.id === inputUser.id && userRole.userId === user.id
     } yield role).result
 
     db.run(action)
   }
 
   //------------------------------------------------------------------------
-  def permissions(user: UserRow) : Future[Seq[Permission]] = {
+  def permissions(inputUser: UserRow) : Future[Seq[Permission]] = {
     val action = (for {
       permission <- SecurityPermission
       userPermission <- UserSecurityPermission if permission.id === userPermission.securityPermissionId
-      user <- User if userPermission.userId === user.id
+      user <- User if user.id === inputUser.id && userPermission.userId === user.id
     } yield permission).result
 
     db.run(action)
   }
 
   //------------------------------------------------------------------------
-  def linkedAccounts(user: UserRow) : Future[Seq[LinkedAccountRow]] = {
+  def linkedAccounts(inputUser: UserRow) : Future[Seq[LinkedAccountRow]] = {
     val action = (for {
       linkedAccount <- LinkedAccount
-      user <- User if linkedAccount.userId === user.id
+      user <- User if user.id === inputUser.id && user.id === linkedAccount.userId
     } yield linkedAccount).result
 
     db.run(action)
@@ -84,5 +84,23 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   //------------------------------------------------------------------------
   def findByEmail(email: String): Future[Seq[UserRow]] = {
     filter(_.email === email)
+  }
+
+  //------------------------------------------------------------------------
+  def merge(targetUser: UserRow, sourceUser: UserRow) : Future[Unit] = {
+    // define an update DBIOAction to deactivate sourceUser
+    val updateAction = User.filter(_.id === sourceUser.id).update(sourceUser.copy(active = false))
+
+    // selects all linkedAccount from sourceUser but yield the userId of the targetUser
+    val selectAction = (for {
+      linkedAccount <- LinkedAccount
+      user <- User if user.id === sourceUser.id && user.id === linkedAccount.userId
+    } yield (targetUser.id, linkedAccount.providerKey, linkedAccount.providerPassword, linkedAccount.modified)).result
+
+    // define an insert DBIOAction to insert all the selected linked accounts from sourceUser to targetUser
+    val insertAction = selectAction.flatMap(LinkedAccount ++= _)
+
+    // combine both actions using >> and transactionally
+    db.run((updateAction >> insertAction).transactionally).map(_ => ())
   }
 }

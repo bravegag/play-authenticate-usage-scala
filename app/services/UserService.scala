@@ -163,20 +163,34 @@ class UserService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   override def merge(newAuthUser: AuthUser, oldAuthUser: AuthUser): AuthUser = {
     if (!oldAuthUser.equals(newAuthUser)) {
-      val oldUser = findByAuthUser(oldAuthUser)
-      val newUser = findByAuthUser(newAuthUser)
+      val oldUserOpt = findByAuthUser(oldAuthUser)
+      val newUserOpt = findByAuthUser(newAuthUser)
 
-      // TODO: implement the merge
-      newAuthUser
-
-    } else {
-      oldAuthUser
+      (oldUserOpt, newUserOpt) match {
+        case (Some(oldUser), Some(newUser)) => {
+          // new user is no longer active
+          userDao.merge(oldUser, newUser)
+        }
+        case _ => // TODO: the most sensible thing to do seems to be throwing an exception
+      }
     }
+    oldAuthUser
   }
 
   //------------------------------------------------------------------------
-  override def link(oldUser: AuthUser, newUser: AuthUser): AuthUser = {
-    ???
+  override def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): Unit = {
+    if (!oldAuthUser.equals(newAuthUser)) {
+      val oldUserOpt = findByAuthUser(oldAuthUser)
+      val newUserOpt = findByAuthUser(newAuthUser)
+
+      (oldUserOpt, newUserOpt) match {
+        case (Some(oldUser: UserRow), Some(_)) => {
+          // link the two users
+          linkedAccountDao.create(oldUser, newAuthUser)
+        }
+        case _ => // TODO: the most sensible thing to do seems to be throwing an exception
+      }
+    }
   }
 
   //------------------------------------------------------------------------
