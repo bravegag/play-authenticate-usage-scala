@@ -58,7 +58,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     }
 
     //-------------------------------------------------------------------
-    public void sendPasswordResetMailing(final Tables.UserRow user, final Context ctx) {
+    public void sendPasswordResetMailing(Tables.UserRow user, Context ctx) {
         final String token = generatePasswordResetRecord(user);
         final String subject = getPasswordResetMailingSubject(user, ctx);
         final Body body = getPasswordResetMailingBody(token, user, ctx);
@@ -72,8 +72,8 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     }
 
     //-------------------------------------------------------------------
-    public void sendVerifyEmailMailingAfterSignup(final Tables.UserRow user,
-                                                  final Context ctx) {
+    public void sendVerifyEmailMailingAfterSignup(Tables.UserRow user,
+                                                  Context ctx) {
 
         final String subject = getVerifyEmailMailingSubjectAfterSignup(user,
                 ctx);
@@ -97,7 +97,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected SignupResult signupUser(final SecuredUserSignupAuth signupAuthUser) {
+    protected SignupResult signupUser(SecuredUserSignupAuth signupAuthUser) {
         final Tables.UserRow user = userService.findByAuthUser(signupAuthUser).get();
         if (user != null) {
             if (user.emailValidated()) {
@@ -121,8 +121,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected LoginResult loginUser(
-            final SecuredUserLoginAuth authUser) {
+    protected LoginResult loginUser(SecuredUserLoginAuth authUser) {
         final Tables.UserRow user = userService.findByAuthUser(authUser).get();
         if (user == null) {
             return LoginResult.NOT_FOUND;
@@ -153,47 +152,46 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected Call userExists(final UsernamePasswordAuthUser authUser) {
+    protected Call userExists(UsernamePasswordAuthUser authUser) {
         return routes.Signup.exists();
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected Call userUnverified(final UsernamePasswordAuthUser authUser) {
+    protected Call userUnverified(UsernamePasswordAuthUser authUser) {
         return routes.Signup.unverified();
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected SecuredUserSignupAuth buildSignupAuthUser(final Signup signup,
-                                                        final Context ctx) {
+    protected SecuredUserSignupAuth buildSignupAuthUser(Signup signup,
+                                                        Context ctx) {
         return new SecuredUserSignupAuth(signup);
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected SecuredUserLoginAuth buildLoginAuthUser(final Login login, final Context ctx) {
+    protected SecuredUserLoginAuth buildLoginAuthUser(Login login, Context ctx) {
         return new SecuredUserLoginAuth(login.getPassword(), login.getEmail());
     }
 
 
     //-------------------------------------------------------------------
     @Override
-    protected SecuredUserLoginAuth transformAuthUser(final SecuredUserSignupAuth authUser,
-                                                     final Context context) {
+    protected SecuredUserLoginAuth transformAuthUser(SecuredUserSignupAuth authUser,
+                                                     Context context) {
         return new SecuredUserLoginAuth(authUser.getEmail());
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected String getVerifyEmailMailingSubject(
-            final SecuredUserSignupAuth user, final Context ctx) {
+    protected String getVerifyEmailMailingSubject(SecuredUserSignupAuth user, Context ctx) {
         return Messages.get("playauthenticate.password.verify_signup.subject");
     }
 
     //-------------------------------------------------------------------
     @Override
-    protected String onLoginUserNotFound(final Context context) {
+    protected String onLoginUserNotFound(Context context) {
         context.flash().put(controllers.Application.FLASH_ERROR_KEY(),
                 Messages.get("playauthenticate.password.login.unknown_user_or_pw"));
         return super.onLoginUserNotFound(context);
@@ -201,8 +199,8 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected Body getVerifyEmailMailingBody(final String token,
-                                             final SecuredUserSignupAuth user, final Context ctx) {
+    protected Body getVerifyEmailMailingBody(String token,
+                                             SecuredUserSignupAuth user, Context ctx) {
         final boolean isSecure = getConfiguration().getBoolean(
                 SETTING_KEY_VERIFICATION_LINK_SECURE);
         final String url = routes.Signup.verify(token).absoluteURL(
@@ -223,13 +221,12 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     //-------------------------------------------------------------------
     @Override
-    protected String generateVerificationRecord(
-            final SecuredUserSignupAuth user) {
+    protected String generateVerificationRecord(SecuredUserSignupAuth user) {
         return generateVerificationRecord(userService.findByAuthUser(user).get());
     }
 
     //-------------------------------------------------------------------
-    protected String generateVerificationRecord(final Tables.UserRow user) {
+    protected String generateVerificationRecord(Tables.UserRow user) {
         final String token = generateToken();
         // Do database actions, etc.
         tokenActionService.create(user, TokenAction.EMAIL_VERIFICATION(), token);
@@ -237,21 +234,21 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     }
 
     //-------------------------------------------------------------------
-    protected String generatePasswordResetRecord(final Tables.UserRow user) {
+    protected String generatePasswordResetRecord(Tables.UserRow user) {
         final String token = generateToken();
         tokenActionService.create(user, TokenAction.PASSWORD_RESET(), token);
         return token;
     }
 
     //-------------------------------------------------------------------
-    protected String getPasswordResetMailingSubject(final Tables.UserRow user,
-                                                    final Context ctx) {
+    protected String getPasswordResetMailingSubject(Tables.UserRow user,
+                                                    Context ctx) {
         return Messages.get("playauthenticate.password.reset_email.subject");
     }
 
     //-------------------------------------------------------------------
-    protected Body getPasswordResetMailingBody(final String token,
-                                               final Tables.UserRow user, final Context ctx) {
+    protected Body getPasswordResetMailingBody(String token, Tables.UserRow user,
+                                               Context ctx) {
 
         final boolean isSecure = getConfiguration().getBoolean(
                 SETTING_KEY_PASSWORD_RESET_LINK_SECURE);
@@ -272,15 +269,15 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     }
 
     //-------------------------------------------------------------------
-    protected String getVerifyEmailMailingSubjectAfterSignup(final Tables.UserRow user,
-                                                             final Context ctx) {
+    protected String getVerifyEmailMailingSubjectAfterSignup(Tables.UserRow user,
+                                                             Context ctx) {
         return Messages.get("playauthenticate.password.verify_email.subject");
     }
 
     //-------------------------------------------------------------------
-    protected String getEmailTemplate(final String template,
-                                      final String langCode, final String url, final String token,
-                                      final String name, final String email) {
+    protected String getEmailTemplate(String template,
+                                      String langCode, String url, String token,
+                                      String name, String email) {
         Class<?> cls = null;
         String ret = null;
         try {
@@ -322,8 +319,8 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     }
 
     //-------------------------------------------------------------------
-    protected Body getVerifyEmailMailingBodyAfterSignup(final String token,
-                                                        final Tables.UserRow user, final Context ctx) {
+    protected Body getVerifyEmailMailingBodyAfterSignup(String token,
+                                                        Tables.UserRow user, Context ctx) {
 
         final boolean isSecure = getConfiguration().getBoolean(
                 SETTING_KEY_VERIFICATION_LINK_SECURE);
@@ -351,7 +348,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     }
 
     //-------------------------------------------------------------------
-    private String getEmailName(final Tables.UserRow user) {
+    private String getEmailName(Tables.UserRow user) {
         return getEmailName(user.email(), user.username());
     }
 
