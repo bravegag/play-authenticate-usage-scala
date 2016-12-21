@@ -7,6 +7,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import play.api.mvc._
 import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
 import providers.AuthProvider
 import views.form._
@@ -83,8 +84,8 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def jsRoutes = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(play.routing.JavaScriptReverseRouter.create("jsRoutes",
-        routes.javascript.Signup.forgotPassword)).as("text/javascript")
+      Ok(JavaScriptReverseRouter("jsRoutes")(routes.javascript.Signup.forgotPassword)).
+        as("text/javascript")
     }
   }
 
