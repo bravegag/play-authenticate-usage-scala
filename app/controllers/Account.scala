@@ -4,7 +4,6 @@ import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
-import dao.UserDao
 import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Controller, Session}
