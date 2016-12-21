@@ -3,6 +3,7 @@ package services
 import com.feth.play.module.pa.Resolver
 import com.feth.play.module.pa.exceptions.AccessDeniedException
 import com.feth.play.module.pa.exceptions.AuthException
+import com.feth.play.module.pa.controllers.routes.Authenticate
 import controllers.routes
 import play.mvc.Call
 
@@ -31,7 +32,7 @@ class MyResolver extends Resolver {
   override def auth(provider: String): Call = {
     // You can provide your own authentication implementation,
     // however the default should be sufficient for most cases
-    com.feth.play.module.pa.controllers.routes.Authenticate.authenticate(provider)
+    Authenticate.authenticate(provider)
   }
 
   //------------------------------------------------------------------------
@@ -47,7 +48,8 @@ class MyResolver extends Resolver {
   //------------------------------------------------------------------------
   override def onException(authException: AuthException): Call = {
     authException match {
-      case accessDeniedException: AccessDeniedException => routes.Signup.oAuthDenied(accessDeniedException.getProviderKey)
+      case accessDeniedException: AccessDeniedException =>
+        routes.Signup.oAuthDenied(accessDeniedException.getProviderKey)
       case _ => // ignore
     }
 
