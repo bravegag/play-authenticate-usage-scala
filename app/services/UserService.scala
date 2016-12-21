@@ -100,8 +100,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
         }
       }
     }
-    val update = linkedAccount.copy(providerPassword = authUser.getHashedPassword)
-    linkedAccountDao.update(update)
+    linkedAccountDao.update(linkedAccount.copy(providerPassword = authUser.getHashedPassword))
   }
 
   //------------------------------------------------------------------------
@@ -119,8 +118,8 @@ class UserService @Inject()(auth : PlayAuthenticate,
 
   //------------------------------------------------------------------------
   def findInSession(session: Session): Option[UserRow] = {
-    val currentAuthUser = Option(auth.getUser(session))
-    currentAuthUser match {
+    val option = Option(auth.getUser(session))
+    option match {
       case Some(authUser: UsernamePasswordAuthUser) => findByAuthUser(authUser)
       case Some(userIdentity: AuthUserIdentity) => findByAuthUser(userIdentity)
       case _ => None
@@ -150,8 +149,13 @@ class UserService @Inject()(auth : PlayAuthenticate,
 
   //------------------------------------------------------------------------
   override def save(authUser: AuthUser): AnyRef = {
-    // TODO: implement
-    ???
+    val option = authUser match {
+      case authUser: UsernamePasswordAuthUser => findByAuthUser(authUser)
+      case userIdentity: AuthUserIdentity => findByAuthUser(userIdentity)
+      case _ => None
+    }
+    val id = option.map(_.id).getOrElse(null.asInstanceOf[Long])
+    Long.box(id)
   }
 
   //------------------------------------------------------------------------
