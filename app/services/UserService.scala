@@ -149,7 +149,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
-  override def save(authUser: AuthUser): Unit = {
+  override def save(authUser: AuthUser): AnyRef = {
     // TODO: implement
     ???
   }
@@ -184,7 +184,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
-  override def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): Unit = {
+  override def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): AuthUser = {
     if (!oldAuthUser.equals(newAuthUser)) {
       val oldUserOpt = findByAuthUser(oldAuthUser)
       val newUserOpt = findByAuthUser(newAuthUser)
@@ -197,10 +197,11 @@ class UserService @Inject()(auth : PlayAuthenticate,
         case _ => // TODO: the most sensible thing to do seems to be throwing an exception
       }
     }
+    newAuthUser
   }
 
   //------------------------------------------------------------------------
-  override def update(authUser: AuthUser): AnyRef = {
+  override def update(authUser: AuthUser): AuthUser = {
     val option = findByAuthUser(authUser)
     option.map { user : UserRow =>
       userDao.update(user.copy(lastLogin = Some(new Timestamp(new Date().getTime))))
