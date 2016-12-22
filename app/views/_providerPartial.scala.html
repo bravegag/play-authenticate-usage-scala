@@ -13,15 +13,16 @@ function askOpenID(url) {
 }
 </script>
 <ul class="providers">
-	@play.mvc.Http.Context.current.set(play.core.j.JavaHelpers.createJavaContext(request))
-	@forProviders(playAuth, skipCurrent) { p =>
-		<li>
-		@if(p.getKey() == "openid") {
-			<a href="javascript:void(0);" onclick="askOpenID('@p.getUrl()');">
-		} else {
-			<a href="@p.getUrl()">
+	@play.core.j.JavaHelpers.withContext(request) { jContext =>
+		@forProviders(playAuth, skipCurrent) { p =>
+			<li>
+			@if(p.getKey() == "openid") {
+				<a href="javascript:void(0);" onclick="askOpenID('@p.getUrl()');">
+			} else {
+				<a href="@p.getUrl()">
+			}
+			@_providerIcon(p.getKey())</a>
+			</li>
 		}
-		@_providerIcon(p.getKey())</a>
-		</li>
 	}
 </ul>
