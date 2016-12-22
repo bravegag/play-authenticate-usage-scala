@@ -1,4 +1,6 @@
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit messages: Messages)
+@import be.objectify.deadbolt.scala._
+
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit messages: Messages, request: AuthenticatedRequest[Any])
 
 @import com.feth.play.module.pa.views.html._
 
@@ -11,6 +13,7 @@ function askOpenID(url) {
 }
 </script>
 <ul class="providers">
+	@play.mvc.Http.Context.current.set(play.core.j.JavaHelpers.createJavaContext(request))
 	@forProviders(playAuth, skipCurrent) { p =>
 		<li>
 		@if(p.getKey() == "openid") {
