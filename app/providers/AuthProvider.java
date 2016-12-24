@@ -5,7 +5,7 @@ import com.feth.play.module.mail.Mailer.MailerFactory;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.password.*;
 import controllers.routes;
-import controllers.TokenAction;
+import constants.*;
 import generated.Tables;
 import play.Logger;
 import play.data.Form;
@@ -189,7 +189,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     //-------------------------------------------------------------------
     @Override
     protected String onLoginUserNotFound(Context context) {
-        context.flash().put(controllers.FlashKey.FLASH_ERROR_KEY(),
+        context.flash().put(FlashKey.FLASH_ERROR_KEY(),
                 Messages.get("playauthenticate.password.login.unknown_user_or_pw"));
         return super.onLoginUserNotFound(context);
     }
@@ -226,14 +226,14 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     protected String generateVerificationRecord(Tables.UserRow user) {
         final String token = generateToken();
         // Do database actions, etc.
-        tokenActionService.create(user, TokenAction.EMAIL_VERIFICATION(), token);
+        tokenActionService.create(user, TokenActionKey.EMAIL_VERIFICATION(), token);
         return token;
     }
 
     //-------------------------------------------------------------------
     protected String generatePasswordResetRecord(Tables.UserRow user) {
         final String token = generateToken();
-        tokenActionService.create(user, TokenAction.PASSWORD_RESET(), token);
+        tokenActionService.create(user, TokenActionKey.PASSWORD_RESET(), token);
         return token;
     }
 

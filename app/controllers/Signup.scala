@@ -5,6 +5,7 @@ import javax.inject.{Inject, Singleton}
 import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
+import constants.{FlashKey, TokenActionKey}
 import play.api.mvc._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
@@ -110,7 +111,7 @@ class Signup @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val ta = tokenIsValid(token, TokenAction.PASSWORD_RESET)
+      val ta = tokenIsValid(token, TokenActionKey.PASSWORD_RESET)
       if (ta == null) {
         BadRequest(views.html.account.signup.no_token_or_invalid(userService))
 
@@ -132,7 +133,7 @@ class Signup @Inject() (implicit
       } else {
         val token = filledForm.get.token
         val newPassword = filledForm.get.password
-        val option = tokenIsValid(token, TokenAction.PASSWORD_RESET)
+        val option = tokenIsValid(token, TokenActionKey.PASSWORD_RESET)
         option match {
           case Some(tokenAction) => {
             var flashValues = ArrayBuffer[(String, String)]()
@@ -189,7 +190,7 @@ class Signup @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val option = tokenIsValid(token, TokenAction.EMAIL_VERIFICATION)
+      val option = tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION)
       option match {
         case Some(tokenAction) => {
           val Some(user) =  tokenAction.targetUser
@@ -216,7 +217,7 @@ class Signup @Inject() (implicit
     * @param type
     * @return a token object if valid, null otherwise
     */
-  private def tokenIsValid(token: String, `type`: TokenAction.Type) : Option[TokenActionRow] = {
+  private def tokenIsValid(token: String, `type`: TokenActionKey.Type) : Option[TokenActionRow] = {
     val result =
       if (token != null && !token.trim.isEmpty) {
         val option = tokenActionService.findByToken(token, `type`)

@@ -2,11 +2,11 @@ package dao
 
 import javax.inject._
 
-import controllers.TokenAction
+import constants.TokenActionKey
 import dao.generic._
 
 import scala.concurrent.Future
-import generated.Tables.{TokenAction => TokenActionTQ, _}
+import generated.Tables._
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
@@ -14,17 +14,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class TokenActionDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
-  extends GenericDaoImpl[TokenActionTQ, TokenActionRow, Long] (dbConfigProvider, TokenActionTQ) {
+  extends GenericDaoImpl[TokenAction, TokenActionRow, Long] (dbConfigProvider, TokenAction) {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def findByToken(token: String, `type`: TokenAction.Type): Future[Seq[TokenActionRow]] = {
+  def findByToken(token: String, `type`: TokenActionKey.Type): Future[Seq[TokenActionRow]] = {
     filter(tokenAction => tokenAction.token === token && tokenAction.`type` === `type`.toString)
   }
 
   //------------------------------------------------------------------------
-  def deleteByUser(user: UserRow, `type`: TokenAction.Type) : Future[Unit] = {
+  def deleteByUser(user: UserRow, `type`: TokenActionKey.Type) : Future[Unit] = {
     // TODO: review this implementation
-    db.run(TokenActionTQ.filter(tokenAction => tokenAction.userId === user.id && tokenAction.`type` === `type`.toString).delete.map( _ => ()))
+    db.run(TokenAction.filter(tokenAction => tokenAction.userId === user.id && tokenAction.`type` === `type`.toString).delete.map( _ => ()))
   }
 }

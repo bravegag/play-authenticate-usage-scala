@@ -7,11 +7,11 @@ import play.mvc.Http.Session
 import javax.inject._
 import java.util.Date
 
-import controllers.{Application, SecurityRole, TokenAction}
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.service.AbstractUserService
 import com.feth.play.module.pa.user._
+import constants.{SecurityRoleKey, TokenActionKey}
 import dao._
 import generated.Tables.{LinkedAccountRow, UserRow}
 
@@ -46,7 +46,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
     }
 
     // initialize security role
-    val securityRole = securityRoleDao.findByName(SecurityRole.USER_ROLE).get
+    val securityRole = securityRoleDao.findByName(SecurityRoleKey.USER_ROLE).get
 
     // initialize linked account
     val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None)
@@ -106,14 +106,14 @@ class UserService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   def resetPassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
     changePassword(user, authUser, create)
-    tokenActionDao.deleteByUser(user, TokenAction.PASSWORD_RESET)
+    tokenActionDao.deleteByUser(user, TokenActionKey.PASSWORD_RESET)
   }
 
   //------------------------------------------------------------------------
   def verify(user: UserRow) : Unit = {
     val updated = user.copy(emailValidated = true)
     userDao.update(updated)
-    tokenActionDao.deleteByUser(user, TokenAction.EMAIL_VERIFICATION)
+    tokenActionDao.deleteByUser(user, TokenActionKey.EMAIL_VERIFICATION)
   }
 
   //------------------------------------------------------------------------

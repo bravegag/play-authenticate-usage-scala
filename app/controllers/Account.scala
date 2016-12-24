@@ -4,6 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
+import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Controller, Session}
@@ -36,7 +37,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
+  def verifyEmail = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -58,7 +59,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def changePassword = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
+  def changePassword = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -75,7 +76,7 @@ class Account @Inject() (implicit
   }
 
     //-------------------------------------------------------------------
-    def doChangePassword = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
+    def doChangePassword = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
       Future {
         val context = JavaHelpers.createJavaContext(request)
         com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())

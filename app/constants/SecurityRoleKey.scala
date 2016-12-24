@@ -1,6 +1,6 @@
-package controllers
+package constants
 
-object SecurityRole extends Enumeration {
+object SecurityRoleKey extends Enumeration {
   type Type = Value
   val USER_ROLE = Value("user")
   val ADMINISTRATOR_ROLE = Value("administrator")

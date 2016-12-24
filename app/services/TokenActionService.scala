@@ -5,7 +5,7 @@ import java.util.Date
 import javax.inject.{Inject, Singleton}
 
 import com.feth.play.module.pa.PlayAuthenticate
-import controllers.TokenAction
+import constants.TokenActionKey
 import dao._
 import generated.Tables.{TokenActionRow, UserRow}
 
@@ -18,7 +18,7 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def create(user: UserRow, `type`: TokenAction.Type, token: String) : TokenActionRow = {
+  def create(user: UserRow, `type`: TokenActionKey.Type, token: String) : TokenActionRow = {
     val created = new Timestamp(new Date().getTime)
     val expires = new Timestamp(created.getTime + VERIFICATION_TIME * 1000)
     val tokenAction = TokenActionRow(user.id, token, `type`.toString,
@@ -28,7 +28,7 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
-  def findByToken(token: String, `type`: TokenAction.Type): Option[TokenActionRow] = {
+  def findByToken(token: String, `type`: TokenActionKey.Type): Option[TokenActionRow] = {
     tokenActionDao.findByToken(token, `type`).headOption
   }
 

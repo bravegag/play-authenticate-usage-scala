@@ -1,4 +1,4 @@
-package controllers
+package constants
 
 object FlashKey extends Enumeration {
   type Type = Value

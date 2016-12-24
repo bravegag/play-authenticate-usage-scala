@@ -4,6 +4,7 @@ import javax.inject._
 
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
+import constants.SecurityRoleKey
 import play.api.mvc._
 import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -35,7 +36,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def restricted = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
+  def restricted = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.findInSession(context.session)
@@ -44,7 +45,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def profile = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
+  def profile = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       val localUser = userService.findInSession(context.session)

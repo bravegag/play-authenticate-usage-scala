@@ -1,6 +1,6 @@
-package controllers
+package constants
 
-object TokenAction extends Enumeration {
+object TokenActionKey extends Enumeration {
   type Type = Value
   val EMAIL_VERIFICATION = Value("EV")
   val PASSWORD_RESET = Value("PR")
