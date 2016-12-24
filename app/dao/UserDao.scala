@@ -96,7 +96,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
       linkedAccount <- LinkedAccount
       user <- User if user.id === sourceUser.id && user.id === linkedAccount.userId
     } yield (targetUser.id, linkedAccount.providerKey, linkedAccount.providerPassword, linkedAccount.modified)).
-      result.map(_.map(LinkedAccountRow.tupled))
+      result.map(seq => seq.map(LinkedAccountRow.tupled))
 
     // define an insert DBIOAction to insert all the selected linked accounts from sourceUser to targetUser
     val insertAction = selectAction.flatMap(LinkedAccount ++= _)
