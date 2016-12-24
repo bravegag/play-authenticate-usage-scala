@@ -4,9 +4,8 @@ import com.feth.play.module.pa.providers.password._
 
 /**
   * For logging the user with clear password
-  *
   * @param clearPassword clear password
-  * @param email         user identity
+  * @param email user identity
   */
 class SecuredUserLoginAuth(val clearPassword: String, val email: String) extends DefaultUsernamePasswordAuthUser(clearPassword, email) {
   //-------------------------------------------------------------------
