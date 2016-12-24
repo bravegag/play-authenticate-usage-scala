@@ -7,7 +7,7 @@ import play.mvc.Http.Session
 import javax.inject._
 import java.util.Date
 
-import controllers.Application
+import controllers.{Application, SecurityRole, TokenAction}
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.service.AbstractUserService
@@ -46,7 +46,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
     }
 
     // initialize security role
-    val securityRole = securityRoleDao.findByName(Application.USER_ROLE_KEY).get
+    val securityRole = securityRoleDao.findByName(SecurityRole.USER_ROLE).get
 
     // initialize linked account
     val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None)

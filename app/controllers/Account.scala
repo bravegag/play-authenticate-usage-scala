@@ -36,7 +36,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
+  def verifyEmail = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -44,13 +44,13 @@ class Account @Inject() (implicit
       val tuple =
         if (user.emailValidated) {
           // email has been validated already
-          (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
+          (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
         } else
         if (user.email != null && !user.email.trim.isEmpty) {
           authProvider.sendVerifyEmailMailingAfterSignup(user, context)
-          (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
+          (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
         } else {
-          (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
+          (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
         }
 
       Redirect(routes.Application.profile).flashing(tuple)
@@ -58,7 +58,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def changePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
+  def changePassword = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -75,7 +75,7 @@ class Account @Inject() (implicit
   }
 
     //-------------------------------------------------------------------
-    def doChangePassword = deadbolt.Restrict(List(Array(Application.USER_ROLE_KEY)))() { implicit request =>
+    def doChangePassword = deadbolt.Restrict(List(Array(SecurityRole.USER_ROLE.toString)))() { implicit request =>
       Future {
         val context = JavaHelpers.createJavaContext(request)
         com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
@@ -90,7 +90,7 @@ class Account @Inject() (implicit
           val newPassword = filledForm.get.password
           userService.changePassword(user, new SecuredUserSignupAuth(newPassword), true)
           Redirect(routes.Application.profile).flashing(
-            Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
+            FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
           )
         }
       }
@@ -132,7 +132,7 @@ class Account @Inject() (implicit
           val link = filledForm.get.accept
           val result = JavaHelpers.createResult(context, auth.link(context, link))
           link match {
-            case true => result.flashing(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
+            case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
             case false => result
           }
         }
@@ -191,7 +191,7 @@ class Account @Inject() (implicit
           val merge = filledForm.get.accept
           val result = JavaHelpers.createResult(context, auth.merge(context, merge))
           merge match {
-            case true => result.flashing(Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.merge.success"))
+            case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.merge.success"))
             case false => result
           }
         }

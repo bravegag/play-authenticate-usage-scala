@@ -75,7 +75,7 @@
 
 
 <div class="container">
-    @request.flash.get(Application.FLASH_ERROR_KEY).map { errorMessage =>
+    @request.flash.get(FlashKey.FLASH_ERROR_KEY).map { errorMessage =>
     <div class="alert alert-danger" role="alert">
         <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
                         Close</span></button>
@@ -83,7 +83,7 @@
     </div>
     }
 
-    @request.flash.get(Application.FLASH_MESSAGE_KEY).map { errorMessage =>
+    @request.flash.get(FlashKey.FLASH_MESSAGE_KEY).map { errorMessage =>
     <div class="alert alert-success" role="alert">
         <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
                         Close</span></button>

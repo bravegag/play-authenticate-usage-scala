@@ -5,6 +5,7 @@ import com.feth.play.module.mail.Mailer.MailerFactory;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.password.*;
 import controllers.routes;
+import controllers.TokenAction;
 import generated.Tables;
 import play.Logger;
 import play.data.Form;
@@ -16,7 +17,6 @@ import play.mvc.Http.Context;
 import scala.collection.JavaConversions;
 import services.*;
 import views.form.*;
-import dao.TokenAction;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -189,7 +189,7 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
     //-------------------------------------------------------------------
     @Override
     protected String onLoginUserNotFound(Context context) {
-        context.flash().put(controllers.Application.FLASH_ERROR_KEY(),
+        context.flash().put(controllers.FlashKey.FLASH_ERROR_KEY(),
                 Messages.get("playauthenticate.password.login.unknown_user_or_pw"));
         return super.onLoginUserNotFound(context);
     }

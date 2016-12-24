@@ -2,21 +2,15 @@ package dao
 
 import javax.inject._
 
+import controllers.TokenAction
 import dao.generic._
 
 import scala.concurrent.Future
-import generated.Tables.{ TokenAction => TokenActionTQ, _}
+import generated.Tables.{TokenAction => TokenActionTQ, _}
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent._
-
-object TokenAction extends Enumeration {
-  type Type = Value
-  val EMAIL_VERIFICATION = Value("EV")
-  val PASSWORD_RESET = Value("PR")
-}
 
 @Singleton
 class TokenActionDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)

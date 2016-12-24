@@ -3,20 +3,20 @@ package dao
 import javax.inject.{Inject, Singleton}
 
 import dao.generic.GenericDaoAutoIncImpl
-import generated.Tables.{SecurityRole, SecurityRoleRow}
 
 import scala.concurrent.Future
-import generated.Tables._
+import generated.Tables.{ SecurityRole => SecurityRoleTQ, _ }
+import controllers.SecurityRole
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
 @Singleton
 class SecurityRoleDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
-  extends GenericDaoAutoIncImpl[SecurityRole, SecurityRoleRow, Long] (dbConfigProvider, SecurityRole) {
+  extends GenericDaoAutoIncImpl[SecurityRoleTQ, SecurityRoleRow, Long] (dbConfigProvider, SecurityRoleTQ) {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def findByName(name: String) : Future[Option[SecurityRoleRow]] = {
-    db.run(SecurityRole.filter(_.name === name).result.headOption)
+  def findByName(securityRole: SecurityRole.Type) : Future[Option[SecurityRoleRow]] = {
+    db.run(SecurityRoleTQ.filter(_.name === securityRole.toString).result.headOption)
   }
 }

@@ -10,7 +10,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.core.j.JavaHelpers
 import providers._
 import services._
-import dao.TokenAction
 import generated.Tables.TokenActionRow
 import views.account.signup.form._
 
@@ -73,7 +72,7 @@ class Signup @Inject() (implicit
         // up, so just say an email has been sent, even though it might not
         // be true - that's protecting our user privacy.
         var flashValues = ArrayBuffer[(String, String)]()
-        flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
+        flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
 
         val userOption = userService.findByEmail(email)
         if (userOption.isDefined) {
@@ -95,7 +94,7 @@ class Signup @Inject() (implicit
             // with the password reset, as a "bad" user could then sign
             // up with a fake email via OAuth and get it verified by an
             // a unsuspecting user that clicks the link.
-            flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
+            flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
 
             // You might want to re-send the verification email here...
             authProvider.sendVerifyEmailMailingAfterSignup(user, context)
@@ -146,18 +145,18 @@ class Signup @Inject() (implicit
             }
             catch {
               case exception: RuntimeException => {
-                flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
+                flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
               }
             }
             val login = authProvider.isLoginAfterPasswordReset
             if (login) {
               // automatically log in
-              flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
+              flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
               auth.loginAndRedirect(context, new SecuredUserLoginAuth(user.email))
 
             } else {
               // send the user to the login page
-              flashValues += (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+              flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
             }
             Redirect(routes.Application.login).flashing(flashValues: _*)
           }
@@ -196,7 +195,7 @@ class Signup @Inject() (implicit
           val Some(user) =  tokenAction.targetUser
           val email = user.email
           user.verify
-          val flashValues = (Application.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
+          val flashValues = (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
           if (userService.findInSession(context.session) != null) {
             Redirect(routes.Application.index).flashing(flashValues)
           } else {

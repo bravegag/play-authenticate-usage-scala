@@ -5,6 +5,7 @@ import java.util.Date
 import javax.inject.{Inject, Singleton}
 
 import com.feth.play.module.pa.PlayAuthenticate
+import controllers.TokenAction
 import dao._
 import generated.Tables.{TokenActionRow, UserRow}
 
