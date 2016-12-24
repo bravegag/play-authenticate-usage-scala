@@ -181,7 +181,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
           // new user is no longer active
           userDao.merge(oldUser, newUser)
         }
-        case _ => // TODO: the most sensible thing to do seems to be throwing an exception
+        case _ => // TODO: the most sensible thing to do is to throw an exception
       }
     }
     oldAuthUser
@@ -198,7 +198,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
           // link the two users
           linkedAccountDao.create(oldUser, newAuthUser)
         }
-        case _ => // TODO: the most sensible thing to do seems to be throwing an exception
+        case _ => // TODO: the most sensible thing to do is to throw an exception
       }
     }
     newAuthUser

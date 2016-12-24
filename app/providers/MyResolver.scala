@@ -1,9 +1,8 @@
-package services
+package providers
 
 import com.feth.play.module.pa.Resolver
-import com.feth.play.module.pa.exceptions.AccessDeniedException
-import com.feth.play.module.pa.exceptions.AuthException
 import com.feth.play.module.pa.controllers.routes.Authenticate
+import com.feth.play.module.pa.exceptions.{AccessDeniedException, AuthException}
 import controllers.routes
 import play.mvc.Call
 

@@ -6,7 +6,7 @@ import com.feth.play.module.pa.Resolver
 import com.feth.play.module.pa.providers.openid.OpenIdAuthProvider
 import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.FactoryModuleBuilder
-import providers.AuthProvider
+import providers.{AuthProvider, MyResolver}
 import services._
 
 class MyModule extends AbstractModule {
