@@ -237,8 +237,3 @@ class Signup @Inject() (implicit
     result
   }
 }
-
-/**
-  * Signup companion object
-  */
-object Signup

@@ -199,8 +199,3 @@ class Account @Inject() (implicit
     }
   }
 }
-
-/**
-  * Account companion object
-  */
-object Account
