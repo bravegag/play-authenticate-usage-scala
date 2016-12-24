@@ -2,14 +2,14 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, providerKey: String)(implicit request: AuthenticatedRequest[Any], messages: Messages)
+@(userService: UserService, providerKey: String)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
 
-@main(userService, Messages("playauthenticate.oauth.access.denied.title")) {
+@main(userService, messagesApi("playauthenticate.oauth.access.denied.title")) {
 
-	<h1>@Messages("playauthenticate.oauth.access.denied.title")</h1>
+	<h1>@messagesApi("playauthenticate.oauth.access.denied.title")</h1>
 	<p>
-		@Messages("playauthenticate.oauth.access.denied.explanation")<br/>
+		@messagesApi("playauthenticate.oauth.access.denied.explanation")<br/>
 	</p>
 	<p>
-		@Messages("playauthenticate.oauth.access.denied.alternative") <a href="@routes.Application.signup">@Messages("playauthenticate.oauth.access.denied.alternative.cta")</a>.
+		@messagesApi("playauthenticate.oauth.access.denied.alternative") <a href="@routes.Application.signup">@messagesApi("playauthenticate.oauth.access.denied.alternative.cta")</a>.
 }

@@ -22,7 +22,8 @@ class Application @Inject() (implicit
                              auth: PlayAuthenticate,
                              userService: UserService,
                              authProvider: AuthProvider,
-                             formFactory: LoginSignupFormFactory) extends Controller with I18nSupport {
+                             loginForm: LoginForm,
+                             signupForm: SignupForm) extends Controller with I18nSupport {
 
   //-------------------------------------------------------------------
   // public
@@ -54,7 +55,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def login() = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(views.html.login(auth, userService, formFactory.getLoginForm))
+      Ok(views.html.login(auth, userService, loginForm.Instance))
     }
   }
 
@@ -62,7 +63,7 @@ class Application @Inject() (implicit
   def doLogin = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
       val context = JavaHelpers.createJavaContext(request)
-      val filledForm = formFactory.getLoginForm.bindFromRequest(context.request())
+      val filledForm = loginForm.Instance.bindFromRequest
       if (filledForm.hasErrors) {
         // User did not fill everything properly
         BadRequest(views.html.login(auth, userService, filledForm))
@@ -77,15 +78,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def signup = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(views.html.signup(auth, userService, formFactory.getSignupForm))
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def jsRoutes = deadbolt.WithAuthRequest()() { implicit request =>
-    Future {
-      Ok(JavaScriptReverseRouter("jsRoutes")(routes.javascript.Signup.forgotPassword)).
-        as("text/javascript")
+      Ok(views.html.signup(auth, userService, signupForm.Instance))
     }
   }
 
@@ -94,7 +87,7 @@ class Application @Inject() (implicit
     Future {
       val context = JavaHelpers.createJavaContext(request)
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val filledForm = formFactory.getSignupForm.bindFromRequest(context.request())
+      val filledForm = signupForm.Instance.bindFromRequest
       if (filledForm.hasErrors) {
         // User did not fill everything properly
         BadRequest(views.html.signup(auth, userService, filledForm))
@@ -105,6 +98,14 @@ class Application @Inject() (implicit
         // signup
         JavaHelpers.createResult(context, authProvider.handleSignup(context))
       }
+    }
+  }
+
+  //-------------------------------------------------------------------
+  def jsRoutes = deadbolt.WithAuthRequest()() { implicit request =>
+    Future {
+      Ok(JavaScriptReverseRouter("jsRoutes")(routes.javascript.Signup.forgotPassword)).
+        as("text/javascript")
     }
   }
 }

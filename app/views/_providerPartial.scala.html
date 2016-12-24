@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit messages: Messages, request: AuthenticatedRequest[Any])
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit messagesApi: MessagesApi, request: AuthenticatedRequest[Any])
 
 @import com.feth.play.module.pa.views.html._
 

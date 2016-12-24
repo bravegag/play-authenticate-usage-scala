@@ -2,12 +2,12 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messages: Messages)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
 
-@main(userService, Messages("playauthenticate.verify.account.title")) {
+@main(userService, messagesApi("playauthenticate.verify.account.title")) {
 
-	<h1>@Messages("playauthenticate.verify.account.title")</h1>
+	<h1>@messagesApi("playauthenticate.verify.account.title")</h1>
 	<p>
-	@Messages("playauthenticate.verify.account.before") <a href="@routes.Account.verifyEmail">@Messages("playauthenticate.verify.account.first")</a>.<br/>
+	@messagesApi("playauthenticate.verify.account.before") <a href="@routes.Account.verifyEmail">@messagesApi("playauthenticate.verify.account.first")</a>.<br/>
 	</p>
 }

@@ -2,9 +2,9 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messages: Messages)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
 
-@main(userService, Messages("playauthenticate.user.exists.title")) {
-	<h1>@Messages("playauthenticate.user.exists.title")</h1>
-	<p>@Messages("playauthenticate.user.exists.message")</p>
+@main(userService, messagesApi("playauthenticate.user.exists.title")) {
+	<h1>@messagesApi("playauthenticate.user.exists.title")</h1>
+	<p>@messagesApi("playauthenticate.user.exists.message")</p>
 }

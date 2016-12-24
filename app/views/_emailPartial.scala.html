@@ -1,4 +1,4 @@
-@(f: Form[_], constraints: Boolean = false)(implicit messages: Messages)
+@(f: Form[_], constraints: Boolean = false)(implicit messagesApi: MessagesApi, messages: Messages)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -6,5 +6,5 @@
 @inputText(
   f("email"),
   '_showConstraints -> constraints,
-  '_label -> Messages("playauthenticate.login.email.placeholder")
+  '_label -> messagesApi("playauthenticate.login.email.placeholder")
 )

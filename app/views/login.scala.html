@@ -1,19 +1,20 @@
 @import services.UserService
 @import play.api.mvc._
+@import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@import play.core.j.PlayMagicForJava._
+@import views.form._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: play.data.Form[views.form.Login])(implicit request: AuthenticatedRequest[Any])
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, Messages("playauthenticate.login.title"),"login") {
+@main(userService, messagesApi("playauthenticate.login.title"),"login") {
 
   <div class="row">
     <div class="col-xs-6 col-sm-4">
-      <h1>@Messages("playauthenticate.login.title")</h1>
+      <h1>@messagesApi("playauthenticate.login.title")</h1>
     </div>
   </div>
 
@@ -25,33 +26,33 @@
 
         @if(loginForm.hasGlobalErrors) {
           	<p class="alert alert-danger">
-	          @loginForm.globalError.message
+	          @loginForm.globalError.get.message
 	     	</p>
         }
 
-        @_emailPartialJava(loginForm)
+        @_emailPartial(loginForm)
 
         @inputPassword(
           loginForm("password"),
           '_showConstraints -> false,
-          '_label -> Messages("playauthenticate.login.password.placeholder")
+          '_label -> messagesApi("playauthenticate.login.password.placeholder")
         )
 
-            <button type="submit" class="btn btn-default">@Messages("playauthenticate.login.now")</button>
+            <button type="submit" class="btn btn-default">@messagesApi("playauthenticate.login.now")</button>
 
-        <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@Messages("playauthenticate.login.forgot.password")</a>
+        <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@messagesApi("playauthenticate.login.forgot.password")</a>
 
     	}
     </div>
 
    <div class="col-xs-6 col-sm-4">
-      @Messages("playauthenticate.login.oauth")
+      @messagesApi("playauthenticate.login.oauth")
       @* Display list of available providers *@
       @_providerPartial(playAuth, skipCurrent=false)
       @providerAvailable("basic") { available: java.lang.Boolean =>
           @if(available) {
               <br>
-              <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")">@Messages("playauthenticate.login.basic")</a>
+              <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")">@messagesApi("playauthenticate.login.basic")</a>
           }
       }
     </div>

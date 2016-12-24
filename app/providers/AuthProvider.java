@@ -38,23 +38,20 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
             ApplicationLifecycle lifecycle,
             UserService userService,
             TokenActionService tokenActionService,
-            MailerFactory mailerFactory,
-            LoginSignupFormFactory formFactory) {
+            MailerFactory mailerFactory) {
         super(auth, lifecycle, mailerFactory);
-        this.loginForm = formFactory.getLoginForm();
-        this.signupForm = formFactory.getSignupForm();
         this.userService = userService;
         this.tokenActionService = tokenActionService;
     }
 
     //-------------------------------------------------------------------
     public Form<Login> getLoginForm() {
-        return loginForm;
+        return null;
     }
 
     //-------------------------------------------------------------------
     public Form<Signup> getSignupForm() {
-        return signupForm;
+        return null;
     }
 
     //-------------------------------------------------------------------
@@ -363,8 +360,6 @@ public class AuthProvider extends UsernamePasswordAuthProvider<String,
 
     private static final String EMAIL_TEMPLATE_FALLBACK_LANGUAGE = "en";
 
-    private final Form<Signup> signupForm;
-    private final Form<Login> loginForm;
     private final UserService userService;
     private final TokenActionService tokenActionService;
 }

@@ -5,7 +5,7 @@
 @import play.core.j.JavaHelpers
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit lang: Lang, request: AuthenticatedRequest[Any], messages: Messages)
+@(userService: UserService, title: String, nav: String = "")(content: Html)(implicit lang: Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
 
 <!DOCTYPE html>
 <html lang="@lang.code">
@@ -43,11 +43,11 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@Messages("playauthenticate.navigation.home")</a></li>
-                <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.restricted()">@Messages("playauthenticate.navigation.restricted")</a></li>
+                <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@messagesApi("playauthenticate.navigation.home")</a></li>
+                <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.restricted()">@messagesApi("playauthenticate.navigation.restricted")</a></li>
 
                 @subjectNotPresent() {
-                <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
+                <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@messagesApi("playauthenticate.navigation.signup")</a></li>
                 }
             </ul>
 
@@ -57,16 +57,16 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.get.username <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
-                        <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
+                        <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@messagesApi("playauthenticate.navigation.profile")</a></li>
+                        <li><a href="@routes.Account.link()">@messagesApi("playauthenticate.navigation.link_more")</a></li>
                         <li class="divider"></li>
-                        <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
+                        <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @messagesApi("playauthenticate.navigation.logout")</a></li>
                     </ul>
                 </li>
                 }
             </ul>
             } {
-            <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
+            <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@messagesApi("playauthenticate.navigation.login")</a>
             }
 
         </div><!-- /.navbar-collapse -->

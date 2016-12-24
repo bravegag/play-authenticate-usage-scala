@@ -14,7 +14,7 @@ public class SecuredUserSignupAuth extends UsernamePasswordAuthUser implements N
 	 */
 	public SecuredUserSignupAuth(final Signup signup) {
 		super(signup.getPassword(), signup.getEmail());
-		this.username = signup.getUsername();
+		this.name = signup.name();
 	}
 
 	//-------------------------------------------------------------------
@@ -24,18 +24,18 @@ public class SecuredUserSignupAuth extends UsernamePasswordAuthUser implements N
 	 */
 	public SecuredUserSignupAuth(final String password) {
 		super(password, null);
-		username = null;
+		name = null;
 	}
 
 	//-------------------------------------------------------------------
 	@Override
 	public String getName() {
-		return username;
+		return name;
 	}
 
 	//-------------------------------------------------------------------
 	// members
 	//-------------------------------------------------------------------
 	private static final long serialVersionUID = 1L;
-	private final String username;
+	private final String name;
 }

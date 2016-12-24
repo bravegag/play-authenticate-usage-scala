@@ -1,18 +1,19 @@
 @import services.UserService
 @import play.api.mvc._
+@import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@import play.core.j.PlayMagicForJava._
+@import views.form._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: play.data.Form[views.form.Signup])(implicit request: AuthenticatedRequest[Any])
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
-@main(userService, Messages("playauthenticate.signup.title"),"signup") {
+@main(userService, messagesApi("playauthenticate.signup.title"),"signup") {
 
   <div class="row">
     <div class="col-xs-12 col-sm-6 col-md-8">
-      <h1>@Messages("playauthenticate.signup.title")</h1>
+      <h1>@messagesApi("playauthenticate.signup.title")</h1>
     </div>
   </div>
 
@@ -24,25 +25,25 @@
 
             @if(signupForm.hasGlobalErrors) {
 		        <p class="alert alert-danger">
-		          @signupForm.globalError.message
+		          @signupForm.globalError.get.message
 		     	</p>
             }
 
              @inputText(
-                signupForm("name"),
-                '_label -> Messages("playauthenticate.signup.name")
+                signupForm("username"),
+                '_label -> messagesApi("playauthenticate.signup.name")
              )
 
-             @_emailPartialJava(signupForm)
+             @_emailPartial(signupForm)
 
-             @_passwordPartialJava(signupForm)
+             @_passwordPartial(signupForm)
 
-            <button type="submit" class="btn btn-default">@Messages("playauthenticate.signup.now")</button>
+            <button type="submit" class="btn btn-default">@messagesApi("playauthenticate.signup.now")</button>
     	}
     </div>
 
     <div class="col-xs-6 col-md-4">
-        @Messages("playauthenticate.signup.oauth")
+        @messagesApi("playauthenticate.signup.oauth")
         @* Display list of available providers *@
         @_providerPartial(playAuth, skipCurrent=false)
     </div>
