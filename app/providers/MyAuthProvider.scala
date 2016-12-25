@@ -85,26 +85,29 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def signupUser(signupAuthUser: MySignupAuthUser): SignupResult = {
-    val user: Tables#UserRow = userService.findByAuthUser (signupAuthUser).get
-    if (user != null) {
-      if (user.emailValidated) {
-        // This user exists, has its email validated and is active
-        SignupResult.USER_EXISTS
-      } else {
-        // this user exists, is active but has not yet validated its
-        // email
-        SignupResult.USER_EXISTS_UNVERIFIED
+    val option = userService.findByAuthUser (signupAuthUser)
+    option match {
+      case Some(user) => {
+        if (user.emailValidated) {
+          // This user exists, has its email validated and is active
+          SignupResult.USER_EXISTS
+        } else {
+          // this user exists, is active but has not yet validated its
+          // email
+          SignupResult.USER_EXISTS_UNVERIFIED
+        }
+      }
+      case None => {
+        // The user either does not exist or is inactive - create a new one
+        val newUser = userService.create(signupAuthUser)
+
+        // Usually the email should be verified before allowing login, however
+        // if you return
+        // return SignupResult.USER_CREATED;
+        // then the user gets logged in directly
+        SignupResult.USER_CREATED_UNVERIFIED
       }
     }
-
-    // The user either does not exist or is inactive - create a new one
-    val newUser = userService.create(signupAuthUser)
-
-    // Usually the email should be verified before allowing login, however
-    // if you return
-    // return SignupResult.USER_CREATED;
-    // then the user gets logged in directly
-    SignupResult.USER_CREATED_UNVERIFIED
   }
 
   //-------------------------------------------------------------------
@@ -187,7 +190,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def generateVerificationRecord(user: MySignupAuthUser): String = {
-    generateVerificationRecord(userService.findByAuthUser (user).get)
+    generateVerificationRecord(userService.findByAuthUser(user).get)
   }
 
   //-------------------------------------------------------------------
@@ -206,12 +209,12 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def getPasswordResetMailingSubject(user: Tables#UserRow, ctx: Http.Context): String = {
+  protected def getPasswordResetMailingSubject(user: UserRow, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.reset_email.subject")
   }
 
   //-------------------------------------------------------------------
-  protected def getPasswordResetMailingBody(token: String, user: Tables#UserRow, ctx: Http.Context) : Body = {
+  protected def getPasswordResetMailingBody(token: String, user: UserRow, ctx: Http.Context) : Body = {
     val isSecure: Boolean = getConfiguration.getBoolean (SETTING_KEY_PASSWORD_RESET_LINK_SECURE)
     val url: String = routes.Signup.resetPassword (token).absoluteURL (ctx.request, isSecure)
     val lang: Lang = Lang.preferred (ctx.request.acceptLanguages)
@@ -222,7 +225,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingSubjectAfterSignup (user: Tables#UserRow, ctx: Http.Context): String = {
+  protected def getVerifyEmailMailingSubjectAfterSignup (user: UserRow, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.verify_email.subject")
   }
 
