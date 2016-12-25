@@ -2,7 +2,6 @@ package providers
 
 import com.feth.play.module.mail.Mailer.MailerFactory
 import com.feth.play.module.pa.PlayAuthenticate
-import com.feth.play.module.pa.providers.password._
 import controllers.routes
 import constants._
 import generated.Tables
@@ -22,28 +21,34 @@ import java.lang.reflect.Method
 import java.util
 import java.util.UUID
 
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.{LoginResult, SignupResult}
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import generated.Tables.UserRow
 import play.api.i18n.MessagesApi
+import AbstractUsernamePasswordAuthProvider.{LoginResult, SignupResult}
+import play.core.j.JavaHelpers
 
 @Singleton
-class AuthProvider @Inject() (val messagesApi: MessagesApi,
-                              val userService: UserService,
-                              val tokenActionService: TokenActionService,
-                              auth: PlayAuthenticate,
-                              lifecycle: ApplicationLifecycle,
-                              mailerFactory: MailerFactory)
-  extends UsernamePasswordAuthProvider[String, SecuredUserLoginAuth, SecuredUserSignupAuth, Login, Signup] (auth, lifecycle, mailerFactory) {
+class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
+                               val userService: UserService,
+                               val tokenActionService: TokenActionService,
+                               val signupForm: SignupForm,
+                               val loginForm: LoginForm,
+                               auth: PlayAuthenticate,
+                               lifecycle: ApplicationLifecycle,
+                               mailerFactory: MailerFactory)
+  extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuth, MySignupAuth, Login, Signup] (auth, lifecycle, mailerFactory) {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def getLoginForm: Form[Login] = {
-    null
+  protected def getSignup(context: Http.Context): Signup = {
+    val filledForm = signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    filledForm.get
   }
 
   //-------------------------------------------------------------------
-  def getSignupForm: Form[Signup] = {
-    null
+  protected def getLogin(context: Http.Context): Login = {
+    val filledForm = loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    filledForm.get
   }
 
   //-------------------------------------------------------------------
@@ -79,7 +84,7 @@ class AuthProvider @Inject() (val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def signupUser(signupAuthUser: SecuredUserSignupAuth): UsernamePasswordAuthProvider.SignupResult = {
+  protected def signupUser(signupAuthUser: MySignupAuth): SignupResult = {
     val user: Tables#UserRow = userService.findByAuthUser (signupAuthUser).get
     if (user != null) {
       if (user.emailValidated) {
@@ -103,7 +108,7 @@ class AuthProvider @Inject() (val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def loginUser (authUser: SecuredUserLoginAuth): UsernamePasswordAuthProvider.LoginResult = {
+  protected def loginUser (authUser: MyLoginAuth): LoginResult = {
     val user = userService.findByAuthUser(authUser).get
     if (user == null) {
       LoginResult.NOT_FOUND
@@ -144,22 +149,22 @@ class AuthProvider @Inject() (val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): SecuredUserSignupAuth = {
-    new SecuredUserSignupAuth (signup)
+  protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): MySignupAuth = {
+    new MySignupAuth (signup)
   }
 
   //-------------------------------------------------------------------
-  protected def buildLoginAuthUser(login: Login, ctx: Http.Context): SecuredUserLoginAuth = {
-    new SecuredUserLoginAuth (login.getPassword, login.getEmail)
+  protected def buildLoginAuthUser(login: Login, ctx: Http.Context): MyLoginAuth = {
+    new MyLoginAuth (login.getPassword, login.getEmail)
   }
 
   //-------------------------------------------------------------------
-  protected def transformAuthUser(authUser: SecuredUserSignupAuth, context: Http.Context): SecuredUserLoginAuth = {
-    new SecuredUserLoginAuth (authUser.getEmail)
+  protected def transformAuthUser(authUser: MySignupAuth, context: Http.Context): MyLoginAuth = {
+    new MyLoginAuth (authUser.getEmail)
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingSubject (user: SecuredUserSignupAuth, ctx: Http.Context): String = {
+  protected def getVerifyEmailMailingSubject (user: MySignupAuth, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.verify_signup.subject")
   }
 
@@ -170,7 +175,7 @@ class AuthProvider @Inject() (val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingBody(token: String, user: SecuredUserSignupAuth, ctx: Http.Context): Body = {
+  protected def getVerifyEmailMailingBody(token: String, user: MySignupAuth, ctx: Http.Context): Body = {
     val isSecure: Boolean = getConfiguration.getBoolean (SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url: String = routes.Signup.verify (token).absoluteURL (ctx.request, isSecure)
     val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
@@ -181,7 +186,7 @@ class AuthProvider @Inject() (val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def generateVerificationRecord(user: SecuredUserSignupAuth): String = {
+  protected def generateVerificationRecord(user: MySignupAuth): String = {
     generateVerificationRecord(userService.findByAuthUser (user).get)
   }
 
@@ -283,8 +288,8 @@ class AuthProvider @Inject() (val messagesApi: MessagesApi,
   //-------------------------------------------------------------------
   // members
   //-------------------------------------------------------------------
-  private lazy val SETTING_KEY_VERIFICATION_LINK_SECURE: String = UsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "verificationLink.secure"
-  private lazy val SETTING_KEY_PASSWORD_RESET_LINK_SECURE: String = UsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "passwordResetLink.secure"
+  private lazy val SETTING_KEY_VERIFICATION_LINK_SECURE: String = AbstractUsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "verificationLink.secure"
+  private lazy val SETTING_KEY_PASSWORD_RESET_LINK_SECURE: String = AbstractUsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "passwordResetLink.secure"
   private lazy val SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET: String = "loginAfterPasswordReset"
   private lazy val EMAIL_TEMPLATE_FALLBACK_LANGUAGE: String = "en"
 }

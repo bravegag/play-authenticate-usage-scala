@@ -9,7 +9,7 @@ import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Controller, Session}
 import play.core.j.JavaHelpers
-import providers.{AuthProvider, SecuredUserSignupAuth}
+import providers.{MyAuthProvider, MySignupAuth}
 import services.UserService
 import views.account.form._
 
@@ -22,7 +22,7 @@ class Account @Inject() (implicit
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
                          userService: UserService,
-                         authProvider: AuthProvider,
+                         authProvider: MyAuthProvider,
                          acceptForm: AcceptForm,
                          passwordChangeForm: PasswordChangeForm) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
@@ -89,7 +89,7 @@ class Account @Inject() (implicit
         } else {
           val Some(user: UserRow) = userService.findInSession(context.session)
           val newPassword = filledForm.get.password
-          userService.changePassword(user, new SecuredUserSignupAuth(newPassword), true)
+          userService.changePassword(user, new MySignupAuth(newPassword), true)
           Redirect(routes.Application.profile).flashing(
             FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
           )

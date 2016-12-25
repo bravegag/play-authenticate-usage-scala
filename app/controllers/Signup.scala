@@ -24,7 +24,7 @@ class Signup @Inject() (implicit
                         auth: PlayAuthenticate,
                         userService: UserService,
                         tokenActionService: TokenActionService,
-                        authProvider: AuthProvider,
+                        authProvider: MyAuthProvider,
                         forgotPasswordForm: ForgotPasswordForm,
                         passwordResetForm: PasswordResetForm) extends Controller with I18nSupport {
   import services.PluggableUserService._
@@ -142,7 +142,7 @@ class Signup @Inject() (implicit
               // Pass true for the second parameter if you want to
               // automatically create a password and the exception never to
               // happen
-              user.resetPassword(new SecuredUserSignupAuth(newPassword), false)
+              user.resetPassword(new MySignupAuth(newPassword), false)
             }
             catch {
               case exception: RuntimeException => {
@@ -153,7 +153,7 @@ class Signup @Inject() (implicit
             if (login) {
               // automatically log in
               flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
-              auth.loginAndRedirect(context, new SecuredUserLoginAuth(user.email))
+              auth.loginAndRedirect(context, new MyLoginAuth(user.email))
 
             } else {
               // send the user to the login page

@@ -7,7 +7,7 @@ import com.feth.play.module.pa.providers.password._
   * @param clearPassword clear password
   * @param email user identity
   */
-class SecuredUserLoginAuth(val clearPassword: String, val email: String) extends DefaultUsernamePasswordAuthUser(clearPassword, email) {
+class MyLoginAuth(val clearPassword: String, val email: String) extends DefaultUsernamePasswordAuthUser(clearPassword, email) {
   //-------------------------------------------------------------------
   /**
     * For logging the user in automatically

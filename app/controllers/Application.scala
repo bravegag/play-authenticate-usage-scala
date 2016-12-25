@@ -10,7 +10,7 @@ import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
-import providers.AuthProvider
+import providers.MyAuthProvider
 import views.form._
 
 import scala.concurrent._
@@ -22,7 +22,7 @@ class Application @Inject() (implicit
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,
-                             authProvider: AuthProvider,
+                             authProvider: MyAuthProvider,
                              loginForm: LoginForm,
                              signupForm: SignupForm) extends Controller with I18nSupport {
 
