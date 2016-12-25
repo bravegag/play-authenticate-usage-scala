@@ -24,6 +24,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
       linkedAccount <- (LinkedAccount += inputLinkedAccount.copy(userId = user.id))
       userSecurityRole <- (UserSecurityRole += UserSecurityRoleRow(user.id, inputSecurityRole.id, None))
     } yield user).transactionally
+
     db.run(insertion)
   }
 
