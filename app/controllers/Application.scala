@@ -55,7 +55,7 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def login() = deadbolt.WithAuthRequest()() { implicit request =>
+  def login = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
       Ok(views.html.login(auth, userService, loginForm.Instance))
     }
