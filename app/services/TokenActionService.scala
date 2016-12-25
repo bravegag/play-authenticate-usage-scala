@@ -11,8 +11,7 @@ import generated.Tables.{TokenActionRow, UserRow}
 
 @Singleton
 class TokenActionService @Inject()(auth : PlayAuthenticate,
-                                   tokenActionDao: TokenActionDao,
-                                   userDao: UserDao) {
+                                   daoContext: DaoContext) {
   import utils.DbExecutionUtils._
 
   //------------------------------------------------------------------------
@@ -23,13 +22,13 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
     val expires = new Timestamp(created.getTime + VERIFICATION_TIME * 1000)
     val tokenAction = TokenActionRow(user.id, token, `type`.toString,
       created, expires, None)
-    tokenActionDao.create(tokenAction)
+    daoContext.tokenActionDao.create(tokenAction)
     tokenAction
   }
 
   //------------------------------------------------------------------------
   def findByToken(token: String, `type`: TokenActionKey.Type): Option[TokenActionRow] = {
-    tokenActionDao.findByToken(token, `type`).headOption
+    daoContext.tokenActionDao.findByToken(token, `type`).headOption
   }
 
   //------------------------------------------------------------------------
@@ -39,7 +38,7 @@ class TokenActionService @Inject()(auth : PlayAuthenticate,
 
   //------------------------------------------------------------------------
   def targetUser(tokenAction: TokenActionRow): Option[UserRow] = {
-    userDao.findById(tokenAction.userId)
+    daoContext.userDao.findById(tokenAction.userId)
   }
 
   //------------------------------------------------------------------------

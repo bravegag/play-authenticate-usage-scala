@@ -4,9 +4,7 @@ import com.feth.play.module.mail.Mailer.MailerFactory
 import com.feth.play.module.pa.PlayAuthenticate
 import controllers.routes
 import constants._
-import generated.Tables
 import play.Logger
-import play.data.Form
 import play.i18n.Lang
 import play.inject.ApplicationLifecycle
 import play.mvc.{Call, Http}
