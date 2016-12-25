@@ -30,30 +30,34 @@ class UserService @Inject()(auth : PlayAuthenticate,
     val lastLogin = new Timestamp(new Date().getTime)
     val active = true
     val emailValidated = false
-    val emptyUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
+    var newUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
       None, Option(lastLogin), active, emailValidated, None)
-    val userToCreate = authUser match {
-      case identity : EmailIdentity => {
-        emptyUser.copy(email = identity.getEmail, emailValidated = false)
+
+    newUser = authUser match {
+      case identity: EmailIdentity => {
+        newUser.copy(email = identity.getEmail, emailValidated = false)
       }
-      case identity : FirstLastNameIdentity => {
-        emptyUser.copy(username = Option(identity.getName).getOrElse("N/A"),
+      case _ => newUser
+    }
+
+    newUser = authUser match {
+      case identity: FirstLastNameIdentity => {
+        newUser.copy(username = Option(identity.getName).getOrElse("N/A"),
           firstName = Option(identity.getFirstName), lastName = Option(identity.getLastName))
+        }
+      case identity: NameIdentity => {
+        newUser.copy(username = Option(identity.getName).getOrElse("N/A"))
       }
-      case identity : NameIdentity => {
-        emptyUser.copy(username = Option(identity.getName).getOrElse("N/A"))
-      }
+      case _ => newUser
     }
 
     // initialize security role
     val securityRole = securityRoleDao.findByName(SecurityRoleKey.USER_ROLE).get
 
     // initialize linked account
-    val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None)
+    val linkedAccount = LinkedAccountRow(0L, authUser.getProvider, authUser.getId, None)
 
-    val newUser = userDao.create(userToCreate, securityRole, linkedAccount)
-
-    newUser
+    userDao.create(newUser, securityRole, linkedAccount)
   }
 
   //------------------------------------------------------------------------

@@ -189,7 +189,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def generateVerificationRecord(user: MySignupAuthUser): String = {
-    generateVerificationRecord(userService.findByAuthUser(user).getOrElse(null))
+    generateVerificationRecord(userService.findByAuthUser(user).get)
   }
 
   //-------------------------------------------------------------------
