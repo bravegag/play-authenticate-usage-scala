@@ -10,6 +10,7 @@ import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
+import play.mvc.Http.RequestBody
 import providers.MyAuthProvider
 import views.form._
 
@@ -63,7 +64,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def doLogin = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      val context = JavaHelpers.createJavaContext(request)
+      val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
       val filledForm = loginForm.Instance.bindFromRequest
       if (filledForm.hasErrors) {
         // User did not fill everything properly
@@ -86,7 +87,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def doSignup = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      val context = JavaHelpers.createJavaContext(request)
+      val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
       com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
       val filledForm = signupForm.Instance.bindFromRequest
       if (filledForm.hasErrors) {

@@ -2,12 +2,13 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import actions.NoCache
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Controller, Session}
+import play.api.mvc.Controller
 import play.core.j.JavaHelpers
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
@@ -28,11 +29,11 @@ class Account @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def link = deadbolt.SubjectPresent()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      Ok(views.html.account.link(userService, auth))
+  def link = NoCache {
+    deadbolt.SubjectPresent()() { implicit request =>
+      Future {
+        Ok(views.html.account.link(userService, auth))
+      }
     }
   }
 
