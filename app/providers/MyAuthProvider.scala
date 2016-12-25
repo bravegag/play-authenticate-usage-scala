@@ -36,7 +36,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
                                auth: PlayAuthenticate,
                                lifecycle: ApplicationLifecycle,
                                mailerFactory: MailerFactory)
-  extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuth, MySignupAuth, Login, Signup] (auth, lifecycle, mailerFactory) {
+  extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuthUser, MySignupAuthUser, Login, Signup] (auth, lifecycle, mailerFactory) {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -84,7 +84,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def signupUser(signupAuthUser: MySignupAuth): SignupResult = {
+  protected def signupUser(signupAuthUser: MySignupAuthUser): SignupResult = {
     val user: Tables#UserRow = userService.findByAuthUser (signupAuthUser).get
     if (user != null) {
       if (user.emailValidated) {
@@ -108,7 +108,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def loginUser (authUser: MyLoginAuth): LoginResult = {
+  protected def loginUser (authUser: MyLoginAuthUser): LoginResult = {
     val user = userService.findByAuthUser(authUser).get
     if (user == null) {
       LoginResult.NOT_FOUND
@@ -149,22 +149,22 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): MySignupAuth = {
-    new MySignupAuth (signup)
+  protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): MySignupAuthUser = {
+    new MySignupAuthUser (signup)
   }
 
   //-------------------------------------------------------------------
-  protected def buildLoginAuthUser(login: Login, ctx: Http.Context): MyLoginAuth = {
-    new MyLoginAuth (login.getPassword, login.getEmail)
+  protected def buildLoginAuthUser(login: Login, ctx: Http.Context): MyLoginAuthUser = {
+    new MyLoginAuthUser (login.getPassword, login.getEmail)
   }
 
   //-------------------------------------------------------------------
-  protected def transformAuthUser(authUser: MySignupAuth, context: Http.Context): MyLoginAuth = {
-    new MyLoginAuth (authUser.getEmail)
+  protected def transformAuthUser(authUser: MySignupAuthUser, context: Http.Context): MyLoginAuthUser = {
+    new MyLoginAuthUser (authUser.getEmail)
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingSubject (user: MySignupAuth, ctx: Http.Context): String = {
+  protected def getVerifyEmailMailingSubject (user: MySignupAuthUser, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.verify_signup.subject")
   }
 
@@ -175,7 +175,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingBody(token: String, user: MySignupAuth, ctx: Http.Context): Body = {
+  protected def getVerifyEmailMailingBody(token: String, user: MySignupAuthUser, ctx: Http.Context): Body = {
     val isSecure: Boolean = getConfiguration.getBoolean (SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url: String = routes.Signup.verify (token).absoluteURL (ctx.request, isSecure)
     val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
@@ -186,7 +186,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def generateVerificationRecord(user: MySignupAuth): String = {
+  protected def generateVerificationRecord(user: MySignupAuthUser): String = {
     generateVerificationRecord(userService.findByAuthUser (user).get)
   }
 

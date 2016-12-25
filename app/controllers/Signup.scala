@@ -142,7 +142,7 @@ class Signup @Inject() (implicit
               // Pass true for the second parameter if you want to
               // automatically create a password and the exception never to
               // happen
-              user.resetPassword(new MySignupAuth(newPassword), false)
+              user.resetPassword(new MySignupAuthUser(newPassword), false)
             }
             catch {
               case exception: RuntimeException => {
@@ -153,7 +153,7 @@ class Signup @Inject() (implicit
             if (login) {
               // automatically log in
               flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
-              auth.loginAndRedirect(context, new MyLoginAuth(user.email))
+              auth.loginAndRedirect(context, new MyLoginAuthUser(user.email))
 
             } else {
               // send the user to the login page

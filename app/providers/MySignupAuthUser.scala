@@ -9,7 +9,7 @@ import views.form.Signup
   * @param password
   * @param email
   */
-class MySignupAuth(password: String, email: String = null) extends UsernamePasswordAuthUser(password, email) with NameIdentity {
+class MySignupAuthUser(password: String, email: String = null) extends UsernamePasswordAuthUser(password, email) with NameIdentity {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
