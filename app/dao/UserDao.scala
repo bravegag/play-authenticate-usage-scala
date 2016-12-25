@@ -60,24 +60,26 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   }
 
   //------------------------------------------------------------------------
-  def findActiveByProviderKeyAndEmail(providerKey: String, email: String): Future[Option[UserRow]] = {
-    val action = sql"""SELECT t1.* FROM \"${User.baseTableRow.tableName}\" t1 " +
-                       "WHERE t1.active=true AND " +
-                       "      t1.email=${email} AND " +
-                       "      EXISTS (SELECT * FROM ${LinkedAccount.baseTableRow.tableName} t2 " +
-                       "              WHERE t2.user_id = t1.id AND " +
-                       "                    t2.provider_key = ${providerKey})""".as[UserRow].headOption
-    db.run(action)
-  }
+    def findActiveByProviderKeyAndEmail(providerKey: String, email: String): Future[Option[UserRow]] = {
+      val action = sql"""SELECT t1.*
+                         FROM "#${User.baseTableRow.tableName}" t1
+                         WHERE t1.active=true
+                           AND t1.email=$email
+                           AND EXISTS (SELECT * FROM #${LinkedAccount.baseTableRow.tableName} t2
+                                       WHERE t2.user_id=t1.id
+                                         AND t2.provider_key=$providerKey)""".as[UserRow].headOption
+      db.run(action)
+    }
 
   //------------------------------------------------------------------------
   def findActiveByProviderKeyAndUsername(providerKey: String, providerPassword: String): Future[Option[UserRow]] = {
-    val action = sql"""SELECT t1.* FROM \"${User.baseTableRow.tableName}\" t1 " +
-                       "WHERE t1.active=true AND "
-                             "EXISTS (SELECT * FROM ${LinkedAccount.baseTableRow.tableName} t2 " +
-                                     "WHERE t2.user_id = t1.id AND " +
-                                           "t2.provider_key = ${providerKey} AND " +
-                                           "t2.provider_password = ${providerPassword})""".as[UserRow].headOption
+    val action = sql"""SELECT t1.*
+                       FROM "#${User.baseTableRow.tableName}" t1
+                       WHERE t1.active=true
+                         AND EXISTS (SELECT * FROM #${LinkedAccount.baseTableRow.tableName} t2
+                                     WHERE t2.user_id=t1.id
+                                       AND t2.provider_key=$providerKey
+                                       AND t2.provider_password=$providerPassword)""".as[UserRow].headOption
     db.run(action)
   }
 
