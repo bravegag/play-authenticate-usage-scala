@@ -120,24 +120,16 @@ class UserService @Inject()(auth : PlayAuthenticate,
   def findInSession(session: Session): Option[UserRow] = {
     val option = Option(auth.getUser(session))
     option match {
-      case Some(authUser: UsernamePasswordAuthUser) => findByAuthUser(authUser)
-      case Some(userIdentity: AuthUserIdentity) => findByAuthUser(userIdentity)
+      case Some(identity: AuthUserIdentity) => findByAuthUser(identity)
       case _ => None
     }
   }
 
   //------------------------------------------------------------------------
-  def findByAuthUser(authUser: UsernamePasswordAuthUser): Option[UserRow] = {
-    Option(authUser) match {
-      case Some(authUser) => userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
-      case _ => None
-    }
-  }
-
-  //------------------------------------------------------------------------
-  def findByAuthUser(authUser: AuthUserIdentity): Option[UserRow] = {
-    Option(authUser) match {
-      case Some(authUser) => userDao.findActiveByProviderKeyAndUsername(authUser.getProvider, authUser.getId)
+  def findByAuthUser(identity: AuthUserIdentity): Option[UserRow] = {
+    Option(identity) match {
+      case Some(authUser: UsernamePasswordAuthUser) => userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
+      case Some(authUser: AuthUserIdentity) => userDao.findActiveByProviderKeyAndUsername(authUser.getProvider, authUser.getId)
       case _ => None
     }
   }
@@ -150,8 +142,7 @@ class UserService @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   override def save(authUser: AuthUser): AnyRef = {
     val option = authUser match {
-      case authUser: UsernamePasswordAuthUser => findByAuthUser(authUser)
-      case userIdentity: AuthUserIdentity => findByAuthUser(userIdentity)
+      case identity: AuthUserIdentity => findByAuthUser(identity)
       case _ => None
     }
     val id = option.map(_.id).getOrElse(null.asInstanceOf[Long])

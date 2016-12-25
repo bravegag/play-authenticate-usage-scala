@@ -25,7 +25,6 @@ import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import generated.Tables.UserRow
 import play.api.i18n.MessagesApi
 import AbstractUsernamePasswordAuthProvider.{LoginResult, SignupResult}
-import play.core.j.JavaHelpers
 
 @Singleton
 class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
@@ -52,7 +51,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  def sendPasswordResetMailing (user: UserRow, ctx: Http.Context) {
+  def sendPasswordResetMailing(user: UserRow, ctx: Http.Context) {
     val token = generatePasswordResetRecord (user)
     val subject = getPasswordResetMailingSubject (user, ctx)
     val body = getPasswordResetMailingBody(token, user, ctx)
@@ -111,7 +110,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def loginUser (authUser: MyLoginAuthUser): LoginResult = {
+  protected def loginUser(authUser: MyLoginAuthUser): LoginResult = {
     val user = userService.findByAuthUser(authUser).get
     if (user == null) {
       LoginResult.NOT_FOUND
@@ -153,17 +152,17 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): MySignupAuthUser = {
-    new MySignupAuthUser (signup)
+    new MySignupAuthUser(signup)
   }
 
   //-------------------------------------------------------------------
   protected def buildLoginAuthUser(login: Login, ctx: Http.Context): MyLoginAuthUser = {
-    new MyLoginAuthUser (login.getPassword, login.getEmail)
+    new MyLoginAuthUser(login.getPassword, login.getEmail)
   }
 
   //-------------------------------------------------------------------
   protected def transformAuthUser(authUser: MySignupAuthUser, context: Http.Context): MyLoginAuthUser = {
-    new MyLoginAuthUser (authUser.getEmail)
+    new MyLoginAuthUser(authUser.getEmail)
   }
 
   //-------------------------------------------------------------------
@@ -173,8 +172,8 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   override protected def onLoginUserNotFound(context: Http.Context): String = {
-    context.flash.put (FlashKey.FLASH_ERROR_KEY, messagesApi("playauthenticate.password.login.unknown_user_or_pw") )
-    super.onLoginUserNotFound (context)
+    context.flash.put(FlashKey.FLASH_ERROR_KEY, messagesApi("playauthenticate.password.login.unknown_user_or_pw"))
+    super.onLoginUserNotFound(context)
   }
 
   //-------------------------------------------------------------------
@@ -190,7 +189,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def generateVerificationRecord(user: MySignupAuthUser): String = {
-    generateVerificationRecord(userService.findByAuthUser(user).get)
+    generateVerificationRecord(userService.findByAuthUser(user).getOrElse(null))
   }
 
   //-------------------------------------------------------------------
@@ -225,12 +224,12 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingSubjectAfterSignup (user: UserRow, ctx: Http.Context): String = {
+  protected def getVerifyEmailMailingSubjectAfterSignup(user: UserRow, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.verify_email.subject")
   }
 
   //-------------------------------------------------------------------
-  protected def getEmailTemplate (template: String, langCode: String, url: String, token: String, name: String, email: String): String = {
+  protected def getEmailTemplate(template: String, langCode: String, url: String, token: String, name: String, email: String): String = {
     var cls: Class[_] = null
     var ret: String = null
     try {
@@ -268,7 +267,7 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingBodyAfterSignup (token: String, user: UserRow, ctx: Http.Context): Body = {
+  protected def getVerifyEmailMailingBodyAfterSignup(token: String, user: UserRow, ctx: Http.Context): Body = {
     val isSecure = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url = routes.Signup.verify (token).absoluteURL (ctx.request, isSecure)
     val lang = Lang.preferred(ctx.request.acceptLanguages)
