@@ -15,10 +15,8 @@ import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.NameIdentity;
 
-import play.data.Form;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
-import play.mvc.Http;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 
