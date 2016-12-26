@@ -40,8 +40,8 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def restricted = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
     Future {
-      val context = JavaHelpers.createJavaContext(request)
-      val localUser = userService.findInSession(context.session)
+      val jContext = JavaHelpers.createJavaContext(request)
+      val localUser = userService.findInSession(jContext.session)
       Ok(views.html.restricted(userService, localUser))
     }
   }
@@ -49,8 +49,8 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def profile = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
     Future {
-      val context = JavaHelpers.createJavaContext(request)
-      val localUser = userService.findInSession(context.session)
+      val jContext = JavaHelpers.createJavaContext(request)
+      val localUser = userService.findInSession(jContext.session)
       Ok(views.html.profile(auth, localUser.get))
     }
   }
@@ -66,7 +66,7 @@ class Application @Inject() (implicit
   def doLogin = NoCache {
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
-        val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
         val filledForm = loginForm.Instance.bindFromRequest
         if (filledForm.hasErrors) {
           // User did not fill everything properly
@@ -74,7 +74,7 @@ class Application @Inject() (implicit
         }
         else {
           // Everything was filled
-          JavaHelpers.createResult(context, authProvider.handleLogin(context))
+          JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext))
         }
       }
     }
@@ -91,7 +91,7 @@ class Application @Inject() (implicit
   def doSignup = NoCache {
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
-        val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
         val filledForm = signupForm.Instance.bindFromRequest
         if (filledForm.hasErrors) {
           // User did not fill everything properly
@@ -101,7 +101,7 @@ class Application @Inject() (implicit
           // Everything was filled
           // do something with your part of the form before handling the user
           // signup
-          JavaHelpers.createResult(context, authProvider.handleSignup(context))
+          JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
         }
       }
     }

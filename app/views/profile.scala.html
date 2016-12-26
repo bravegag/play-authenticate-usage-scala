@@ -44,13 +44,15 @@
     }
 
     <br/>
-    @currentAuth(playAuth) { auth =>
-    @messagesApi("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
-    @if(auth.expires() != -1){
-        @messagesApi("playauthenticate.profile.session", auth.getId(), auth.expires())
-    } else {
-        @messagesApi("playauthenticate.profile.session_endless", auth.getId())
-    }
+    @play.core.j.JavaHelpers.withContext(request) { jContext =>
+        @currentAuth(playAuth) { auth =>
+            @messagesApi("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
+            @if(auth.expires() != -1){
+                @messagesApi("playauthenticate.profile.session", auth.getId(), auth.expires())
+            } else {
+                @messagesApi("playauthenticate.profile.session_endless", auth.getId())
+            }
+        }
     }
     <br/>
 <ul>

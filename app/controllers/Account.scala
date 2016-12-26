@@ -38,104 +38,108 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val Some(user: UserRow) = userService.findInSession(context.session)
-      val tuple =
-        if (user.emailValidated) {
-          // email has been validated already
-          (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
-        } else
-        if (user.email != null && !user.email.trim.isEmpty) {
-          authProvider.sendVerifyEmailMailingAfterSignup(user, context)
-          (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
-        } else {
-          (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
-        }
+  def verifyEmail = NoCache {
+    deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request)
+        val Some(user: UserRow) = userService.findInSession(jContext.session)
+        val tuple =
+          if (user.emailValidated) {
+            // email has been validated already
+            (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.already_validated"))
+          } else
+          if (user.email != null && !user.email.trim.isEmpty) {
+            authProvider.sendVerifyEmailMailingAfterSignup(user, jContext)
+            (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.message.instructions_sent", user.email))
+          } else {
+            (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.error.set_email_first", user.email))
+          }
 
-      Redirect(routes.Application.profile).flashing(tuple)
+        Redirect(routes.Application.profile).flashing(tuple)
+      }
     }
   }
 
   //-------------------------------------------------------------------
-  def changePassword = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val Some(user: UserRow) = userService.findInSession(context.session)
-      val result =
-        if (!user.emailValidated) {
-          Ok(views.html.account.unverified(userService))
+  def changePassword = NoCache {
+    deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request)
+        val Some(user: UserRow) = userService.findInSession(jContext.session)
+        val result =
+          if (!user.emailValidated) {
+            Ok(views.html.account.unverified(userService))
 
-        } else {
-          Ok(views.html.account.password_change(userService, passwordChangeForm.Instance))
-        }
-      result
+          } else {
+            Ok(views.html.account.password_change(userService, passwordChangeForm.Instance))
+          }
+        result
+      }
     }
   }
 
     //-------------------------------------------------------------------
-    def doChangePassword = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-      Future {
-        val context = JavaHelpers.createJavaContext(request)
-        com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+    def doChangePassword = NoCache {
+      deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
+        Future {
+          val jContext = JavaHelpers.createJavaContext(request)
+          val filledForm = passwordChangeForm.Instance.bindFromRequest
+          if (filledForm.hasErrors) {
+            // User did not select whether to link or not link
+            BadRequest(views.html.account.password_change(userService, filledForm))
 
-        val filledForm = passwordChangeForm.Instance.bindFromRequest
-        if (filledForm.hasErrors) {
-          // User did not select whether to link or not link
-          BadRequest(views.html.account.password_change(userService, filledForm))
-
-        } else {
-          val Some(user: UserRow) = userService.findInSession(context.session)
-          val newPassword = filledForm.get.password
-          userService.changePassword(user, new MySignupAuthUser(newPassword), true)
-          Redirect(routes.Application.profile).flashing(
-            FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
-          )
+          } else {
+            val Some(user: UserRow) = userService.findInSession(jContext.session)
+            val newPassword = filledForm.get.password
+            userService.changePassword(user, new MySignupAuthUser(newPassword), true)
+            Redirect(routes.Application.profile).flashing(
+              FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
+            )
+          }
         }
       }
     }
 
   //-------------------------------------------------------------------
-  def askLink = deadbolt.SubjectPresent()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val user = auth.getLinkUser(context.session)
-      if (user == null) {
-        // account to link could not be found, silently redirect to login
-        Redirect(routes.Application.index)
+  def askLink = NoCache {
+    deadbolt.SubjectPresent()() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request)
+        val user = auth.getLinkUser(jContext.session)
+        if (user == null) {
+          // account to link could not be found, silently redirect to login
+          Redirect(routes.Application.index)
 
-      } else {
-        Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
+        } else {
+          Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
+        }
       }
     }
   }
 
   //-------------------------------------------------------------------
-  def doLink = deadbolt.SubjectPresent()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val user = auth.getLinkUser(context.session)
-      if (user == null) {
-        // account to link could not be found, silently redirect to login
-        Redirect(routes.Application.index)
-
-      } else {
-        val filledForm = acceptForm.Instance.bindFromRequest
-        if (filledForm.hasErrors) {
-          BadRequest(views.html.account.ask_link(userService, filledForm, user))
+  def doLink = NoCache {
+    deadbolt.SubjectPresent()() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request)
+        val user = auth.getLinkUser(jContext.session)
+        if (user == null) {
+          // account to link could not be found, silently redirect to login
+          Redirect(routes.Application.index)
 
         } else {
-          // User made a choice :)
-          val link = filledForm.get.accept
-          val result = JavaHelpers.createResult(context, auth.link(context, link))
-          link match {
-            case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
-            case false => result
+          val filledForm = acceptForm.Instance.bindFromRequest
+          if (filledForm.hasErrors) {
+            BadRequest(views.html.account.ask_link(userService, filledForm, user))
+
+          } else {
+            // User made a choice :)
+            val link = filledForm.get.accept
+            val result = JavaHelpers.createResult(jContext, auth.link(jContext, link))
+            link match {
+              case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
+              case false => result
+            }
           }
         }
       }
@@ -143,58 +147,61 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def askMerge = deadbolt.SubjectPresent()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+  def askMerge = NoCache {
+    deadbolt.SubjectPresent()() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request)
 
-      // this is the currently logged in user
-      val userA = auth.getUser(context.session)
+        // this is the currently logged in user
+        val userA = auth.getUser(jContext.session)
 
-      // this is the user that was selected for a login
-      val userB = auth.getMergeUser(context.session)
+        // this is the user that was selected for a login
+        val userB = auth.getMergeUser(jContext.session)
 
-      if (userB == null) {
-        // user to merge with could not be found, silently redirect to login
-        Redirect(routes.Application.index)
+        if (userB == null) {
+          // user to merge with could not be found, silently redirect to login
+          Redirect(routes.Application.index)
 
-      } else {
-        // You could also get the local user object here via
-        // User.findByAuthUserIdentity(newUser)
-        Ok(views.html.account.ask_merge(userService, acceptForm.Instance, userA, userB))
+        } else {
+          // You could also get the local user object here via
+          // User.findByAuthUserIdentity(newUser)
+          Ok(views.html.account.ask_merge(userService, acceptForm.Instance, userA, userB))
+        }
       }
     }
   }
 
   //-------------------------------------------------------------------
-  def doMerge = deadbolt.SubjectPresent()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request)
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
+  def doMerge = NoCache {
+    deadbolt.SubjectPresent()() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request)
 
-      // this is the currently logged in user
-      val userA = auth.getUser(context.session)
+        // this is the currently logged in user
+        val userA = auth.getUser(jContext.session)
 
-      // this is the user that was selected for a login
-      val userB = auth.getMergeUser(context.session)
+        // this is the user that was selected for a login
+        val option = Option(auth.getMergeUser(jContext.session))
+        option match {
+          case Some(userB) => {
+            val filledForm = acceptForm.Instance.bindFromRequest
+            if (filledForm.hasErrors) {
+              // User did not select whether to merge or not merge
+              BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))
 
-      if (userB == null) {
-        // user to merge with could not be found, silently redirect to login
-        Redirect(routes.Application.index)
-
-      } else {
-        val filledForm = acceptForm.Instance.bindFromRequest
-        if (filledForm.hasErrors) {
-          // User did not select whether to merge or not merge
-          BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))
-
-        } else {
-          // User made a choice :)
-          val merge = filledForm.get.accept
-          val result = JavaHelpers.createResult(context, auth.merge(context, merge))
-          merge match {
-            case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.merge.success"))
-            case false => result
+            } else {
+              // User made a choice :)
+              val merge = filledForm.get.accept
+              val result = JavaHelpers.createResult(jContext, auth.merge(jContext, merge))
+              merge match {
+                case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.merge.success"))
+                case false => result
+              }
+            }
+          }
+          case None => {
+            // user to merge with could not be found, silently redirect to login
+            Redirect(routes.Application.index)
           }
         }
       }
