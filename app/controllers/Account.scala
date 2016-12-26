@@ -42,7 +42,8 @@ class Account @Inject() (implicit
     deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val Some(user: UserRow) = userService.findInSession(jContext.session)
+        // TODO: change because this is cowboy style
+        val Some(user) = userService.findInSession(jContext.session)
         val tuple =
           if (user.emailValidated) {
             // email has been validated already
@@ -65,7 +66,8 @@ class Account @Inject() (implicit
     deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val Some(user: UserRow) = userService.findInSession(jContext.session)
+        // TODO: change because this is cowboy style
+        val Some(user) = userService.findInSession(jContext.session)
         val result =
           if (!user.emailValidated) {
             Ok(views.html.account.unverified(userService))
@@ -105,8 +107,7 @@ class Account @Inject() (implicit
     deadbolt.SubjectPresent()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val option = Option(auth.getLinkUser(jContext.session))
-        option match {
+        Option(auth.getLinkUser(jContext.session)) match {
           case Some(user) => Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
           case None => {
             // account to link could not be found, silently redirect to login
@@ -122,8 +123,7 @@ class Account @Inject() (implicit
     deadbolt.SubjectPresent()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val option = Option(auth.getLinkUser(jContext.session))
-        option match {
+        Option(auth.getLinkUser(jContext.session)) match {
           case Some(user) => {
             acceptForm.Instance.bindFromRequest.fold(
               formWithErrors => BadRequest(views.html.account.ask_link(userService, formWithErrors, user)),
@@ -157,8 +157,7 @@ class Account @Inject() (implicit
         val userA = auth.getUser(jContext.session)
 
         // this is the user that was selected for a login
-        val option = Option(auth.getMergeUser(jContext.session))
-        option match {
+        Option(auth.getMergeUser(jContext.session)) match {
           case Some(userB) => {
             // You could also get the local user object here via
             // User.findByAuthUserIdentity(newUser)
@@ -183,8 +182,7 @@ class Account @Inject() (implicit
         val userA = auth.getUser(jContext.session)
 
         // this is the user that was selected for a login
-        val option = Option(auth.getMergeUser(jContext.session))
-        option match {
+        Option(auth.getMergeUser(jContext.session)) match {
           case Some(userB) => {
             val filledForm = acceptForm.Instance.bindFromRequest
             if (filledForm.hasErrors) {

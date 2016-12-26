@@ -123,8 +123,7 @@ class Signup @Inject() (implicit
   def resetPassword(token: String) = NoCache {
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
-        val option = tokenIsValid(token, TokenActionKey.PASSWORD_RESET)
-        option match {
+        tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
           case Some(_) => Ok(views.html.account.signup.password_reset(userService, passwordResetForm.Instance.fill(PasswordReset("", "", token))))
           case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
         }
@@ -142,8 +141,7 @@ class Signup @Inject() (implicit
           formSuccess => {
             val token = formSuccess.token
             val newPassword = formSuccess.password
-            val option = tokenIsValid(token, TokenActionKey.PASSWORD_RESET)
-            option match {
+            tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
               case Some(tokenAction) => {
                 var flashValues = ArrayBuffer[(String, String)]()
                 val Some(user) = tokenAction.targetUser
@@ -201,8 +199,7 @@ class Signup @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val option = tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION)
-        option match {
+        tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION) match {
           case Some(tokenAction) => {
             val Some(user) =  tokenAction.targetUser
             val email = user.email
@@ -231,8 +228,7 @@ class Signup @Inject() (implicit
   private def tokenIsValid(token: String, `type`: TokenActionKey.Type) : Option[TokenActionRow] = {
     val result =
       if (token != null && !token.trim.isEmpty) {
-        val option = tokenActionService.findByToken(token, `type`)
-        option match {
+        tokenActionService.findByToken(token, `type`) match {
           case Some(tokenAction) => {
             if (tokenAction.isValid) {
               Some(tokenAction)
