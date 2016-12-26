@@ -83,19 +83,19 @@ class Account @Inject() (implicit
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
-          val filledForm = passwordChangeForm.Instance.bindFromRequest
-          if (filledForm.hasErrors) {
-            // User did not select whether to link or not link
-            BadRequest(views.html.account.password_change(userService, filledForm))
-
-          } else {
-            val Some(user: UserRow) = userService.findInSession(jContext.session)
-            val newPassword = filledForm.get.password
-            userService.changePassword(user, new MySignupAuthUser(newPassword), true)
-            Redirect(routes.Application.profile).flashing(
-              FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
-            )
-          }
+          passwordChangeForm.Instance.bindFromRequest.fold(
+            formWithErrors => {
+              // User did not select whether to link or not link
+              BadRequest(views.html.account.password_change(userService, formWithErrors))
+            },
+            formSuccess => {
+              val Some(user: UserRow) = userService.findInSession(jContext.session)
+              val newPassword = formSuccess.password
+              userService.changePassword(user, new MySignupAuthUser(newPassword), true)
+              Redirect(routes.Application.profile).flashing(
+                FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.change_password.success")
+              )
+          })
         }
       }
     }

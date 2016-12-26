@@ -67,15 +67,16 @@ class Application @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-        val filledForm = loginForm.Instance.bindFromRequest
-        if (filledForm.hasErrors) {
-          // User did not fill everything properly
-          BadRequest(views.html.login(auth, userService, filledForm))
-        }
-        else {
-          // Everything was filled
-          JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext))
-        }
+        loginForm.Instance.bindFromRequest.fold(
+          formWithErrors => {
+            // User did not fill everything properly
+            BadRequest(views.html.login(auth, userService, formWithErrors))
+          },
+          _ => {
+            // Everything was filled
+            JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext))
+          }
+        )
       }
     }
   }
@@ -92,17 +93,18 @@ class Application @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-        val filledForm = signupForm.Instance.bindFromRequest
-        if (filledForm.hasErrors) {
-          // User did not fill everything properly
-          BadRequest(views.html.signup(auth, userService, filledForm))
-
-        } else {
-          // Everything was filled
-          // do something with your part of the form before handling the user
-          // signup
-          JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
-        }
+        signupForm.Instance.bindFromRequest.fold(
+          formWithErrors => {
+            // User did not fill everything properly
+            BadRequest(views.html.signup(auth, userService, formWithErrors))
+          },
+          _ => {
+            // Everything was filled
+            // do something with your part of the form before handling the user
+            // signup
+            JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
+          }
+        )
       }
     }
   }

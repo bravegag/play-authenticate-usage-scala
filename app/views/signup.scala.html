@@ -24,9 +24,7 @@
     	@helper.form(routes.Application.doSignup, 'class -> "form-horizontal", 'role -> "form") {
 
             @if(signupForm.hasGlobalErrors) {
-		        <p class="alert alert-danger">
-		          @signupForm.globalError.get.message
-		     	</p>
+                <p class="alert alert-danger">@signupForm.globalError.get.message</p>
             }
 
              @inputText(
