@@ -10,7 +10,6 @@ import play.inject.ApplicationLifecycle
 import play.mvc.{Call, Http}
 import com.feth.play.module.mail.Mailer.Mail.Body
 
-import scala.collection.JavaConversions
 import services._
 import views.form._
 import javax.inject.Inject
@@ -25,7 +24,8 @@ import play.api.i18n.MessagesApi
 import AbstractUsernamePasswordAuthProvider.{LoginResult, SignupResult}
 
 @Singleton
-class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
+class MyAuthProvider @Inject()(implicit
+                               val messagesApi: MessagesApi,
                                val userService: UserService,
                                val tokenActionService: TokenActionService,
                                val signupForm: SignupForm,
@@ -34,6 +34,9 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
                                lifecycle: ApplicationLifecycle,
                                mailerFactory: MailerFactory)
   extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuthUser, MySignupAuthUser, Login, Signup] (auth, lifecycle, mailerFactory) {
+
+  import services.PluggableUserService._
+
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -63,10 +66,10 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   def sendVerifyEmailMailingAfterSignup(user: UserRow, ctx: Http.Context) {
-    val subject = getVerifyEmailMailingSubjectAfterSignup (user, ctx)
-    val token = generateVerificationRecord (user)
+    val subject = getVerifyEmailMailingSubjectAfterSignup(user, ctx)
+    val token = generateVerificationRecord(user)
     val body = getVerifyEmailMailingBodyAfterSignup(token, user, ctx)
-    sendMail(subject, body, getEmailName (user))
+    sendMail(subject, body, getEmailName(user))
   }
 
   //-------------------------------------------------------------------
@@ -82,12 +85,13 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def signupUser(signupAuthUser: MySignupAuthUser): SignupResult = {
-    val option = userService.findByAuthUser (signupAuthUser)
+    val option = userService.findByAuthUser(signupAuthUser)
     option match {
       case Some(user) => {
         if (user.emailValidated) {
           // This user exists, has its email validated and is active
           SignupResult.USER_EXISTS
+
         } else {
           // this user exists, is active but has not yet validated its
           // email
@@ -109,31 +113,23 @@ class MyAuthProvider @Inject()(val messagesApi: MessagesApi,
 
   //-------------------------------------------------------------------
   protected def loginUser(authUser: MyLoginAuthUser): LoginResult = {
-    val user = userService.findByAuthUser(authUser).get
-    if (user == null) {
-      LoginResult.NOT_FOUND
-    } else {
-      if (! user.emailValidated) {
-        LoginResult.USER_UNVERIFIED
-      } else {
-        import scala.collection.JavaConversions._
-        val linkedAccounts = JavaConversions.seqAsJavaList(userService.linkedAccounts(user))
-        for (linkedAccount <- linkedAccounts) {
-          if (getKey == linkedAccount.providerKey) {
-            if (authUser.checkPassword (linkedAccount.providerPassword, authUser.getPassword) ) {
-              // Password was correct
-              LoginResult.USER_LOGGED_IN
+    val option = userService.findByAuthUser(authUser)
+    option match {
+      case None => LoginResult.NOT_FOUND
+      case Some(user) => {
+        if (!user.emailValidated) {
+          LoginResult.USER_UNVERIFIED
 
-            } else {
-              // if you don't return here,
-              // you would allow the user to have
-              // multiple passwords defined
-              // usually we don't want this
-              LoginResult.WRONG_PASSWORD
-            }
+        } else {
+          val result = user.linkedAccounts.count { linkedAccount =>
+            getKey == linkedAccount.providerKey && authUser.checkPassword(linkedAccount.providerPassword, authUser.getPassword)
+          }
+
+          result match {
+            case 1 => LoginResult.USER_LOGGED_IN
+            case _ => LoginResult.WRONG_PASSWORD
           }
         }
-        LoginResult.WRONG_PASSWORD
       }
     }
   }

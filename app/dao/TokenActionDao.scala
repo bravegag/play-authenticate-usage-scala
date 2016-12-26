@@ -25,6 +25,6 @@ class TokenActionDao @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   //------------------------------------------------------------------------
   def deleteByUser(user: UserRow, `type`: TokenActionKey.Type) : Future[Unit] = {
     // TODO: review this implementation
-    db.run(TokenAction.filter(tokenAction => tokenAction.userId === user.id && tokenAction.`type` === `type`.toString).delete.map( _ => ()))
+    db.run(TokenAction.filter(tokenAction => tokenAction.userId === user.id && tokenAction.`type` === `type`.toString).delete.map(_ => ()))
   }
 }
