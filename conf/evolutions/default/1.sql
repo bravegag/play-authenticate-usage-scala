@@ -43,12 +43,10 @@ CREATE TABLE user_security_role (
 	FOREIGN KEY (security_role_id) REFERENCES security_role(id)
 );
 
-CREATE TYPE token_type AS ENUM ('EV', 'PR');
-
 CREATE TABLE token_action (
 	user_id BIGINT NOT NULL,
 	token VARCHAR(255) UNIQUE NOT NULL,
-	"type" token_type NOT NULL,
+	"type" CHAR(2) NOT NULL,
 	created TIMESTAMP NOT NULL,
 	expires TIMESTAMP NOT NULL,
 	modified TIMESTAMP DEFAULT now(),
@@ -101,8 +99,6 @@ DROP TABLE user_security_role CASCADE;
 DROP TABLE security_role CASCADE;
 
 DROP TABLE linked_account CASCADE;
-
-DROP TYPE token_type CASCADE;
 
 DROP TABLE "user" CASCADE;
 
