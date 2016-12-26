@@ -1,111 +1,112 @@
 @import play.api.Play.current
 @import services.UserService
 @import play.api.mvc._
-@import be.objectify.deadbolt.scala.views.html._
 @import play.core.j.JavaHelpers
 @import be.objectify.deadbolt.scala._
 @import constants._
 
 @(userService: UserService, title: String, nav: String = "")(content: Html)(implicit lang: Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
 
+@import be.objectify.deadbolt.scala.views.html._
+
 <!DOCTYPE html>
 <html lang="@lang.code">
-<head>
-    <title>@title</title>
+    <head>
+        <title>@title</title>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
-    <meta name="author" content="The Play Authenticate Team">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
+        <meta name="author" content="The Play Authenticate Team">
 
-    <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.versioned("lib/jquery/jquery.js")"></script>
         <script type="text/javascript" src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.js")"></script>
-    <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
+        <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
 
-    <link rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.css")">
-    <link href="@routes.Assets.versioned("css/main.css")" rel="stylesheet">
-</head>
+        <link rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.css")">
+        <link href="@routes.Assets.versioned("css/main.css")" rel="stylesheet">
+    </head>
 
-<body>
+    <body>
 
-<nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="@routes.Application.index()">Play! Authenticate</a>
-        </div>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="@routes.Application.index()">Play! Authenticate</a>
+            </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@messagesApi("playauthenticate.navigation.home")</a></li>
-                <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.restricted()">@messagesApi("playauthenticate.navigation.restricted")</a></li>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@messagesApi("playauthenticate.navigation.home")</a></li>
+                    <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.restricted()">@messagesApi("playauthenticate.navigation.restricted")</a></li>
 
-                @subjectNotPresent() {
-                <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@messagesApi("playauthenticate.navigation.signup")</a></li>
+                    @subjectNotPresent() {
+                    <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@messagesApi("playauthenticate.navigation.signup")</a></li>
+                    }
+                </ul>
+
+                @subjectPresentOr() {
+                <ul class="nav navbar-nav navbar-right">
+                    @defining(userService.findInSession(JavaHelpers.createJavaContext(request).session())) { case Some(user) =>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.username <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@messagesApi("playauthenticate.navigation.profile")</a></li>
+                            <li><a href="@routes.Account.link()">@messagesApi("playauthenticate.navigation.link_more")</a></li>
+                            <li class="divider"></li>
+                            <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @messagesApi("playauthenticate.navigation.logout")</a></li>
+                        </ul>
+                    </li>
+                    }
+                </ul>
+                } {
+                    <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@messagesApi("playauthenticate.navigation.login")</a>
                 }
-            </ul>
 
-            @subjectPresentOr() {
-            <ul class="nav navbar-nav navbar-right">
-                @defining(userService.findInSession(JavaHelpers.createJavaContext(request).session())) { user =>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.get.username <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@messagesApi("playauthenticate.navigation.profile")</a></li>
-                        <li><a href="@routes.Account.link()">@messagesApi("playauthenticate.navigation.link_more")</a></li>
-                        <li class="divider"></li>
-                        <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @messagesApi("playauthenticate.navigation.logout")</a></li>
-                    </ul>
-                </li>
-                }
-            </ul>
-            } {
-            <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@messagesApi("playauthenticate.navigation.login")</a>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+
+
+        <div class="container">
+            @request.flash.get(FlashKey.FLASH_ERROR_KEY).map { errorMessage =>
+            <div class="alert alert-danger" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                                Close</span></button>
+                errorMessage
+            </div>
             }
 
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-</nav>
+            @request.flash.get(FlashKey.FLASH_MESSAGE_KEY).map { errorMessage =>
+            <div class="alert alert-success" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                                Close</span></button>
+                errorMessage
+            </div>
+            }
+            @content
 
+            <hr>
 
-<div class="container">
-    @request.flash.get(FlashKey.FLASH_ERROR_KEY).map { errorMessage =>
-    <div class="alert alert-danger" role="alert">
-        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
-                        Close</span></button>
-        errorMessage
-    </div>
-    }
-
-    @request.flash.get(FlashKey.FLASH_MESSAGE_KEY).map { errorMessage =>
-    <div class="alert alert-success" role="alert">
-        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
-                        Close</span></button>
-        errorMessage
-    </div>
-    }
-    @content
-
-    <hr>
-
-    <footer>
-        <p>&copy;
-            2012-2014 Play! Authenticate. Licensed under Apache License, Version 2.0. View details <a href="https://github.com/joscha/play-authenticate/blob/master/LICENSE">
-                here</a>.</p>
-        <p>
-            <small>Styles by <a href="http://getbootstrap.com" target="_blank">
-                Twitter Bootstrap</a> &middot;
-                Provider icons by <a href="https://github.com/paulrobertlloyd/socialmediaicons/" target="_blank">
-                    Paul Robert Lloyd</a></small></p>
-    </footer>
-</div> <!-- /container -->
+            <footer>
+                <p>&copy;
+                    2012-2014 Play! Authenticate. Licensed under Apache License, Version 2.0. View details <a href="https://github.com/joscha/play-authenticate/blob/master/LICENSE">
+                        here</a>.</p>
+                <p>
+                    <small>Styles by <a href="http://getbootstrap.com" target="_blank">
+                        Twitter Bootstrap</a> &middot;
+                        Provider icons by <a href="https://github.com/paulrobertlloyd/socialmediaicons/" target="_blank">
+                            Paul Robert Lloyd</a></small></p>
+            </footer>
+        </div> <!-- /container -->
 
 </body>
 </html>
