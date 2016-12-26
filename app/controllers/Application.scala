@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import actions.NoCache
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.SecurityRoleKey
@@ -62,17 +63,19 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def doLogin = deadbolt.WithAuthRequest()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-      val filledForm = loginForm.Instance.bindFromRequest
-      if (filledForm.hasErrors) {
-        // User did not fill everything properly
-        BadRequest(views.html.login(auth, userService, filledForm))
-      }
-      else {
-        // Everything was filled
-        JavaHelpers.createResult(context, authProvider.handleLogin(context))
+  def doLogin = NoCache {
+    deadbolt.WithAuthRequest()() { implicit request =>
+      Future {
+        val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        val filledForm = loginForm.Instance.bindFromRequest
+        if (filledForm.hasErrors) {
+          // User did not fill everything properly
+          BadRequest(views.html.login(auth, userService, filledForm))
+        }
+        else {
+          // Everything was filled
+          JavaHelpers.createResult(context, authProvider.handleLogin(context))
+        }
       }
     }
   }
@@ -85,20 +88,21 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def doSignup = deadbolt.WithAuthRequest()() { implicit request =>
-    Future {
-      val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-      com.feth.play.module.pa.controllers.AuthenticateBase.noCache(context.response())
-      val filledForm = signupForm.Instance.bindFromRequest
-      if (filledForm.hasErrors) {
-        // User did not fill everything properly
-        BadRequest(views.html.signup(auth, userService, filledForm))
+  def doSignup = NoCache {
+    deadbolt.WithAuthRequest()() { implicit request =>
+      Future {
+        val context = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        val filledForm = signupForm.Instance.bindFromRequest
+        if (filledForm.hasErrors) {
+          // User did not fill everything properly
+          BadRequest(views.html.signup(auth, userService, filledForm))
 
-      } else {
-        // Everything was filled
-        // do something with your part of the form before handling the user
-        // signup
-        JavaHelpers.createResult(context, authProvider.handleSignup(context))
+        } else {
+          // Everything was filled
+          // do something with your part of the form before handling the user
+          // signup
+          JavaHelpers.createResult(context, authProvider.handleSignup(context))
+        }
       }
     }
   }
