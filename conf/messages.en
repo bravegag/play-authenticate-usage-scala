@@ -69,6 +69,7 @@ playauthenticate.signup.title=Signup
 playauthenticate.signup.name=Your name
 playauthenticate.signup.now=Sign up now
 playauthenticate.signup.oauth=or sign up using one of the following providers:
+playauthenticate.signup.captcha=Please complete the following captcha:
 
 playauthenticate.verify.account.title=E-mail verification required
 playauthenticate.verify.account.before=Before setting a password, you need to

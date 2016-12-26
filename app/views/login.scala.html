@@ -4,7 +4,7 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }

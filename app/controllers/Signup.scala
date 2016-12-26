@@ -16,12 +16,10 @@ import services._
 import generated.Tables.TokenActionRow
 import views.account.signup.form._
 
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-
 @Singleton
 class Signup @Inject() (implicit
                         val messagesApi: MessagesApi,
+                        webJarAssets: WebJarAssets,
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
                         userService: UserService,
@@ -29,6 +27,8 @@ class Signup @Inject() (implicit
                         authProvider: MyAuthProvider,
                         forgotPasswordForm: ForgotPasswordForm,
                         passwordResetForm: PasswordResetForm) extends Controller with I18nSupport {
+  import scala.concurrent._
+  import ExecutionContext.Implicits.global
   import services.PluggableUserService._
   import services.PluggableTokenActionService._
 

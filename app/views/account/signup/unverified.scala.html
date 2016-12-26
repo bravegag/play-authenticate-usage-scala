@@ -2,7 +2,7 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userProvider: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
+@(userProvider: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
 @main(userProvider, messagesApi("playauthenticate.verify.email.title")) {
 

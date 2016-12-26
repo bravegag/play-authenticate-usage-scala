@@ -2,7 +2,7 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, providerKey: String)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
+@(userService: UserService, providerKey: String)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
 @main(userService, messagesApi("playauthenticate.oauth.access.denied.title")) {
 

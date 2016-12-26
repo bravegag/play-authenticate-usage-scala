@@ -2,7 +2,7 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi)
+@(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
 @main(userService, messagesApi("playauthenticate.link.account.title")) {
     

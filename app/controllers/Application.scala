@@ -5,6 +5,7 @@ import javax.inject._
 import actions.NoCache
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
+import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.SecurityRoleKey
 import play.api.mvc._
 import services.UserService
@@ -15,18 +16,20 @@ import play.mvc.Http.RequestBody
 import providers.MyAuthProvider
 import views.form._
 
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-
 @Singleton
 class Application @Inject() (implicit
                              val messagesApi: MessagesApi,
+                             val verifier: RecaptchaVerifier,
+                             widgetHelper: WidgetHelper,
+                             webJarAssets: WebJarAssets,
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,
                              authProvider: MyAuthProvider,
                              loginForm: LoginForm,
                              signupForm: SignupForm) extends Controller with I18nSupport {
+  import scala.concurrent._
+  import ExecutionContext.Implicits.global
 
   //-------------------------------------------------------------------
   // public
@@ -91,9 +94,9 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def doSignup = NoCache {
     deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-        signupForm.Instance.bindFromRequest.fold(
+      val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+      verifier.bindFromRequestAndVerify(signupForm.Instance).map { form =>
+        form.fold(
           formWithErrors => {
             // User did not fill everything properly
             BadRequest(views.html.signup(auth, userService, formWithErrors))

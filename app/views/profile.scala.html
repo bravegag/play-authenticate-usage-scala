@@ -5,7 +5,7 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets)
 
 @import com.feth.play.module.pa.views.html._
 @import utils.FormatUtils._

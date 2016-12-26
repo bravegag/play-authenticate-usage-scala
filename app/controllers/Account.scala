@@ -20,6 +20,7 @@ import ExecutionContext.Implicits.global
 @Singleton
 class Account @Inject() (implicit
                          val messagesApi: MessagesApi,
+                         webJarAssets: WebJarAssets,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
                          userService: UserService,

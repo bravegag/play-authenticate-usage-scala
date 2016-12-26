@@ -3,8 +3,9 @@
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
+@import com.nappin.play.recaptcha.WidgetHelper
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -19,22 +20,20 @@
 
   <div id="signup" class="row">
 
-    <div class="col-xs-6 col-md-4">
+    <div class="col-xs-8 col-md-6">
         @* Display proprietary login form *@
-    	@helper.form(routes.Application.doSignup, 'class -> "form-horizontal", 'role -> "form") {
-
+    	@helper.form(routes.Application.doSignup, 'class -> "form-vertical", 'role -> "form") {
             @if(signupForm.hasGlobalErrors) {
                 <p class="alert alert-danger">@signupForm.globalError.get.message</p>
             }
 
-             @inputText(
-                signupForm("name"),
-                '_label -> messagesApi("playauthenticate.signup.name")
-             )
+            @inputText(signupForm("name"), '_label -> messagesApi("playauthenticate.signup.name"))
 
-             @_emailPartial(signupForm)
+            @_emailPartial(signupForm)
 
-             @_passwordPartial(signupForm)
+            @_passwordPartial(signupForm)
+            <br />
+            @recaptcha.recaptchaField(form=signupForm, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
 
             <button type="submit" class="btn btn-default">@messagesApi("playauthenticate.signup.now")</button>
     	}

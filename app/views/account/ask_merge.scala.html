@@ -3,7 +3,7 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages)
+@(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
