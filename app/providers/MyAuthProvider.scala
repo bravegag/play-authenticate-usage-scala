@@ -225,7 +225,7 @@ class MyAuthProvider @Inject()(implicit
   //-------------------------------------------------------------------
   protected def getEmailTemplate(template: String, langCode: String, url: String, token: String, name: String, email: String): String = {
     var cls: Class[_] = null
-    var ret: String = null
+    var result: String = null
     try {
       cls = Class.forName (template + "_" + langCode)
     }
@@ -249,7 +249,7 @@ class MyAuthProvider @Inject()(implicit
       var htmlRender: Method = null
       try {
         htmlRender = cls.getMethod ("render", classOf[String], classOf[String], classOf[String], classOf[String] )
-        ret = htmlRender.invoke (null, url, token, name, email).toString
+        result = htmlRender.invoke (null, url, token, name, email).toString
       }
       catch {
         case exception: Throwable => {
@@ -257,7 +257,7 @@ class MyAuthProvider @Inject()(implicit
         }
       }
     }
-    ret
+    result
   }
 
   //-------------------------------------------------------------------

@@ -105,13 +105,13 @@ class Account @Inject() (implicit
     deadbolt.SubjectPresent()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val user = auth.getLinkUser(jContext.session)
-        if (user == null) {
-          // account to link could not be found, silently redirect to login
-          Redirect(routes.Application.index)
-
-        } else {
-          Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
+        val option = Option(auth.getLinkUser(jContext.session))
+        option match {
+          case Some(user) => Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
+          case None => {
+            // account to link could not be found, silently redirect to login
+            Redirect(routes.Application.index)
+          }
         }
       }
     }
@@ -122,24 +122,25 @@ class Account @Inject() (implicit
     deadbolt.SubjectPresent()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        val user = auth.getLinkUser(jContext.session)
-        if (user == null) {
-          // account to link could not be found, silently redirect to login
-          Redirect(routes.Application.index)
-
-        } else {
-          val filledForm = acceptForm.Instance.bindFromRequest
-          if (filledForm.hasErrors) {
-            BadRequest(views.html.account.ask_link(userService, filledForm, user))
-
-          } else {
-            // User made a choice :)
-            val link = filledForm.get.accept
-            val result = JavaHelpers.createResult(jContext, auth.link(jContext, link))
-            link match {
-              case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
-              case false => result
-            }
+        val option = Option(auth.getLinkUser(jContext.session))
+        option match {
+          case Some(user) => {
+            acceptForm.Instance.bindFromRequest.fold(
+              formWithErrors => BadRequest(views.html.account.ask_link(userService, formWithErrors, user)),
+              formSuccess => {
+                // User made a choice :)
+                val link = formSuccess.accept
+                val result = JavaHelpers.createResult(jContext, auth.link(jContext, link))
+                link match {
+                  case true => result.flashing(FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.accounts.link.success"))
+                  case false => result
+                }
+              }
+            )
+          }
+          case None  => {
+            // account to link could not be found, silently redirect to login
+            Redirect(routes.Application.index)
           }
         }
       }
@@ -156,16 +157,17 @@ class Account @Inject() (implicit
         val userA = auth.getUser(jContext.session)
 
         // this is the user that was selected for a login
-        val userB = auth.getMergeUser(jContext.session)
-
-        if (userB == null) {
-          // user to merge with could not be found, silently redirect to login
-          Redirect(routes.Application.index)
-
-        } else {
-          // You could also get the local user object here via
-          // User.findByAuthUserIdentity(newUser)
-          Ok(views.html.account.ask_merge(userService, acceptForm.Instance, userA, userB))
+        val option = Option(auth.getMergeUser(jContext.session))
+        option match {
+          case Some(userB) => {
+            // You could also get the local user object here via
+            // User.findByAuthUserIdentity(newUser)
+            Ok(views.html.account.ask_merge(userService, acceptForm.Instance, userA, userB))
+          }
+          case None => {
+            // user to merge with could not be found, silently redirect to login
+            Redirect(routes.Application.index)
+          }
         }
       }
     }
