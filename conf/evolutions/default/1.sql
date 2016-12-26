@@ -78,12 +78,12 @@ BEGIN
 END;;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_modified_user BEFORE UPDATE ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER update_modified_linked_account BEFORE UPDATE ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER update_modified_token_action BEFORE UPDATE ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER update_modified_security_permission BEFORE UPDATE ON security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER update_modified_user_security_permission BEFORE UPDATE ON user_security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_modified_user BEFORE UPDATE OR INSERT ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_modified_linked_account BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE OR INSERT ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_modified_token_action BEFORE UPDATE OR INSERT ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_modified_security_permission BEFORE UPDATE OR INSERT ON security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_modified_user_security_permission BEFORE UPDATE OR INSERT ON user_security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 COPY security_role (name) FROM '/home/bravegag/code/play-authenticate-usage-scala/conf/evolutions/default/security_role.csv' DELIMITER ',' CSV;
 
