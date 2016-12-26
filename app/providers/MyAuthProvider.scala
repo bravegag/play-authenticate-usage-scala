@@ -40,18 +40,6 @@ class MyAuthProvider @Inject()(implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  protected def getSignup(context: Http.Context): Signup = {
-    val filledForm = signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
-    filledForm.get
-  }
-
-  //-------------------------------------------------------------------
-  protected def getLogin(context: Http.Context): Login = {
-    val filledForm = loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
-    filledForm.get
-  }
-
-  //-------------------------------------------------------------------
   def sendPasswordResetMailing(user: UserRow, ctx: Http.Context) {
     val token = generatePasswordResetRecord (user)
     val subject = getPasswordResetMailingSubject (user, ctx)
@@ -84,7 +72,25 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  protected def signupUser(signupAuthUser: MySignupAuthUser): SignupResult = {
+  override protected def onLoginUserNotFound(context: Http.Context): String = {
+    context.flash.put(FlashKey.FLASH_ERROR_KEY, messagesApi("playauthenticate.password.login.unknown_user_or_pw"))
+    super.onLoginUserNotFound(context)
+  }
+
+  //-------------------------------------------------------------------
+  override protected def getSignup(context: Http.Context): Signup = {
+    val filledForm = signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    filledForm.get
+  }
+
+  //-------------------------------------------------------------------
+  override protected def getLogin(context: Http.Context): Login = {
+    val filledForm = loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    filledForm.get
+  }
+
+  //-------------------------------------------------------------------
+  override protected def signupUser(signupAuthUser: MySignupAuthUser): SignupResult = {
     val option = userService.findByAuthUser(signupAuthUser)
     option match {
       case Some(user) => {
@@ -112,7 +118,7 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  protected def loginUser(authUser: MyLoginAuthUser): LoginResult = {
+  override protected def loginUser(authUser: MyLoginAuthUser): LoginResult = {
     val option = userService.findByAuthUser(authUser)
     option match {
       case None => LoginResult.NOT_FOUND
@@ -135,43 +141,37 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  protected def userExists(authUser: UsernamePasswordAuthUser): Call = {
+  override protected def userExists(authUser: UsernamePasswordAuthUser): Call = {
     routes.Signup.exists
   }
 
   //-------------------------------------------------------------------
-  protected def userUnverified(authUser: UsernamePasswordAuthUser): Call = {
+  override protected def userUnverified(authUser: UsernamePasswordAuthUser): Call = {
     routes.Signup.unverified
   }
 
   //-------------------------------------------------------------------
-  protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): MySignupAuthUser = {
+  override protected def buildSignupAuthUser(signup: Signup, ctx: Http.Context): MySignupAuthUser = {
     new MySignupAuthUser(signup)
   }
 
   //-------------------------------------------------------------------
-  protected def buildLoginAuthUser(login: Login, ctx: Http.Context): MyLoginAuthUser = {
+  override protected def buildLoginAuthUser(login: Login, ctx: Http.Context): MyLoginAuthUser = {
     new MyLoginAuthUser(login.getPassword, login.getEmail)
   }
 
   //-------------------------------------------------------------------
-  protected def transformAuthUser(authUser: MySignupAuthUser, context: Http.Context): MyLoginAuthUser = {
+  override protected def transformAuthUser(authUser: MySignupAuthUser, context: Http.Context): MyLoginAuthUser = {
     new MyLoginAuthUser(authUser.getEmail)
   }
 
   //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingSubject (user: MySignupAuthUser, ctx: Http.Context): String = {
+  override protected def getVerifyEmailMailingSubject (user: MySignupAuthUser, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.verify_signup.subject")
   }
 
   //-------------------------------------------------------------------
-  override protected def onLoginUserNotFound(context: Http.Context): String = {
-    context.flash.put(FlashKey.FLASH_ERROR_KEY, messagesApi("playauthenticate.password.login.unknown_user_or_pw"))
-    super.onLoginUserNotFound(context)
-  }
-
-  //-------------------------------------------------------------------
-  protected def getVerifyEmailMailingBody(token: String, user: MySignupAuthUser, ctx: Http.Context): Body = {
+  override protected def getVerifyEmailMailingBody(token: String, user: MySignupAuthUser, ctx: Http.Context): Body = {
     val isSecure: Boolean = getConfiguration.getBoolean (SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url: String = routes.Signup.verify (token).absoluteURL (ctx.request, isSecure)
     val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
@@ -182,7 +182,7 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  protected def generateVerificationRecord(user: MySignupAuthUser): String = {
+  override protected def generateVerificationRecord(user: MySignupAuthUser): String = {
     generateVerificationRecord(userService.findByAuthUser(user).get)
   }
 
@@ -253,7 +253,7 @@ class MyAuthProvider @Inject()(implicit
       }
       catch {
         case exception: Throwable => {
-          exception.printStackTrace ()
+          exception.printStackTrace
         }
       }
     }
