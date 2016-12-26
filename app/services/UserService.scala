@@ -1,207 +1,65 @@
 package services
 
-import java.sql.Timestamp
-
-import com.feth.play.module.pa.PlayAuthenticate
-import play.mvc.Http.Session
-import javax.inject._
-import java.util.Date
-
 import be.objectify.deadbolt.scala.models.{Permission, Role}
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
-import com.feth.play.module.pa.service.AbstractUserService
-import com.feth.play.module.pa.user._
-import constants.{SecurityRoleKey, TokenActionKey}
-import dao._
-import generated.Tables.{LinkedAccountRow, UserRow}
+import com.feth.play.module.pa.user.{AuthUser, AuthUserIdentity}
+import play.mvc.Http.Session
+import generated.Tables._
 
-@Singleton
-class UserService @Inject()(auth : PlayAuthenticate,
-                            daoContext: DaoContext) extends AbstractUserService(auth) {
-  import utils.DbExecutionUtils._
+/**
+  * Service interface definition for a User. This should be the only
+  * point of contact and dependency for doing User operations in the
+  * rest of the application outside the dao and services packages.
+  */
+trait UserService {
+  //------------------------------------------------------------------------
+  def create(authUser: AuthUser): UserRow
 
   //------------------------------------------------------------------------
-  // public
-  //------------------------------------------------------------------------
-  def create(authUser: AuthUser) : UserRow = {
-    val lastLogin = new Timestamp(new Date().getTime)
-    val active = true
-    val emailValidated = false
-    var newUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
-      None, Option(lastLogin), active, emailValidated, None)
-
-    newUser = authUser match {
-      case identity: EmailIdentity => {
-        newUser.copy(email = identity.getEmail, emailValidated = false)
-      }
-      case _ => newUser
-    }
-
-    newUser = authUser match {
-      case identity: FirstLastNameIdentity => {
-        newUser.copy(username = Option(identity.getName).getOrElse("N/A"),
-          firstName = Option(identity.getFirstName), lastName = Option(identity.getLastName))
-        }
-      case identity: NameIdentity => {
-        newUser.copy(username = Option(identity.getName).getOrElse("N/A"))
-      }
-      case _ => newUser
-    }
-
-    // initialize security role
-    val securityRole = daoContext.securityRoleDao.findByName(SecurityRoleKey.USER_ROLE).get
-
-    // initialize linked account
-    val linkedAccount = LinkedAccountRow(0L, authUser.getProvider, authUser.getId, None)
-
-    daoContext.userDao.create(newUser, securityRole, linkedAccount)
-  }
+  def identifier(user: UserRow): String
 
   //------------------------------------------------------------------------
-  def identifier(user: UserRow): String = {
-    user.id.toString
-  }
+  def roles(user: UserRow): List[Role]
 
   //------------------------------------------------------------------------
-  def roles(user: UserRow) : List[Role] = {
-    val roles = daoContext.userDao.roles(user)
-    roles.toList
-  }
+  def permissions(user: UserRow): List[Permission]
 
   //------------------------------------------------------------------------
-  def permissions(user: UserRow) : List[Permission] = {
-    val permissions = daoContext.userDao.permissions(user)
-    permissions.toList
-  }
+  def providers(user: UserRow): Seq[String]
 
   //------------------------------------------------------------------------
-  def providers(user: UserRow) : Seq[String] = {
-    val providers : Seq[LinkedAccountRow] = daoContext.userDao.linkedAccounts(user)
-    providers.map(_.providerKey)
-  }
+  def linkedAccounts(user: UserRow): Seq[LinkedAccountRow]
 
   //------------------------------------------------------------------------
-  def linkedAccounts(user: UserRow) : Seq[LinkedAccountRow] = {
-    daoContext.userDao.linkedAccounts(user)
-  }
+  def changePassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit
 
   //------------------------------------------------------------------------
-  def changePassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
-    val option = daoContext.linkedAccountDao.findByProviderKey(user, authUser.getProvider).headOption
-    val linkedAccount = option match {
-      case Some(linkedAccount) => linkedAccount
-      case None => {
-        if (create) {
-          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getProvider, authUser.getId, None)
-          daoContext.linkedAccountDao.create(newLinkedAccount)
-          newLinkedAccount
-
-        } else {
-          throw new RuntimeException("Account not enabled for password usage")
-        }
-      }
-    }
-    daoContext.linkedAccountDao.update(linkedAccount.copy(providerPassword = authUser.getHashedPassword))
-  }
+  def resetPassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit
 
   //------------------------------------------------------------------------
-  def resetPassword(user: UserRow, authUser: UsernamePasswordAuthUser, create: Boolean): Unit = {
-    changePassword(user, authUser, create)
-    daoContext.tokenActionDao.deleteByUser(user, TokenActionKey.PASSWORD_RESET)
-  }
+  def verify(user: UserRow): Unit
 
   //------------------------------------------------------------------------
-  def verify(user: UserRow) : Unit = {
-    val updated = user.copy(emailValidated = true)
-    daoContext.userDao.update(updated)
-    daoContext.tokenActionDao.deleteByUser(user, TokenActionKey.EMAIL_VERIFICATION)
-  }
+  def findInSession(session: Session): Option[UserRow]
 
   //------------------------------------------------------------------------
-  def findInSession(session: Session): Option[UserRow] = {
-    val option = Option(auth.getUser(session))
-    option match {
-      case Some(identity: AuthUserIdentity) => findByAuthUser(identity)
-      case _ => None
-    }
-  }
+  def findByAuthUser(identity: AuthUserIdentity): Option[UserRow]
 
   //------------------------------------------------------------------------
-  def findByAuthUser(identity: AuthUserIdentity): Option[UserRow] = {
-    Option(identity) match {
-      case Some(authUser: UsernamePasswordAuthUser) => daoContext.userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
-      case Some(authUser: AuthUserIdentity) => daoContext.userDao.findActiveByProviderKeyAndUsername(authUser.getProvider, authUser.getId)
-      case _ => None
-    }
-  }
+  def findByEmail(email: String): Option[UserRow]
 
   //------------------------------------------------------------------------
-  def findByEmail(email: String): Option[UserRow] = {
-    daoContext.userDao.findByEmail(email).headOption
-  }
+  def save(authUser: AuthUser): AnyRef
 
   //------------------------------------------------------------------------
-  override def save(authUser: AuthUser): AnyRef = {
-    val option = authUser match {
-      case identity: AuthUserIdentity => findByAuthUser(identity)
-      case _ => None
-    }
-    val id = option.map(_.id).getOrElse(null.asInstanceOf[Long])
-    Long.box(id)
-  }
+  def getLocalIdentity(identity: AuthUserIdentity): AnyRef
 
   //------------------------------------------------------------------------
-  override def getLocalIdentity(identity: AuthUserIdentity): AnyRef = {
-    // For production: Caching might be a good idea here...
-    // ...and don't forget to sync the cache when users get deactivated/deleted
-    val option = findByAuthUser(identity)
-    val result : AnyRef = option match {
-      case Some(user) => Long.box(user.id)
-      case _ => null
-    }
-    result
-  }
+  def merge(newAuthUser: AuthUser, oldAuthUser: AuthUser): AuthUser
 
   //------------------------------------------------------------------------
-  override def merge(newAuthUser: AuthUser, oldAuthUser: AuthUser): AuthUser = {
-    if (!oldAuthUser.equals(newAuthUser)) {
-      val oldUserOpt = findByAuthUser(oldAuthUser)
-      val newUserOpt = findByAuthUser(newAuthUser)
-
-      (oldUserOpt, newUserOpt) match {
-        case (Some(oldUser), Some(newUser)) => {
-          // new user is no longer active
-          daoContext.userDao.merge(oldUser, newUser)
-        }
-        case _ => // TODO: the most sensible thing to do is to throw an exception
-      }
-    }
-    oldAuthUser
-  }
+  def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): AuthUser
 
   //------------------------------------------------------------------------
-  override def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): AuthUser = {
-    if (!oldAuthUser.equals(newAuthUser)) {
-      val oldUserOpt = findByAuthUser(oldAuthUser)
-      val newUserOpt = findByAuthUser(newAuthUser)
-
-      (oldUserOpt, newUserOpt) match {
-        case (Some(oldUser: UserRow), Some(_)) => {
-          // link the two users
-          daoContext.linkedAccountDao.create(oldUser, newAuthUser)
-        }
-        case _ => // TODO: the most sensible thing to do is to throw an exception
-      }
-    }
-    newAuthUser
-  }
-
-  //------------------------------------------------------------------------
-  override def update(authUser: AuthUser): AuthUser = {
-    val option = findByAuthUser(authUser)
-    option.map { user : UserRow =>
-      daoContext.userDao.update(user.copy(lastLogin = Some(new Timestamp(new Date().getTime))))
-    }
-    authUser
-  }
+  def update(authUser: AuthUser): AuthUser
 }

@@ -17,7 +17,8 @@ class MyModule extends AbstractModule {
     install(new FactoryModuleBuilder().implement(classOf[IMailer], classOf[Mailer]).build(classOf[Mailer.MailerFactory]))
 
     bind(classOf[Resolver]).to(classOf[MyResolver])
-    bind(classOf[UserService]).asEagerSingleton()
+    bind(classOf[UserService]).to(classOf[UserServiceImpl]).asEagerSingleton()
+    bind(classOf[TokenActionService]).to(classOf[TokenActionServiceImpl]).asEagerSingleton()
     bind(classOf[MyAuthProvider]).asEagerSingleton()
     bind(classOf[OpenIdAuthProvider]).asEagerSingleton()
   }

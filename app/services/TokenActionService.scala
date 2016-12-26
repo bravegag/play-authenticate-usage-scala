@@ -1,52 +1,22 @@
 package services
+import constants.TokenActionKey.Type
+import generated.Tables._
 
-import java.sql.Timestamp
-import java.util.Date
-import javax.inject.{Inject, Singleton}
-
-import com.feth.play.module.pa.PlayAuthenticate
-import constants.TokenActionKey
-import dao._
-import generated.Tables.{TokenActionRow, UserRow}
-
-@Singleton
-class TokenActionService @Inject()(auth : PlayAuthenticate,
-                                   daoContext: DaoContext) {
-  import utils.DbExecutionUtils._
+/**
+  * Service interface definition for a TokenAction. This should be the only
+  * point of contact and dependency for doing TokenAction operations in the
+  * rest of the application outside the dao and services packages.
+  */
+trait TokenActionService {
+  //------------------------------------------------------------------------
+  def create(user: UserRow, `type`: Type, token: String): TokenActionRow
 
   //------------------------------------------------------------------------
-  // public
-  //------------------------------------------------------------------------
-  def create(user: UserRow, `type`: TokenActionKey.Type, token: String) : TokenActionRow = {
-    val created = new Timestamp(new Date().getTime)
-    val expires = new Timestamp(created.getTime + VERIFICATION_TIME * 1000)
-    val tokenAction = TokenActionRow(user.id, token, `type`.toString,
-      created, expires, None)
-    daoContext.tokenActionDao.create(tokenAction)
-    tokenAction
-  }
+  def findByToken(token: String, `type`: Type): Option[TokenActionRow]
 
   //------------------------------------------------------------------------
-  def findByToken(token: String, `type`: TokenActionKey.Type): Option[TokenActionRow] = {
-    daoContext.tokenActionDao.findByToken(token, `type`).headOption
-  }
+  def isValid(tokenAction: TokenActionRow): Boolean
 
   //------------------------------------------------------------------------
-  def isValid(tokenAction: TokenActionRow): Boolean = {
-    tokenAction.expires.after(new Date())
-  }
-
-  //------------------------------------------------------------------------
-  def targetUser(tokenAction: TokenActionRow): Option[UserRow] = {
-    daoContext.userDao.findById(tokenAction.userId)
-  }
-
-  //------------------------------------------------------------------------
-  // private
-  //------------------------------------------------------------------------
-  /**
-    * Verification time frame (until the user clicks on the link in the email)
-    * in seconds. Defaults to one week
-    */
-  private val VERIFICATION_TIME = 7 * 24 * 3600
+  def targetUser(tokenAction: TokenActionRow): Option[UserRow]
 }
