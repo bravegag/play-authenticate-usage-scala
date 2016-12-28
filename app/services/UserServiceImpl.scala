@@ -27,8 +27,9 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
     val lastLogin = new Timestamp(new Date().getTime)
     val active = true
     val emailValidated = false
-    var newUser = UserRow(0L, None, None, None, None, None, "N/A", "N/A", None,
-      None, Option(lastLogin), active, emailValidated, None)
+    var newUser = UserRow(id = 0L, firstName = None, middleName = None, lastName = None,
+      dateOfBirth = None, username = "N/A", email = "N/A", lastLogin = Option(lastLogin),
+      active, emailValidated, modified = None)
 
     newUser = authUser match {
       case identity: EmailIdentity => {

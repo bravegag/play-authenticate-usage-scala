@@ -144,7 +144,7 @@ trait Tables {
   /** Entity class storing rows of table TokenAction
    *  @param userId Database column user_id SqlType(int8)
    *  @param token Database column token SqlType(varchar), Length(255,true)
-   *  @param `type` Database column type SqlType(token_type)
+   *  @param `type` Database column type SqlType(bpchar), Length(2,false)
    *  @param created Database column created SqlType(timestamp)
    *  @param expires Database column expires SqlType(timestamp)
    *  @param modified Database column modified SqlType(timestamp) */
@@ -167,9 +167,9 @@ trait Tables {
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column token SqlType(varchar), Length(255,true) */
     val token: Rep[String] = column[String]("token", O.Length(255,varying=true))
-    /** Database column type SqlType(token_type)
+    /** Database column type SqlType(bpchar), Length(2,false)
      *  NOTE: The name was escaped because it collided with a Scala keyword. */
-    val `type`: Rep[String] = column[String]("type")
+    val `type`: Rep[String] = column[String]("type", O.Length(2,varying=false))
     /** Database column created SqlType(timestamp) */
     val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
     /** Database column expires SqlType(timestamp) */
@@ -192,26 +192,23 @@ trait Tables {
    *  @param middleName Database column middle_name SqlType(varchar), Length(50,true), Default(None)
    *  @param lastName Database column last_name SqlType(varchar), Length(50,true), Default(None)
    *  @param dateOfBirth Database column date_of_birth SqlType(date), Default(None)
-   *  @param locationId Database column location_id SqlType(int8), Default(None)
    *  @param username Database column username SqlType(varchar), Length(100,true)
    *  @param email Database column email SqlType(varchar), Length(100,true)
-   *  @param password Database column password SqlType(varchar), Length(100,true), Default(None)
-   *  @param salt Database column salt SqlType(varchar), Length(100,true), Default(None)
    *  @param lastLogin Database column last_login SqlType(timestamp), Default(None)
    *  @param active Database column active SqlType(bool), Default(false)
    *  @param emailValidated Database column email_validated SqlType(bool), Default(false)
    *  @param modified Database column modified SqlType(timestamp) */
-  case class UserRow(id: Long, firstName: Option[String] = None, middleName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, locationId: Option[Long] = None, username: String, email: String, password: Option[String] = None, salt: Option[String] = None, lastLogin: Option[java.sql.Timestamp] = None, active: Boolean = false, emailValidated: Boolean = false, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, UserRow] 
+  case class UserRow(id: Long, firstName: Option[String] = None, middleName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, username: String, email: String, lastLogin: Option[java.sql.Timestamp] = None, active: Boolean = false, emailValidated: Boolean = false, modified: Option[java.sql.Timestamp]) extends EntityAutoInc[Long, UserRow] 
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
-  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Option[Long]], e4: GR[String], e5: GR[Option[java.sql.Timestamp]], e6: GR[Boolean]): GR[UserRow] = GR{
+  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[String], e4: GR[Option[java.sql.Timestamp]], e5: GR[Boolean]): GR[UserRow] = GR{
     prs => import prs._
-    UserRow.tupled((<<[Long], <<?[String], <<?[String], <<?[String], <<?[java.sql.Date], <<?[Long], <<[String], <<[String], <<?[String], <<?[String], <<?[java.sql.Timestamp], <<[Boolean], <<[Boolean], <<?[java.sql.Timestamp]))
+    UserRow.tupled((<<[Long], <<?[String], <<?[String], <<?[String], <<?[java.sql.Date], <<[String], <<[String], <<?[java.sql.Timestamp], <<[Boolean], <<[Boolean], <<?[java.sql.Timestamp]))
   }
   /** Table description of table user. Objects of this class serve as prototypes for rows in queries. */
   class User(_tableTag: Tag) extends profile.api.Table[UserRow](_tableTag, "user") with IdentifyableTable[Long] {
-              def * = (id, firstName, middleName, lastName, dateOfBirth, locationId, username, email, password, salt, lastLogin, active, emailValidated, modified) <> (UserRow.tupled, UserRow.unapply)
+              def * = (id, firstName, middleName, lastName, dateOfBirth, username, email, lastLogin, active, emailValidated, modified) <> (UserRow.tupled, UserRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), firstName, middleName, lastName, dateOfBirth, locationId, Rep.Some(username), Rep.Some(email), password, salt, lastLogin, Rep.Some(active), Rep.Some(emailValidated), modified).shaped.<>({r=>import r._; _1.map(_=> UserRow.tupled((_1.get, _2, _3, _4, _5, _6, _7.get, _8.get, _9, _10, _11, _12.get, _13.get, _14)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), firstName, middleName, lastName, dateOfBirth, Rep.Some(username), Rep.Some(email), lastLogin, Rep.Some(active), Rep.Some(emailValidated), modified).shaped.<>({r=>import r._; _1.map(_=> UserRow.tupled((_1.get, _2, _3, _4, _5, _6.get, _7.get, _8, _9.get, _10.get, _11)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
@@ -223,16 +220,10 @@ trait Tables {
     val lastName: Rep[Option[String]] = column[Option[String]]("last_name", O.Length(50,varying=true), O.Default(None))
     /** Database column date_of_birth SqlType(date), Default(None) */
     val dateOfBirth: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("date_of_birth", O.Default(None))
-    /** Database column location_id SqlType(int8), Default(None) */
-    val locationId: Rep[Option[Long]] = column[Option[Long]]("location_id", O.Default(None))
     /** Database column username SqlType(varchar), Length(100,true) */
     val username: Rep[String] = column[String]("username", O.Length(100,varying=true))
     /** Database column email SqlType(varchar), Length(100,true) */
     val email: Rep[String] = column[String]("email", O.Length(100,varying=true))
-    /** Database column password SqlType(varchar), Length(100,true), Default(None) */
-    val password: Rep[Option[String]] = column[Option[String]]("password", O.Length(100,varying=true), O.Default(None))
-    /** Database column salt SqlType(varchar), Length(100,true), Default(None) */
-    val salt: Rep[Option[String]] = column[Option[String]]("salt", O.Length(100,varying=true), O.Default(None))
     /** Database column last_login SqlType(timestamp), Default(None) */
     val lastLogin: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("last_login", O.Default(None))
     /** Database column active SqlType(bool), Default(false) */
