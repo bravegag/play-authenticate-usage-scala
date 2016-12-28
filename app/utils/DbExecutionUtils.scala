@@ -10,8 +10,6 @@ import scala.concurrent.duration.Duration
   * Blocks until the future is done, implicitly
   */
 object DbExecutionUtils {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

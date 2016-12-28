@@ -1,9 +1,10 @@
+package applications
 
-import slick.driver.PostgresDriver
-import slick.jdbc.meta.MTable
-import slick.codegen.SourceCodeGenerator
-import slick.driver.PostgresDriver.backend.Database
 import play.api.libs.concurrent.Execution.Implicits._
+import slick.codegen.SourceCodeGenerator
+import slick.driver.PostgresDriver
+import slick.driver.PostgresDriver.backend.Database
+import slick.jdbc.meta.MTable
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

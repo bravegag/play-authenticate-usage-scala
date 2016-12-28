@@ -23,16 +23,14 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
+  "com.h2database" % "h2" % "1.4.193" % Test,
   specs2 % Test
 )
 
 resolvers ++= Seq(
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "secured-central" at "https://repo1.maven.org/maven2",
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
+  Resolver.sonatypeRepo("releases")
 )
 
-// Play provides two styles of routers, one expects its actions to be injected, the
-// other, legacy style, accesses its actions statically.
-routesGenerator := InjectedRoutesGenerator
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
