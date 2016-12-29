@@ -1,15 +1,23 @@
 package dao
 
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.scalatest.{BeforeAndAfterAll, FunSpec}
+import org.scalatestplus.play.OneAppPerSuite
+import play.api.Application
 import play.api.db.evolutions.Evolutions
-import play.api.db.Database
+import play.api.db.DBApi
 
-abstract class DaoFunSpec(db: Database) extends FunSpec with BeforeAndAfter {
-  before {
+abstract class DaoFunSpec extends FunSpec with OneAppPerSuite with BeforeAndAfterAll {
+  lazy implicit val db = app.injector.instanceOf[DBApi].database("test")
+
+  override def beforeAll() {
     Evolutions.applyEvolutions(db)
   }
 
-  after {
+  override def afterAll() {
     Evolutions.cleanupEvolutions(db)
+  }
+
+  def userDao(implicit app: Application) = {
+    Application.instanceCache[UserDao].apply(app)
   }
 }
