@@ -1,12 +1,14 @@
 package dao
 
 import generated.Tables.UserRow
+import org.scalatest.Matchers
 import play.api.test.WithApplication
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import utils.AwaitUtils._
 
-class UserDaoFunSpec extends DaoFunSpec {
-  describe("Testing") {
+class UserDaoFunSpec extends DaoFunSpec with Matchers {
+  describe("Create new user") {
     new WithApplication() {
       val dao = userDao
 
@@ -18,13 +20,12 @@ class UserDaoFunSpec extends DaoFunSpec {
       val user = result._1
       val all = result._2
 
-      it("auto generated UserRow#id should be valid") {
-        assert(user.id > 0L)
-        println("auto generated UserRow#id is: %d".format(user.id))
+      it("auto-generated UserRow#id should be valid") {
+        user.id should be >0L
       }
 
-      it("the evolutions didn't reset") {
-        assert(all.size == 1)
+      it("there most be only one user") {
+        all.size should equal(1)
       }
     }
   }
