@@ -18,7 +18,7 @@ import generated.Tables.{LinkedAccountRow, UserRow}
 @Singleton
 class UserServiceImpl @Inject()(auth : PlayAuthenticate,
                                 daoContext: DaoContext) extends AbstractUserService(auth) with UserService {
-  import utils.DbExecutionUtils._
+  import utils.AwaitUtils._
 
   //------------------------------------------------------------------------
   // public

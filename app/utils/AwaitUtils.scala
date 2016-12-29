@@ -3,13 +3,12 @@ package utils
 import scala.concurrent.{Await, Future}
 import generated.Tables._
 import profile.api._
-import slick.profile.BasicProfile
 import scala.concurrent.duration.Duration
 
 /**
   * Blocks until the future is done, implicitly
   */
-object DbExecutionUtils {
+object AwaitUtils {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -18,10 +17,9 @@ object DbExecutionUtils {
     * @param action The action to be executed
     * @param db The db to run under implicit parameter
     * @tparam E Concrete Entity result type
-    * @tparam P Concrete Profile type
     * @return the result of executing the action and retrieving the Future result
     */
-  implicit def execute[E, P <: BasicProfile](action: DBIO[E])(implicit db: P#Backend#Database) =
+  implicit def await[E](action: DBIO[E])(implicit db: Database) =
     Await.result(db.run(action), Duration.Inf)
 
   //------------------------------------------------------------------------
@@ -31,5 +29,5 @@ object DbExecutionUtils {
     * @tparam E concrete Entity result type
     * @return the result of executing and waiting the given Future
     */
-  implicit def execute[E](f: Future[E]) = Await.result(f, Duration.Inf)
+  implicit def await[E](f: Future[E]) = Await.result(f, Duration.Inf)
 }

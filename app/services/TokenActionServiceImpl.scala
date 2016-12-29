@@ -6,13 +6,13 @@ import javax.inject.{Inject, Singleton}
 
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.TokenActionKey
-import dao._
 import generated.Tables.{TokenActionRow, UserRow}
+import dao._
 
 @Singleton
 class TokenActionServiceImpl @Inject()(auth : PlayAuthenticate,
                                        daoContext: DaoContext) extends TokenActionService {
-  import utils.DbExecutionUtils._
+  import utils.AwaitUtils._
 
   //------------------------------------------------------------------------
   // public
