@@ -9,7 +9,7 @@ import utils.AwaitUtils._
 
 class UserDaoFunSpec extends DaoFunSpec with Matchers {
   describe("Create new user") {
-    new WithApplication() {
+    new WithApplication(app) {
       val dao = userDao
 
       val result = (for {
@@ -21,7 +21,7 @@ class UserDaoFunSpec extends DaoFunSpec with Matchers {
       val all = result._2
 
       it("auto-generated UserRow#id should be valid") {
-        user.id should be >0L
+        user.id should be > 0L
       }
 
       it("there most be only one user") {
