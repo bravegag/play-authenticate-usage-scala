@@ -1,5 +1,6 @@
 package dao.generic
 
+import generated.Tables.LinkedAccount
 import generated.Tables.profile.api._
 import play.api.db.slick._
 import slick.lifted.CanBeQueryCondition
@@ -83,4 +84,11 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
     * @return returns a Future
     */
   override def delete(id: PK): Future[Unit] = db.run(tableQuery.filter(_.id === id).delete).map(_ => ())
+
+  //------------------------------------------------------------------------
+  /**
+    * Deletes the given entity by Id and returns a Future
+    * @return returns a Future
+    */
+  override def deleteAll: Future[Unit] = db.run(sqlu"""TRUNCATE TABLE "#${tableQuery.baseTableRow.tableName}" RESTART IDENTITY CASCADE""").map(_ => ())
 }

@@ -76,4 +76,11 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
     * @return returns a Future
     */
   def delete(id: PK): Future[Unit]
+
+  //------------------------------------------------------------------------
+  /**
+    * Deletes all entities and returns a Future
+    * @return returns a Future
+    */
+  def deleteAll: Future[Unit]
 }
