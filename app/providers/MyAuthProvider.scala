@@ -28,8 +28,7 @@ class MyAuthProvider @Inject()(implicit
                                val messagesApi: MessagesApi,
                                val userService: UserService,
                                val tokenActionService: TokenActionService,
-                               val signupForm: SignupForm,
-                               val loginForm: LoginForm,
+                               val formContext: FormContext,
                                auth: PlayAuthenticate,
                                lifecycle: ApplicationLifecycle,
                                mailerFactory: MailerFactory)
@@ -79,13 +78,15 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   override protected def getSignup(context: Http.Context): Signup = {
-    val filledForm = signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    require(context.request()._underlyingRequest != null, "request _underlying must not be null")
+    val filledForm = formContext.signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
     filledForm.get
   }
 
   //-------------------------------------------------------------------
   override protected def getLogin(context: Http.Context): Login = {
-    val filledForm = loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    require(context.request()._underlyingRequest != null, "request _underlying must not be null")
+    val filledForm = formContext.loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
     filledForm.get
   }
 

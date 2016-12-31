@@ -12,7 +12,7 @@ import play.api.mvc.Controller
 import play.core.j.JavaHelpers
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
-import views.account.form._
+import views.form._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -25,8 +25,7 @@ class Account @Inject() (implicit
                          auth: PlayAuthenticate,
                          userService: UserService,
                          authProvider: MyAuthProvider,
-                         acceptForm: AcceptForm,
-                         passwordChangeForm: PasswordChangeForm) extends Controller with I18nSupport {
+                         formContext: FormContext) extends Controller with I18nSupport {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
@@ -74,7 +73,7 @@ class Account @Inject() (implicit
             Ok(views.html.account.unverified(userService))
 
           } else {
-            Ok(views.html.account.password_change(userService, passwordChangeForm.Instance))
+            Ok(views.html.account.password_change(userService, formContext.passwordChangeForm.Instance))
           }
         result
       }
@@ -86,7 +85,7 @@ class Account @Inject() (implicit
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
-          passwordChangeForm.Instance.bindFromRequest.fold(
+          formContext.passwordChangeForm.Instance.bindFromRequest.fold(
             formWithErrors => {
               // User did not select whether to link or not link
               BadRequest(views.html.account.password_change(userService, formWithErrors))
@@ -109,7 +108,7 @@ class Account @Inject() (implicit
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
         Option(auth.getLinkUser(jContext.session)) match {
-          case Some(user) => Ok(views.html.account.ask_link(userService, acceptForm.Instance, user))
+          case Some(user) => Ok(views.html.account.ask_link(userService, formContext.acceptForm.Instance, user))
           case None => {
             // account to link could not be found, silently redirect to login
             Redirect(routes.Application.index)
@@ -126,7 +125,7 @@ class Account @Inject() (implicit
         val jContext = JavaHelpers.createJavaContext(request)
         Option(auth.getLinkUser(jContext.session)) match {
           case Some(user) => {
-            acceptForm.Instance.bindFromRequest.fold(
+            formContext.acceptForm.Instance.bindFromRequest.fold(
               formWithErrors => BadRequest(views.html.account.ask_link(userService, formWithErrors, user)),
               formSuccess => {
                 // User made a choice :)
@@ -162,7 +161,7 @@ class Account @Inject() (implicit
           case Some(userB) => {
             // You could also get the local user object here via
             // User.findByAuthUserIdentity(newUser)
-            Ok(views.html.account.ask_merge(userService, acceptForm.Instance, userA, userB))
+            Ok(views.html.account.ask_merge(userService, formContext.acceptForm.Instance, userA, userB))
           }
           case None => {
             // user to merge with could not be found, silently redirect to login
@@ -185,7 +184,7 @@ class Account @Inject() (implicit
         // this is the user that was selected for a login
         Option(auth.getMergeUser(jContext.session)) match {
           case Some(userB) => {
-            val filledForm = acceptForm.Instance.bindFromRequest
+            val filledForm = formContext.acceptForm.Instance.bindFromRequest
             if (filledForm.hasErrors) {
               // User did not select whether to merge or not merge
               BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))

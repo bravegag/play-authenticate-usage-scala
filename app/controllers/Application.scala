@@ -26,8 +26,7 @@ class Application @Inject() (implicit
                              auth: PlayAuthenticate,
                              userService: UserService,
                              authProvider: MyAuthProvider,
-                             loginForm: LoginForm,
-                             signupForm: SignupForm) extends Controller with I18nSupport {
+                             formContext: FormContext) extends Controller with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
 
@@ -61,7 +60,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def login = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(views.html.login(auth, userService, loginForm.Instance))
+      Ok(views.html.login(auth, userService, formContext.loginForm.Instance))
     }
   }
 
@@ -70,7 +69,7 @@ class Application @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-        loginForm.Instance.bindFromRequest.fold(
+        formContext.loginForm.Instance.bindFromRequest.fold(
           formWithErrors => {
             // User did not fill everything properly
             BadRequest(views.html.login(auth, userService, formWithErrors))
@@ -87,7 +86,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   def signup = deadbolt.WithAuthRequest()() { implicit request =>
     Future {
-      Ok(views.html.signup(auth, userService, signupForm.Instance))
+      Ok(views.html.signup(auth, userService, formContext.signupForm.Instance))
     }
   }
 
@@ -95,7 +94,7 @@ class Application @Inject() (implicit
   def doSignup = NoCache {
     deadbolt.WithAuthRequest()() { implicit request =>
       val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-      verifier.bindFromRequestAndVerify(signupForm.Instance).map { form =>
+      verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
         form.fold(
           formWithErrors => {
             // User did not fill everything properly

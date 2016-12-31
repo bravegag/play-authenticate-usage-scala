@@ -14,7 +14,7 @@ import play.core.j.JavaHelpers
 import providers._
 import services._
 import generated.Tables.TokenActionRow
-import views.account.signup.form._
+import views.form._
 
 @Singleton
 class Signup @Inject() (implicit
@@ -25,8 +25,7 @@ class Signup @Inject() (implicit
                         userService: UserService,
                         tokenActionService: TokenActionService,
                         authProvider: MyAuthProvider,
-                        forgotPasswordForm: ForgotPasswordForm,
-                        passwordResetForm: PasswordResetForm) extends Controller with I18nSupport {
+                        formContext: FormContext) extends Controller with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
   import services.PluggableUserService._
@@ -50,14 +49,14 @@ class Signup @Inject() (implicit
         val form = Option(email) match {
           case Some(email) => {
             if (!email.trim.isEmpty) {
-              forgotPasswordForm.Instance.fill(ForgotPassword(email))
+              formContext.forgotPasswordForm.Instance.fill(ForgotPassword(email))
 
             } else {
-              forgotPasswordForm.Instance
+              formContext.forgotPasswordForm.Instance
             }
           }
           case None => {
-            forgotPasswordForm.Instance
+            formContext.forgotPasswordForm.Instance
           }
         }
         Ok(views.html.account.signup.password_forgot(userService, form))
@@ -70,7 +69,7 @@ class Signup @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        forgotPasswordForm.Instance.bindFromRequest.fold(
+        formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
           formWithErrors => {
             // User did not fill in his/her email
             BadRequest(views.html.account.signup.password_forgot(userService, formWithErrors))
@@ -124,7 +123,8 @@ class Signup @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
-          case Some(_) => Ok(views.html.account.signup.password_reset(userService, passwordResetForm.Instance.fill(PasswordReset("", "", token))))
+          case Some(_) => Ok(views.html.account.signup.password_reset(userService,
+            formContext.passwordResetForm.Instance.fill(PasswordReset("", "", token))))
           case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
         }
       }
@@ -136,7 +136,7 @@ class Signup @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request)
-        passwordResetForm.Instance.bindFromRequest.fold(
+        formContext.passwordResetForm.Instance.bindFromRequest.fold(
           formWithErrors => BadRequest(views.html.account.signup.password_reset(userService, formWithErrors)),
           formSuccess => {
             val token = formSuccess.token
@@ -153,18 +153,21 @@ class Signup @Inject() (implicit
                 }
                 catch {
                   case _ : RuntimeException => {
-                    flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.no_password_account"))
+                    flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                      preferred(request)("playauthenticate.reset_password.message.no_password_account"))
                   }
                 }
                 val login = authProvider.isLoginAfterPasswordReset
                 if (login) {
                   // automatically log in
-                  flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
+                  flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                    preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
                   auth.loginAndRedirect(jContext, new MyLoginAuthUser(user.email))
 
                 } else {
                   // send the user to the login page
-                  flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+                  flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                    preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
                 }
                 Redirect(routes.Application.login).flashing(flashValues: _*)
               }
@@ -204,7 +207,8 @@ class Signup @Inject() (implicit
             val Some(user) =  tokenAction.targetUser
             val email = user.email
             user.verify
-            val flashValues = (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.verify_email.success", email))
+            val flashValues = (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+              preferred(request)("playauthenticate.verify_email.success", email))
             userService.findInSession(jContext.session) match {
               case Some(_) => Redirect(routes.Application.index).flashing(flashValues)
               case None => Redirect(routes.Application.login).flashing(flashValues)

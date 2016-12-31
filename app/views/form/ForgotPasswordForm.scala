@@ -1,4 +1,4 @@
-package views.account.signup.form
+package views.form
 
 import javax.inject.{Inject, Singleton}
 

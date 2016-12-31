@@ -1,8 +1,8 @@
 @import services.UserService
+@import views.form._
 @import play.api.mvc._
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@import views.form._
 @import com.nappin.play.recaptcha.WidgetHelper
 
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper)
