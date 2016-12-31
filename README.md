@@ -35,8 +35,8 @@ application projects there is some room for improvement:
   between Scala -> Java and back to -> Scala. The Play Java <-> Scala interoperability due to 
   reusing a Java plugin resulted in some using of the Play internal `play.core.j.JavaHelpers` 
   implementation. Once the top Play abstractions are made compatible between Java and Scala 
-  then one can refactor away from using `play.core.j.JavaHelpers`. See discussion the
-  [NPE attempting to bindFromRequest a Java Form from a Scala App](https://github.com/playframework/playframework/issues/6831)
+  then one can refactor away from using `play.core.j.JavaHelpers`. See discussion the Playframework 
+  support page [NPE attempting to bindFromRequest a Java Form from a Scala App](https://github.com/playframework/playframework/issues/6831)
 
 # FAQ
 
