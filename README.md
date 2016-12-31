@@ -25,6 +25,18 @@ This project is a complete rewrite of [PlayAuthenticate usage sample](https://gi
 * The application builds on Travis CI https://travis-ci.org/bravegag/play-authenticate-usage-scala including 
   execution of the unit tests on Postgres.
 
+# Future work
+
+Although I have tried very hard to have this project as a perfect template code base for my web 
+application projects there is some room for improvement:
+
+* The PlayAuthenticate plugin is written in Play Java therefore to make this project in Scala 
+  it was necessary tunneling top Play abstractions between Scala -> Java and back to -> Scala.
+  The Play Java <-> Scala interoperability due to reusing a Java plugin resulted in some using 
+  of the Play internal `play.core.j.JavaHelpers` implementation. Once the top Play abstractions 
+  (e.g. Context, Session, Request, etc) are made compatible between Java and Scala then one can
+  refactor away from using `play.core.j.JavaHelpers`.
+
 # FAQ
 
 ## Create/drop Postgres App database in Linux with:
