@@ -12,7 +12,7 @@ import utils.AwaitUtils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TokenActionDaoFunSpec extends DaoFunSpec with Matchers {
+class TokenActionDaoFunSpec extends AbstractDaoFunSpec with Matchers {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

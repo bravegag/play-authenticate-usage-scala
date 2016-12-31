@@ -10,7 +10,7 @@ import be.objectify.deadbolt.scala.models.{Role, Permission}
 import scala.concurrent.ExecutionContext.Implicits.global
 import utils.AwaitUtils._
 
-class UserDaoFunSpec extends DaoFunSpec with Matchers {
+class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

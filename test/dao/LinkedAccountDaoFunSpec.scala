@@ -10,7 +10,7 @@ import utils.AwaitUtils._
 
 import scala.Long
 
-class LinkedAccountDaoFunSpec extends DaoFunSpec with Matchers {
+class LinkedAccountDaoFunSpec extends AbstractDaoFunSpec with Matchers {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
