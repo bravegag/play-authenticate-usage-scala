@@ -31,11 +31,12 @@ Although I have tried very hard to have this project as a perfect template code 
 application projects there is some room for improvement:
 
 * The PlayAuthenticate plugin is written in Play Java therefore to make this project in Scala 
-  it was necessary tunneling top Play abstractions between Scala -> Java and back to -> Scala.
-  The Play Java <-> Scala interoperability due to reusing a Java plugin resulted in some using 
-  of the Play internal `play.core.j.JavaHelpers` implementation. Once the top Play abstractions 
-  (e.g. Context, Session, Request, etc) are made compatible between Java and Scala then one can
-  refactor away from using `play.core.j.JavaHelpers`.
+  it was necessary tunneling top Play abstractions (e.g. Context, Session, Request, etc) 
+  between Scala -> Java and back to -> Scala. The Play Java <-> Scala interoperability due to 
+  reusing a Java plugin resulted in some using of the Play internal `play.core.j.JavaHelpers` 
+  implementation. Once the top Play abstractions are made compatible between Java and Scala 
+  then one can refactor away from using `play.core.j.JavaHelpers`. See discussion the
+  [NPE attempting to bindFromRequest a Java Form from a Scala App](https://github.com/playframework/playframework/issues/6831)
 
 # FAQ
 
