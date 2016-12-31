@@ -52,7 +52,7 @@ application projects there is some room for improvement:
 
 `sudo -u postgres dropdb mytestdb`
 
-## License
+# License
 
 Copyright (c) 2016-2017 Giovanni Azua
 
