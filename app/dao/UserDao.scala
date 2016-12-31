@@ -75,7 +75,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     }
 
   //------------------------------------------------------------------------
-  def findActiveByProviderKeyAndUsername(providerKey: String, providerPassword: String): Future[Option[UserRow]] = {
+  def findActiveByProviderKeyAndPassword(providerKey: String, providerPassword: String): Future[Option[UserRow]] = {
     val action = sql"""
           SELECT t1.*
           FROM "#${User.baseTableRow.tableName}" t1

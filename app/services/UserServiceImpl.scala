@@ -131,7 +131,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   override def findByAuthUser(identity: AuthUserIdentity): Option[UserRow] = {
     Option(identity) match {
       case Some(authUser: UsernamePasswordAuthUser) => daoContext.userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
-      case Some(authUser: AuthUserIdentity) => daoContext.userDao.findActiveByProviderKeyAndUsername(authUser.getProvider, authUser.getId)
+      case Some(authUser: AuthUserIdentity) => daoContext.userDao.findActiveByProviderKeyAndPassword(authUser.getProvider, authUser.getId)
       case _ => None
     }
   }
