@@ -8,9 +8,9 @@ This project is a complete rewrite of [PlayAuthenticate usage sample](https://gi
 * Uses Postgres and Slick 3.1.1
 * Features a generic Slick DAO that is self contained and can be reused in isolation under `app/dao/generic`
 * Integrates [Web Jars](https://github.com/webjars/webjars-play) for all the relevant dependencies. 
-* Features reCAPTCHA using the excellent [Play reCAPTCHA Module](https://github.com/chrisnappin/play-recaptcha).
+* Features reCAPTCHA using the excellent [Play reCAPTCHA Module](https://github.com/chrisnappin/play-recaptcha) implementation.
 * A custom Slick code generator is implemented under `test/generator` and it generates the class `app/generated/Tables.scala` 
-* Features very strict separation of application layers: DAO, Service, Play MVC:
+* Features very strict separation of application layers and programming to the interface: DAO, Service, Play MVC:
     - completely context-free reusable DAO under `app/dao/generic`
     - dao extensions e.g. UserDao have no dependencies outside the dao package
     - Service layer under `app/services` uses the `app/dao` package
