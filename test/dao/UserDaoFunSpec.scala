@@ -14,7 +14,7 @@ class UserDaoFunSpec extends DaoFunSpec with Matchers {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  describe("Simple creation of a new user") {
+  describe("Create a new user") {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
@@ -60,21 +60,21 @@ class UserDaoFunSpec extends DaoFunSpec with Matchers {
       val linkedAccount: Seq[LinkedAccountRow] = result._2
       val securityRoles: Seq[Role] = result._3
 
-      it("user data must be correct") {
+      it("user data should be correct") {
         user.id should equal (1L)
         user.username should equal ("test")
         user.email should equal ("test@test.test")
         user.modified should be (None)
       }
 
-      it("user linked account must be correct") {
+      it("user linked account should be correct") {
         linkedAccount.size should equal (1)
         linkedAccount.head.userId should equal (user.id)
         linkedAccount.head.providerKey should equal ("password")
         linkedAccount.head.providerPassword should equal ("xxx")
       }
 
-      it("user security roles must be correct") {
+      it("user security roles should be correct") {
         securityRoles.size should equal (1)
         securityRoles.head.name should equal (SecurityRoleKey.USER_ROLE.toString)
       }
