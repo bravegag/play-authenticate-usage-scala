@@ -25,11 +25,14 @@ class UserDaoFunSpec extends DaoFunSpec with Matchers {
         all <- dao.userDao.findAll
       } yield (user, all))
 
-      val user = result._1
+      val user: UserRow = result._1
       val all = result._2
 
-      it("auto-generated UserRow#id should be valid") {
+      it("user should be correct") {
         user.id should equal (1L)
+        user.username should equal ("test")
+        user.email should equal ("test@test.test")
+        user.modified should not be None
       }
 
       it("there must be only one user") {
@@ -57,23 +60,24 @@ class UserDaoFunSpec extends DaoFunSpec with Matchers {
       } yield (user, linkedAccount, securityRoles, permissions))
 
       val user: UserRow = result._1
-      val linkedAccount: Seq[LinkedAccountRow] = result._2
+      val linkedAccounts: Seq[LinkedAccountRow] = result._2
       val securityRoles: Seq[Role] = result._3
       val permissions: Seq[Permission] = result._4
 
-      it("user data should be correct") {
+      it("user should be correct") {
         user.id should equal (1L)
         user.username should equal ("test")
         user.email should equal ("test@test.test")
         user.active should be (true)
-        user.modified should be (None)
       }
 
       it("user linked account should be correct") {
-        linkedAccount.size should equal (1)
-        linkedAccount.head.userId should equal (user.id)
-        linkedAccount.head.providerKey should equal ("password")
-        linkedAccount.head.providerPassword should equal ("xxx")
+        linkedAccounts.size should equal (1)
+        val linkedAccount = linkedAccounts.head
+        linkedAccount.userId should equal (user.id)
+        linkedAccount.providerKey should equal ("password")
+        linkedAccount.providerPassword should equal ("xxx")
+        linkedAccount.modified should not be None
       }
 
       it("user security roles should be correct") {
@@ -114,6 +118,66 @@ class UserDaoFunSpec extends DaoFunSpec with Matchers {
 
         it("the user was found") {
           user should not be (None)
+        }
+      }
+    }
+
+    //------------------------------------------------------------------------
+    describe("Find user by email") {
+      new WithApplication() {
+        val dao = daoContext
+
+        // reuses the user created in the previous test
+        val users: Seq[UserRow] = (for {
+          user <- dao.userDao.findByEmail("test@test.test")
+        } yield user)
+
+        it("the user was found") {
+          users.size should equal (1)
+        }
+      }
+    }
+
+    //------------------------------------------------------------------------
+    describe("Merge two users") {
+      new WithApplication() {
+        val dao = daoContext
+
+        // we know it ...
+        val sourceUserId = 1L
+
+        // reuses the user created in the previous test
+        val result = (for {
+          targetUser <- dao.userDao.createAndFetch(UserRow(id = 0L, username = "target", active = true, email = "target@target.target", modified = None))
+          _ <- dao.userDao.merge(targetUser, dao.userDao.findById(sourceUserId).get)
+          linkedAccounts <- dao.userDao.linkedAccounts(targetUser)
+          sourceUser <- dao.userDao.findById(sourceUserId)
+        } yield (targetUser, linkedAccounts, sourceUser))
+
+        val targetUser: UserRow = result._1
+        val linkedAccounts: Seq[LinkedAccountRow] = result._2
+        val sourceUser: Option[UserRow] = result._3
+
+        it("target user should be correct") {
+          targetUser.id should equal (2L)
+          targetUser.username should equal ("target")
+          targetUser.email should equal ("target@target.target")
+          targetUser.active should be (true)
+          targetUser.modified should not be (None)
+        }
+
+        it("target user linked account should be correct") {
+          linkedAccounts.size should equal (1)
+          val linkedAccount = linkedAccounts.head
+          linkedAccount.userId should equal (targetUser.id)
+          linkedAccount.providerKey should equal ("password")
+          linkedAccount.providerPassword should equal ("xxx")
+          linkedAccount.modified should not be (None)
+        }
+
+        it("source user should be inactive") {
+          sourceUser should not be None
+          sourceUser.get.active should be (false)
         }
       }
     }

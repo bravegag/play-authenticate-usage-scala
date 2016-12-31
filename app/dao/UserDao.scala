@@ -95,10 +95,10 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   //------------------------------------------------------------------------
   def merge(targetUser: UserRow, sourceUser: UserRow) : Future[Unit] = {
-    // define an update DBIOAction to deactivate sourceUser
+    // deactivate the sourceUser
     val updateAction = User.filter(_.id === sourceUser.id).update(sourceUser.copy(active = false))
 
-    // selects all linkedAccount from sourceUser but yield the userId of the targetUser
+    // selects all linkedAccount from sourceUser but outputs targetUser's userId
     val selectAction = (for {
       linkedAccount <- LinkedAccount
       user <- User if user.id === sourceUser.id && user.id === linkedAccount.userId
