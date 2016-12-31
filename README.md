@@ -4,7 +4,7 @@
 
 This project is a complete rewrite of [PlayAuthenticate usage sample](https://github.com/joscha/play-authenticate):
 * Rewritten completely in Scala 2.11.8
-* It is a database-driven application i.e. the database design dictates what the generated Slick model is. 
+* It is a database-driven application i.e. the database design dictates what the generated Scala model is. 
 * Uses Postgres and Slick 3.1.1
 * Features a generic Slick DAO that is self contained and can be reused in isolation under `app/dao/generic`
 * Integrates [Web Jars](https://github.com/webjars/webjars-play) for all the relevant dependencies. 
