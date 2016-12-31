@@ -8,7 +8,7 @@ import play.api.db.DBApi
 abstract class DaoFunSpec extends FunSpec with OneAppPerSuite with BeforeAndAfter {
   lazy implicit val db = app.injector.instanceOf[DBApi].database("default")
 
-  def userDao(implicit app: Application) = {
-    Application.instanceCache[UserDao].apply(app)
+  def daoContext(implicit app: Application) = {
+    Application.instanceCache[DaoContext].apply(app)
   }
 }
