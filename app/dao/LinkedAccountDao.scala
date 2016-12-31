@@ -16,9 +16,8 @@ class LinkedAccountDao @Inject()(protected val dbConfigProvider: DatabaseConfigP
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
-  def create(user: UserRow, authUser: AuthUser) : Future[Unit] = {
-    // TODO: investigate why here it was passing authUser.getId as password
-    val newLinkedAccount = LinkedAccountRow(user.id, authUser.getProvider, authUser.getId, None)
+  def create(user: UserRow, providerKey: String, providerPassword: String) : Future[Unit] = {
+    val newLinkedAccount = LinkedAccountRow(user.id, providerKey, providerPassword, None)
     create(newLinkedAccount)
   }
 

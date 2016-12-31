@@ -189,7 +189,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
       (oldUserOpt, newUserOpt) match {
         case (Some(oldUser: UserRow), Some(_)) => {
           // link the two users
-          daoContext.linkedAccountDao.create(oldUser, newAuthUser)
+          daoContext.linkedAccountDao.create(oldUser, newAuthUser.getProvider, newAuthUser.getId)
         }
         case _ => // TODO: the most sensible thing to do is to throw an exception
       }
