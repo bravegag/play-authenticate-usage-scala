@@ -33,7 +33,7 @@ class MyAuthProvider @Inject()(implicit
                                auth: PlayAuthenticate,
                                lifecycle: ApplicationLifecycle,
                                mailerFactory: MailerFactory)
-  extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuthUser, MySignupAuthUser, Login, Signup] (auth, lifecycle, mailerFactory) {
+  extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuthUser, MySignupAuthUser, Login, Signup](auth, lifecycle, mailerFactory) {
 
   import services.PluggableUserService._
 
@@ -41,15 +41,15 @@ class MyAuthProvider @Inject()(implicit
   // public
   //-------------------------------------------------------------------
   def sendPasswordResetMailing(user: UserRow, ctx: Http.Context) {
-    val token = generatePasswordResetRecord (user)
-    val subject = getPasswordResetMailingSubject (user, ctx)
+    val token = generatePasswordResetRecord(user)
+    val subject = getPasswordResetMailingSubject(user, ctx)
     val body = getPasswordResetMailingBody(token, user, ctx)
     sendMail(subject, body, getEmailName(user))
   }
 
   //-------------------------------------------------------------------
   def isLoginAfterPasswordReset: Boolean = {
-    getConfiguration.getBoolean (SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET)
+    getConfiguration.getBoolean(SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET)
   }
 
   //-------------------------------------------------------------------
@@ -166,18 +166,18 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  override protected def getVerifyEmailMailingSubject (user: MySignupAuthUser, ctx: Http.Context): String = {
+  override protected def getVerifyEmailMailingSubject(user: MySignupAuthUser, ctx: Http.Context): String = {
     messagesApi("playauthenticate.password.verify_signup.subject")
   }
 
   //-------------------------------------------------------------------
   override protected def getVerifyEmailMailingBody(token: String, user: MySignupAuthUser, ctx: Http.Context): Body = {
-    val isSecure: Boolean = getConfiguration.getBoolean (SETTING_KEY_VERIFICATION_LINK_SECURE)
-    val url: String = routes.Signup.verify (token).absoluteURL (ctx.request, isSecure)
+    val isSecure: Boolean = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
+    val url: String = routes.Signup.verify(token).absoluteURL(ctx.request, isSecure)
     val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
     val langCode: String = lang.code
-    val html: String = getEmailTemplate ("views.html.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
-    val text: String = getEmailTemplate ("views.txt.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
+    val html: String = getEmailTemplate("views.html.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
+    val text: String = getEmailTemplate("views.txt.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
     new Body(text, html)
   }
 
@@ -208,12 +208,12 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   protected def getPasswordResetMailingBody(token: String, user: UserRow, ctx: Http.Context) : Body = {
-    val isSecure: Boolean = getConfiguration.getBoolean (SETTING_KEY_PASSWORD_RESET_LINK_SECURE)
-    val url: String = routes.Signup.resetPassword (token).absoluteURL (ctx.request, isSecure)
-    val lang: Lang = Lang.preferred (ctx.request.acceptLanguages)
+    val isSecure: Boolean = getConfiguration.getBoolean(SETTING_KEY_PASSWORD_RESET_LINK_SECURE)
+    val url: String = routes.Signup.resetPassword(token).absoluteURL(ctx.request, isSecure)
+    val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
     val langCode: String = lang.code
-    val html: String = getEmailTemplate ("views.html.account.email.password_reset", langCode, url, token, user.username, user.email)
-    val text: String = getEmailTemplate ("views.txt.account.email.password_reset", langCode, url, token, user.username, user.email)
+    val html: String = getEmailTemplate("views.html.account.email.password_reset", langCode, url, token, user.username, user.email)
+    val text: String = getEmailTemplate("views.txt.account.email.password_reset", langCode, url, token, user.username, user.email)
     new Body(text, html)
   }
 
@@ -227,16 +227,16 @@ class MyAuthProvider @Inject()(implicit
     var cls: Class[_] = null
     var result: String = null
     try {
-      cls = Class.forName (template + "_" + langCode)
+      cls = Class.forName(template + "_" + langCode)
     }
     catch {
       case e: ClassNotFoundException => {
-        Logger.warn ("Template: '" + template + "_" + langCode + "' was not found! Trying to use English fallback template instead.")
+        Logger.warn("Template: '" + template + "_" + langCode + "' was not found! Trying to use English fallback template instead.")
       }
     }
     if (cls == null) {
       try {
-        cls = Class.forName (template + "_" + EMAIL_TEMPLATE_FALLBACK_LANGUAGE)
+        cls = Class.forName(template + "_" + EMAIL_TEMPLATE_FALLBACK_LANGUAGE)
       }
       catch {
         case e: ClassNotFoundException => {
@@ -248,8 +248,8 @@ class MyAuthProvider @Inject()(implicit
     if (cls != null) {
       var htmlRender: Method = null
       try {
-        htmlRender = cls.getMethod ("render", classOf[String], classOf[String], classOf[String], classOf[String] )
-        result = htmlRender.invoke (null, url, token, name, email).toString
+        htmlRender = cls.getMethod("render", classOf[String], classOf[String], classOf[String], classOf[String] )
+        result = htmlRender.invoke(null, url, token, name, email).toString
       }
       catch {
         case exception: Throwable => {
@@ -263,7 +263,7 @@ class MyAuthProvider @Inject()(implicit
   //-------------------------------------------------------------------
   protected def getVerifyEmailMailingBodyAfterSignup(token: String, user: UserRow, ctx: Http.Context): Body = {
     val isSecure = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
-    val url = routes.Signup.verify (token).absoluteURL (ctx.request, isSecure)
+    val url = routes.Signup.verify(token).absoluteURL(ctx.request, isSecure)
     val lang = Lang.preferred(ctx.request.acceptLanguages)
     val langCode = lang.code
     val html = getEmailTemplate("views.html.account.email.verify_email", langCode, url, token, user.username, user.email)
