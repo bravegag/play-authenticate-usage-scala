@@ -65,7 +65,6 @@ class TokenActionDaoFunSpec extends AbstractDaoFunSpec with Matchers {
       }
 
       it("PSQLException exception is received") {
-        assert(caught.getMessage.indexOf("-1") != -1)
         assert(caught.getMessage.contains("ERROR: new row for relation \"token_action\" violates check constraint \"token_action_type_check\""))
       }
     }
