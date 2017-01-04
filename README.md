@@ -1,4 +1,4 @@
-# [![Build Status](https://travis-ci.org/bravegag/play-authenticate-usage-scala.svg?branch=master)](https://travis-ci.org/bravegag/play-authenticate-usage-scala) [![Apache License](https://img.shields.io/badge/license-Apache-green.svg) ](https://github.com/bravegag/play-authenticate-usage-scala/LICENSE) PlayAuthenticate - usage sample application Play! Framework 2 (Scala)
+# [![Build Status](https://travis-ci.org/bravegag/play-authenticate-usage-scala.svg?branch=master)](https://travis-ci.org/bravegag/play-authenticate-usage-scala) [![Apache 2.0 License](https://img.shields.io/badge/license-Apache2-green.svg) ](https://github.com/bravegag/play-authenticate-usage-scala/blob/master/LICENSE) PlayAuthenticate - usage sample application Play! Framework 2 (Scala)
 
 # Play Authenticate usage in Scala
 
