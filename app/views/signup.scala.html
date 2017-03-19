@@ -8,43 +8,70 @@
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper)
 
 @import helper._
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+@import b3.vertical.fieldConstructor
+@import com.feth.play.module.pa.views.html._
 
 @main(userService, messagesApi("playauthenticate.signup.title"),"signup") {
-
-  <div class="row">
-    <div class="col-xs-12 col-sm-6 col-md-8">
-      <h1>@messagesApi("playauthenticate.signup.title")</h1>
+    @if(signupForm.hasGlobalErrors) {
+        <p class="alert alert-danger">@signupForm.globalError.get.message</p>
+    }
+    <div class="inner-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+                    <div class="form-top">
+                        <div class="form-top-left">
+                            <h3>@messagesApi("playauthenticate.signup.title")</h3>
+                            <p>Enter your new account information to sign up:</p>
+                        </div>
+                        <div class="form-top-right">
+                            <i class="fa fa-key"></i>
+                        </div>
+                    </div>
+                    <div class="form-bottom">
+                        @* Display proprietary signup form *@
+                        @b3.vertical.form(routes.Application.doSignup, 'class -> "form-vertical", 'role -> "form") { implicit vfc =>
+                            @b3.inputWrapped("text", signupForm("name"), '_label -> messagesApi("playauthenticate.signup.name"), '_showConstraints -> false, 'placeholder -> "John Doe")  { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @b3.inputWrapped("email", signupForm("email"), '_label -> messagesApi("playauthenticate.login.email.placeholder"), '_showConstraints -> false, 'placeholder -> "example@mail.com") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @b3.inputWrapped("password", signupForm("password"), '_label -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @b3.inputWrapped("password", signupForm("repeatPassword"), '_label -> messagesApi("playauthenticate.login.password.repeat"), '_showConstraints -> false, 'placeholder -> "Password", '_error -> signupForm.error("password")) { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @_recaptchaFieldPartial(form=signupForm, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
+                            @b3.submit('class -> "btn btn-default") {
+                                @messagesApi("playauthenticate.signup.now")
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 social-login">
+                    <div class="social-login-buttons">
+                        @messagesApi("playauthenticate.login.oauth")
+                        @* Display list of available providers *@
+                        @_providerPartial(playAuth, skipCurrent=false)
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <div id="signup" class="row">
-
-    <div class="col-xs-8 col-md-6">
-        @* Display proprietary login form *@
-    	@helper.form(routes.Application.doSignup, 'class -> "form-vertical", 'role -> "form") {
-            @if(signupForm.hasGlobalErrors) {
-                <p class="alert alert-danger">@signupForm.globalError.get.message</p>
-            }
-
-            @inputText(signupForm("name"), '_label -> messagesApi("playauthenticate.signup.name"))
-
-            @_emailPartial(signupForm)
-
-            @_passwordPartial(signupForm)
-            <br />
-            @twitterBootstrapRecaptchaField(form=signupForm, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
-
-            <button type="submit" class="btn btn-default">@messagesApi("playauthenticate.signup.now")</button>
-    	}
-    </div>
-
-    <div class="col-xs-6 col-md-4">
-        @messagesApi("playauthenticate.signup.oauth")
-        @* Display list of available providers *@
-        @_providerPartial(playAuth, skipCurrent=false)
-    </div>
-
-  </div>
-
 }

@@ -62,13 +62,13 @@ playauthenticate.login.title=Login
 playauthenticate.login.password.placeholder=Password
 playauthenticate.login.now=Login now
 playauthenticate.login.forgot.password=Forgot your password?
-playauthenticate.login.oauth=or log in using one of the following providers:
+playauthenticate.login.oauth=... or log in using one of the following providers:
 playauthenticate.login.basic=or try HTTP basic auth (as example/secret)
 
 playauthenticate.signup.title=Signup
 playauthenticate.signup.name=Your name
 playauthenticate.signup.now=Sign up now
-playauthenticate.signup.oauth=or sign up using one of the following providers:
+playauthenticate.signup.oauth=... or sign up using one of the following providers:
 playauthenticate.signup.captcha=Please complete the following captcha:
 
 playauthenticate.verify.account.title=E-mail verification required

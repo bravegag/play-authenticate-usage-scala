@@ -62,12 +62,12 @@ playauthenticate.login.title=Entrar
 playauthenticate.login.password.placeholder=Contraseña
 playauthenticate.login.now=Entrar
 playauthenticate.login.forgot.password=¿Olvidó su contraseña?
-playauthenticate.login.oauth=entre usando su cuenta con alguno de los siguientes proveedores:
+playauthenticate.login.oauth=... o entre usando su cuenta con alguno de los siguientes proveedores:
 
 playauthenticate.signup.title=Registrarse
 playauthenticate.signup.name=Su nombre
 playauthenticate.signup.now=Regístrese
-playauthenticate.signup.oauth=regístrese usando su cuenta con alguno de los siguientes proveedores:
+playauthenticate.signup.oauth=... or regístrese usando su cuenta con alguno de los siguientes proveedores:
 
 playauthenticate.verify.account.title=Es necesario validar su email
 playauthenticate.verify.account.before=Antes de configurar una contraseña

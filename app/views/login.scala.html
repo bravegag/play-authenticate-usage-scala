@@ -11,6 +11,9 @@
 @import com.feth.play.module.pa.views.html._
 
 @main(userService, messagesApi("playauthenticate.login.title"),"login") {
+    @if(loginForm.hasGlobalErrors) {
+        <p class="alert alert-danger">@loginForm.globalError.get.message</p>
+    }
     <div class="inner-bg">
         <div class="container">
             <div class="row">
@@ -27,16 +30,13 @@
                     <div class="form-bottom">
                         @* Display proprietary login form *@
                         @b3.vertical.form(routes.Application.doLogin) { implicit vfc =>
-                            @if(loginForm.hasGlobalErrors) {
-                                <p class="alert alert-danger">@loginForm.globalError.get.message</p>
-                            }
                             @b3.inputWrapped("email", loginForm("email"), '_label -> messagesApi("playauthenticate.login.email.placeholder"), '_showConstraints -> false, 'placeholder -> "example@mail.com") { input =>
                                 <div class="input-group">
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
                                     @input
                                 </div>
                             }
-                            @b3.inputWrapped("password", loginForm("password"), '_label -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "password") { input =>
+                            @b3.inputWrapped("password", loginForm("password"), '_label -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
                                 <div class="input-group">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
                                     @input
