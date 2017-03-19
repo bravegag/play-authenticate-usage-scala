@@ -5,11 +5,7 @@
 @(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
 @main(userService, messagesApi("playauthenticate.link.account.title")) {
-    
     <h1>@messagesApi("playauthenticate.link.account.title")</h1>
-    
-    <p>
-	@_providerPartial(playAuth)
-    <br/>
+    <p>@_providerPartial(playAuth)<br/>
     </p>
 }

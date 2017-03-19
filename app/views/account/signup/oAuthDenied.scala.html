@@ -5,11 +5,7 @@
 @(userService: UserService, providerKey: String)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
 @main(userService, messagesApi("playauthenticate.oauth.access.denied.title")) {
-
 	<h1>@messagesApi("playauthenticate.oauth.access.denied.title")</h1>
-	<p>
-		@messagesApi("playauthenticate.oauth.access.denied.explanation")<br/>
-	</p>
-	<p>
-		@messagesApi("playauthenticate.oauth.access.denied.alternative") <a href="@routes.Application.signup">@messagesApi("playauthenticate.oauth.access.denied.alternative.cta")</a>.
+	<p>@messagesApi("playauthenticate.oauth.access.denied.explanation")<br/></p>
+	<p>@messagesApi("playauthenticate.oauth.access.denied.alternative")<a href="@routes.Application.signup">@messagesApi("playauthenticate.oauth.access.denied.alternative.cta")</a>.</p>
 }
