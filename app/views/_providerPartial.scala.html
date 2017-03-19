@@ -12,17 +12,15 @@ function askOpenID(url) {
 	}
 }
 </script>
-<ul class="providers">
-	@play.core.j.JavaHelpers.withContext(request) { jContext =>
-		@forProviders(playAuth, skipCurrent) { p =>
-			<li>
-			@if(p.getKey() == "openid") {
-				<a href="javascript:void(0);" onclick="askOpenID('@p.getUrl()');">
-			} else {
-				<a href="@p.getUrl()">
-			}
-			@_providerIcon(p.getKey())</a>
-			</li>
-		}
-	}
-</ul>
+
+@play.core.j.JavaHelpers.withContext(request) { jContext =>
+    @forProviders(playAuth, skipCurrent) { p =>
+        @defining(p.getKey().head.toUpper + p.getKey().tail) { label =>
+            @if(p.getKey() == "openid") {
+                <a href="javascript:void(0);" class="btn btn-link-1 btn-link-1-@p.getKey()" onclick="askOpenID('@p.getUrl()');"><i class="fa fa-@p.getKey()"></i> @label</a>
+            } else {
+                <a href="@p.getUrl()" class="btn btn-link-1 btn-link-1-@p.getKey()"><i class="fa fa-@p.getKey()"></i> @label</a>
+            }
+        }
+    }
+}

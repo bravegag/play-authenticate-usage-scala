@@ -1,6 +1,6 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
+import javax.inject._
 
 import actions.NoCache
 

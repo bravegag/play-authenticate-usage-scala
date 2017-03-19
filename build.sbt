@@ -8,6 +8,9 @@ scalaVersion := "2.11.8"
 autoScalaLibrary := false
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
+// needed for adrianhurt's play-bootstrap dependency
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "2.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
@@ -20,6 +23,9 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.3.7-1",
   "com.chuusai" %% "shapeless" % "2.3.2",
   "com.nappin" %% "play-recaptcha" % "2.1",
+  "com.adrianhurt" %% "play-bootstrap" % "1.1.1-P25-B3-SNAPSHOT",
+  "org.webjars" % "font-awesome" % "4.7.0",
+  "org.webjars" % "bootstrap-datepicker" % "1.4.0",
   cache,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,

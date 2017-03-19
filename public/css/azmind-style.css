@@ -1,99 +1,9 @@
-body {
-    padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-}
-
-form .error input {
-    background-color: #F2DEDE;
-    border-color: #EED3D7;
-    color: #B94A48;
-}
-
-form .error .help-inline {
-    color: #B94A48;
-}
-
-.providers {
-    margin: 5px 0;
-    list-style: none;
-}
-
-.providers li {
-    display: inline;
-}
-
-.help-block {
-    margin: 0px 0 10px 0;
-    font-size: 10px;
-    color: #ccc !important;
-    display: block;
-}
-
-h1 {
-    margin-bottom: 20px !important;
-}
-
-/*****************************************************************************************************/
-/*********************************** Custom Bootstrap Template form-elements.css *********************/
-/*****************************************************************************************************/
-
-input[type="text"],
-textarea,
-textarea.form-control {
-	height: 50px;
-    margin: 0;
-    padding: 0 20px;
-    vertical-align: middle;
-    background: #f8f8f8;
-    border: 3px solid #ddd;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 50px;
-    color: #888;
-    -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;
-    -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none;
-    -o-transition: all .3s; -moz-transition: all .3s; -webkit-transition: all .3s; -ms-transition: all .3s; transition: all .3s;
-}
-
-textarea,
-textarea.form-control {
-	padding-top: 10px;
-	padding-bottom: 10px;
-	line-height: 30px;
-}
-
-button.btn {
-	height: 50px;
-    margin: 0;
-    padding: 0 20px;
-    vertical-align: middle;
-    background: #4aaf51;
-    border: 0;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 50px;
-    color: #fff;
-    -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;
-    text-shadow: none;
-    -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none;
-    -o-transition: all .3s; -moz-transition: all .3s; -webkit-transition: all .3s; -ms-transition: all .3s; transition: all .3s;
-}
-
-button.btn:hover { opacity: 0.6; color: #fff; }
-
-button.btn:active { outline: 0; opacity: 0.6; color: #fff; -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none; }
-
-button.btn:focus { outline: 0; opacity: 0.6; background: #4aaf51; color: #fff; }
-
-button.btn:active:focus, button.btn.active:focus { outline: 0; opacity: 0.6; background: #4aaf51; color: #fff; }
-
-/*****************************************************************************************************/
-/*********************************** Custom Bootstrap Template style.css *****************************/
-/*****************************************************************************************************/
+/* 
+ * Author: AZMIND [http://azmind.com/contact/]
+ */
 
 body {
-    /*font-family: 'Roboto', sans-serif;*/
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 300;
     color: #888;
@@ -168,7 +78,7 @@ img { max-width: 100%; }
     color: #fff;
     -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;
 }
-.btn-link-2:hover, .btn-link-2:focus,
+.btn-link-2:hover, .btn-link-2:focus, 
 .btn-link-2:active, .btn-link-2:active:focus { outline: 0; opacity: 0.6; background: rgba(0, 0, 0, 0.3); color: #fff; }
 
 
@@ -193,7 +103,7 @@ img { max-width: 100%; }
 .top-content .description a {
 	color: #fff;
 }
-.top-content .description a:hover,
+.top-content .description a:hover, 
 .top-content .description a:focus { border-bottom: 1px dotted #fff; }
 
 .form-box {
@@ -265,10 +175,14 @@ img { max-width: 100%; }
 @media (min-width: 768px) and (max-width: 991px) {}
 
 @media (max-width: 767px) {
+	
 	.inner-bg { padding: 60px 0 110px 0; }
+
 }
 
 @media (max-width: 415px) {
+	
 	h1, h2 { font-size: 32px; }
+
 }
 

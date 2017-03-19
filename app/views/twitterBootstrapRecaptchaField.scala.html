@@ -24,21 +24,21 @@ isRequired: Boolean = true)(implicit widgetHelper: WidgetHelper, request: Reques
     <div class="row">
         <div class="col-md-7">@recaptcha.recaptchaWidget(tabindex = tabindex, includeNoScript = includeNoScript)</div>
     </div>
-@errorCode match {
-    case Some(RecaptchaErrorCode.captchaIncorrect) => {
-        <span class="help-block">@messageOrDefault("error.captchaIncorrect", "Incorrect, please try again")</span>
+    @errorCode match {
+        case Some(RecaptchaErrorCode.captchaIncorrect) => {
+            <span class="help-block">@messageOrDefault("error.captchaIncorrect", "Incorrect, please try again")</span>
+        }
+        case Some(RecaptchaErrorCode.recaptchaNotReachable) => {
+            <span class="help-block">@messageOrDefault("error.recaptchaNotReachable", "Unable to contact Recaptcha")</span>
+        }
+        case Some(RecaptchaErrorCode.apiError) => {
+            <span class="help-block">@messageOrDefault("error.apiError", "Invalid response from Recaptcha")</span>
+        }
+        case Some(RecaptchaErrorCode.responseMissing) => {
+            <span class="help-block">@messages("constraint.required")</span>
+        }
+        case _ => {
+            <span class="help-block text-muted">@messages("constraint.required")</span>
+        }
     }
-    case Some(RecaptchaErrorCode.recaptchaNotReachable) => {
-        <span class="help-block">@messageOrDefault("error.recaptchaNotReachable", "Unable to contact Recaptcha")</span>
-    }
-    case Some(RecaptchaErrorCode.apiError) => {
-        <span class="help-block">@messageOrDefault("error.apiError", "Invalid response from Recaptcha")</span>
-    }
-    case Some(RecaptchaErrorCode.responseMissing) => {
-        <span class="help-block">@messages("constraint.required")</span>
-    }
-    case _ => {
-        <span class="help-block text-muted">@messages("constraint.required")</span>
-    }
-}
 </div>

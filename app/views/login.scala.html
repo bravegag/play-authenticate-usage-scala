@@ -7,55 +7,65 @@
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets)
 
 @import helper._
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+@import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
 @main(userService, messagesApi("playauthenticate.login.title"),"login") {
-
-  <div class="row">
-    <div class="col-xs-6 col-sm-4">
-      <h1>@messagesApi("playauthenticate.login.title")</h1>
+    <div class="inner-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+                    <div class="form-top">
+                        <div class="form-top-left">
+                            <h3>Login to our site</h3>
+                            <p>Enter your username and password to log on:</p>
+                        </div>
+                        <div class="form-top-right">
+                            <i class="fa fa-key"></i>
+                        </div>
+                    </div>
+                    <div class="form-bottom">
+                        @* Display proprietary login form *@
+                        @b3.vertical.form(routes.Application.doLogin) { implicit vfc =>
+                            @if(loginForm.hasGlobalErrors) {
+                                <p class="alert alert-danger">@loginForm.globalError.get.message</p>
+                            }
+                            @b3.inputWrapped("email", loginForm("email"), '_label -> messagesApi("playauthenticate.login.email.placeholder"), '_showConstraints -> false, 'placeholder -> "example@mail.com") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @b3.inputWrapped("password", loginForm("password"), '_label -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "password") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @b3.submit('class -> "btn btn-default") {
+                                @messagesApi("playauthenticate.login.now")
+                            }
+                            <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@messagesApi("playauthenticate.login.forgot.password")</a>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 social-login">
+                    <div class="social-login-buttons">
+                        @messagesApi("playauthenticate.login.oauth")
+                        @* Display list of available providers *@
+                        @_providerPartial(playAuth, skipCurrent=false)
+                        @providerAvailable("basic") { available: java.lang.Boolean =>
+                            @if(available) {
+                                <br>
+                                <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")">@messagesApi("playauthenticate.login.basic")</a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <div id="login" class="row">
-
-    <div class="col-xs-8 col-md-6">
-      @* Display proprietary login form *@
-    	@helper.form(routes.Application.doLogin, 'class -> "form-vertical", 'role -> "form") {
-            @if(loginForm.hasGlobalErrors) {
-                <p class="alert alert-danger">
-                  @loginForm.globalError.get.message
-                </p>
-            }
-
-            @_emailPartial(loginForm)
-
-            @inputPassword(
-              loginForm("password"),
-              '_showConstraints -> false,
-              '_label -> messagesApi("playauthenticate.login.password.placeholder")
-            )
-            <br />
-            <button type="submit" class="btn btn-default">@messagesApi("playauthenticate.login.now")</button>
-            &nbsp;
-            <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@messagesApi("playauthenticate.login.forgot.password")</a>
-    	}
-    </div>
-
-   <div class="col-xs-6 col-sm-4">
-      @messagesApi("playauthenticate.login.oauth")
-      @* Display list of available providers *@
-      @_providerPartial(playAuth, skipCurrent=false)
-      @providerAvailable("basic") { available: java.lang.Boolean =>
-          @if(available) {
-              <br>
-              <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")">@messagesApi("playauthenticate.login.basic")</a>
-          }
-      }
-    </div>
-
-  </div>
-
 }
 

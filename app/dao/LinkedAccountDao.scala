@@ -2,7 +2,6 @@ package dao
 
 import javax.inject._
 
-import com.feth.play.module.pa.user.AuthUser
 import dao.generic._
 
 import scala.concurrent.Future

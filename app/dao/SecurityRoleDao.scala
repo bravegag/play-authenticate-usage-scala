@@ -1,6 +1,6 @@
 package dao
 
-import javax.inject.{Inject, Singleton}
+import javax.inject._
 
 import constants.SecurityRoleKey
 import dao.generic.GenericDaoAutoIncImpl

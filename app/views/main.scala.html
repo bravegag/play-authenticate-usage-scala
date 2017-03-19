@@ -19,12 +19,18 @@
         <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
         <meta name="author" content="The Play Authenticate Team">
 
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.css"))">
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("font-awesome.min.css"))">
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap-datepicker3.css"))">
+        <link rel="stylesheet" href="@routes.Assets.versioned("css/main.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("css/azmin-form-elements.css.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("css/azmin-style.css")">
+
         <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))"></script>
         <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.js"))"></script>
-        <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
+        <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap-datepicker.js"))"></script>
 
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))">
-        <link href="@routes.Assets.versioned("css/main.css")" rel="stylesheet">
+        <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
     </head>
 
     <body>
@@ -54,19 +60,21 @@
                 </ul>
 
                 @subjectPresentOr() {
-                <ul class="nav navbar-nav navbar-right">
-                    @defining(userService.findInSession(JavaHelpers.createJavaContext(request).session())) { case Some(user) =>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.username <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@messagesApi("playauthenticate.navigation.profile")</a></li>
-                            <li><a href="@routes.Account.link()">@messagesApi("playauthenticate.navigation.link_more")</a></li>
-                            <li class="divider"></li>
-                            <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @messagesApi("playauthenticate.navigation.logout")</a></li>
-                        </ul>
-                    </li>
-                    }
-                </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        @defining(userService.findInSession(JavaHelpers.createJavaContext(request).session())) { userOption =>
+                            @userOption.map {  user =>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.username <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@messagesApi("playauthenticate.navigation.profile")</a></li>
+                                        <li><a href="@routes.Account.link()">@messagesApi("playauthenticate.navigation.link_more")</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @messagesApi("playauthenticate.navigation.logout")</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
                 } {
                     <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@messagesApi("playauthenticate.navigation.login")</a>
                 }
@@ -98,13 +106,10 @@
 
             <footer>
                 <p>&copy;
-                    2012-2014 Play! Authenticate. Licensed under Apache License, Version 2.0. View details <a href="https://github.com/joscha/play-authenticate/blob/master/LICENSE">
-                        here</a>.</p>
+                    2015-2017 <a href="https://github.com/bravegag/play-authenticate-usage-scala" target="_blank">Play! Authenticate usage sample Scala</a>. Licensed under Apache License, Version 2.0. View details <a href="https://github.com/bravegag/play-authenticate-usage-scala/blob/master/LICENSE">here</a>.</p>
                 <p>
-                    <small>Styles by <a href="http://getbootstrap.com" target="_blank">
-                        Twitter Bootstrap</a> &middot;
-                        Provider icons by <a href="https://github.com/paulrobertlloyd/socialmediaicons/" target="_blank">
-                            Paul Robert Lloyd</a></small></p>
+                    <small>Styles by <a href="http://getbootstrap.com" target="_blank">Twitter Bootstrap</a> &middot;
+                        Custom Bootstrap Theme and styles by <a href="http://azmind.com/" target="_blank">Anli Zaimi</a></small></p>
             </footer>
         </div> <!-- /container -->
 

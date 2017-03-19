@@ -1,6 +1,6 @@
 package dao
 
-import javax.inject.{Inject, Singleton}
+import javax.inject._
 
 /**
   * Simplifies access to all available Dao implementations so that they don't have to
