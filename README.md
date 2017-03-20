@@ -9,6 +9,8 @@ This project is a complete rewrite of [PlayAuthenticate usage sample](https://gi
 * Features a generic Slick DAO that is self-contained and context-free, it can be reused in other projects `app/dao/generic`.
 * Integrates [Web Jars](https://github.com/webjars/webjars-play) for all the relevant dependencies. 
 * Features reCAPTCHA using the excellent [Play reCAPTCHA Module](https://github.com/chrisnappin/play-recaptcha) implementation.
+* Integrates [Play-Bootstrap](http://adrianhurt.github.io/play-bootstrap/) for all form implementations.
+* Integrates [Font Awesome icons](http://fontawesome.io/) that is used as part of forms and design details.
 * A custom Slick code generator is implemented under `test/generator` and it generates the class `app/generated/Tables.scala`. 
 * Features very strict separation of application layers and programming to the interface: DAO, Service, Play MVC:
     - completely context-free reusable DAO under `app/dao/generic`.
