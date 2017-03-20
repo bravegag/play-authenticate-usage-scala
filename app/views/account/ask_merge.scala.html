@@ -6,35 +6,42 @@
 @(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets)
 
 @import helper._
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+@import b3.vertical.fieldConstructor
+@import com.feth.play.module.pa.views.html._
 
 @label = {
 	@messagesApi("playauthenticate.merge.accounts.question", aUser, bUser)
 }
 
 @main(userService, messagesApi("playauthenticate.merge.accounts.title")) {
-
-	<h1>@messagesApi("playauthenticate.merge.accounts.title")</h1>
-	<p>
-	@form(routes.Account.doMerge, 'class -> "form-horizontal", 'role -> "form") {
-
-            @if(acceptForm.hasGlobalErrors) {
-		        <p class="alert alert-danger">
-		          @acceptForm.globalError.get.message
-		     	</p>
-            }
-
-	   @inputRadioGroup(
-            acceptForm("accept"),
-            options = Seq(
-            	"true"-> messagesApi("playauthenticate.merge.accounts.true"),
-            	"false"->messagesApi("playauthenticate.merge.accounts.false")
-            ),
-            '_label -> label,
-            '_showConstraints -> false
-        )
-
-    <button type="submit" class="btn btn-default">@messagesApi("playauthenticate.merge.accounts.ok")</button>
-	}
-	</p>
+    @if(acceptForm.hasGlobalErrors) {
+        <p class="alert alert-danger">@acceptForm.globalError.get.message</p>
+    }
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3 form-box">
+            <div class="form-top">
+                <div class="form-top-left">
+                    <h3>@messagesApi("playauthenticate.merge.accounts.title")</h3>
+                </div>
+                <div class="form-top-right">
+                    <i class="fa fa-key"></i>
+                </div>
+            </div>
+            <div class="form-bottom">
+                @b3.vertical.form(routes.Account.doMerge) { implicit vfc =>
+                    @b3.radio(
+                        acceptForm("accept"),
+                        options = Seq(
+                            "true"-> messagesApi("playauthenticate.merge.accounts.true"),
+                            "false"->messagesApi("playauthenticate.merge.accounts.false")
+                        ),
+                        '_label -> label,
+                        '_showConstraints -> false)
+                    @b3.submit('class -> "btn btn-default") {
+                        @messagesApi("playauthenticate.merge.accounts.ok")
+                    }
+                }
+            </div>
+        </div>
+    </div>
 }
