@@ -87,9 +87,7 @@ class Signup @Inject() (implicit
             flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
 
             val userOption = userService.findByEmail(email)
-            if (userOption.isDefined) {
-              val Some(user) = userOption
-
+            userOption.map { user =>
               // yep, we have a user with this email that is active - we do
               // not know if the user owning that account has requested this
               // reset, though.
