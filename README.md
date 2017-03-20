@@ -11,7 +11,7 @@ This project is a complete rewrite of [PlayAuthenticate usage sample](https://gi
 * Features reCAPTCHA using the excellent [Play reCAPTCHA Module](https://github.com/chrisnappin/play-recaptcha) implementation.
 * Integrates [Play-Bootstrap](http://adrianhurt.github.io/play-bootstrap/) for all form implementations.
 * Integrates [Font Awesome icons](http://fontawesome.io/) that is used as part of forms and design details.
-* Integrates [Anli Zaimi](http://azmind.com/) custom Bootstrap theme for the different forms providing a neat consistent L&F that integrates well with the two points above.  
+* Integrates one free [Anli Zaimi](http://azmind.com/)'s custom Bootstrap theme for the different forms providing a neat consistent L&F that integrates well with the two points above.  
 * A custom Slick code generator is implemented under `test/generator` and it generates the class `app/generated/Tables.scala`. 
 * Features very strict separation of application layers and programming to the interface: DAO, Service, Play MVC:
     - completely context-free reusable DAO under `app/dao/generic`.
