@@ -1,6 +1,6 @@
 package views.form
 
-import providers.AbstractUsernamePasswordAuthProvider.UsernamePassword
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider._
 
 trait MyUsernamePassword extends UsernamePassword {
   val email : String

@@ -18,10 +18,11 @@ import java.lang.reflect.Method
 import java.util
 import java.util.UUID
 
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import generated.Tables.UserRow
 import play.api.i18n.MessagesApi
-import AbstractUsernamePasswordAuthProvider.{LoginResult, SignupResult}
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider._
 
 @Singleton
 class MyAuthProvider @Inject()(implicit
@@ -32,7 +33,7 @@ class MyAuthProvider @Inject()(implicit
                                auth: PlayAuthenticate,
                                lifecycle: ApplicationLifecycle,
                                mailerFactory: MailerFactory)
-  extends AbstractUsernamePasswordAuthProvider[String, MyLoginAuthUser, MySignupAuthUser, Login, Signup](auth, lifecycle, mailerFactory) {
+  extends UsernamePasswordAuthProvider[String, MyLoginAuthUser, MySignupAuthUser, Login, Signup](auth, lifecycle, mailerFactory) {
 
   import services.PluggableUserService._
 
@@ -285,8 +286,8 @@ class MyAuthProvider @Inject()(implicit
   //-------------------------------------------------------------------
   // members
   //-------------------------------------------------------------------
-  private lazy val SETTING_KEY_VERIFICATION_LINK_SECURE: String = AbstractUsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "verificationLink.secure"
-  private lazy val SETTING_KEY_PASSWORD_RESET_LINK_SECURE: String = AbstractUsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "passwordResetLink.secure"
+  private lazy val SETTING_KEY_VERIFICATION_LINK_SECURE: String = UsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "verificationLink.secure"
+  private lazy val SETTING_KEY_PASSWORD_RESET_LINK_SECURE: String = UsernamePasswordAuthProvider.SETTING_KEY_MAIL + "." + "passwordResetLink.secure"
   private lazy val SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET: String = "loginAfterPasswordReset"
   private lazy val EMAIL_TEMPLATE_FALLBACK_LANGUAGE: String = "en"
 }
