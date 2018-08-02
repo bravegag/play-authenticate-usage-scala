@@ -12,7 +12,7 @@ import scala.concurrent.{Await, Future}
 object Generator extends App {
   val slickDriver = "slick.driver.PostgresDriver"
   val jdbcDriver = "org.postgresql.Driver"
-  val url = "jdbc:postgresql://localhost:5432/exampledb?searchpath=public"
+  val url = "jdbc:postgresql://localhost:5432/myappdb?searchpath=public"
   val outputDir = "./app/"
   val pkg = "generated"
   val username = "postgres"
