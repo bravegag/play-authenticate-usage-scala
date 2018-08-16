@@ -198,6 +198,12 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
+  override def unlink(otherAuthUser: AuthUser): Unit = {
+    // TODO: implement
+    ???
+  }
+
+    //------------------------------------------------------------------------
   override def update(authUser: AuthUser): AuthUser = {
     val option = findByAuthUser(authUser)
     option.map { user : UserRow =>

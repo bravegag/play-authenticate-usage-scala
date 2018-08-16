@@ -1,10 +1,10 @@
 package controllers
 
 import javax.inject._
-
 import actions.NoCache
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
+import com.feth.play.module.pa.providers.cookie.SudoForbidCookieAuthAction
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.SecurityRoleKey
 import play.api.mvc._
@@ -13,6 +13,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
 import play.mvc.Http.RequestBody
+import play.mvc.With
 import providers.MyAuthProvider
 import views.form._
 
@@ -65,18 +66,51 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
+  //@With(classOf[SudoForbidCookieAuthAction])
+  def restrictedForbidCookie = NoCache {
+    deadbolt.WithAuthRequest()() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        val localUser = userService.findInSession(jContext.session)
+        Ok(views.html.restrictedForbidCookie(userService, localUser))
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------
+  def relogin = NoCache {
+    deadbolt.WithAuthRequest()() { implicit request =>
+      Future {
+        val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        // partially initialize the Login form to only miss the password
+        val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
+          email = userService.findInSession(jContext.session).toString(), password = "", isRememberMe = true))
+        updatedForm.bindFromRequest.fold(
+          formWithErrors => {
+            // user did not fill everything properly
+            BadRequest(views.html.login(auth, userService, formWithErrors))
+          },
+          formSuccess => {
+            // everything was filled
+            Ok(views.html.relogin(auth, userService, formContext.loginForm.Instance))
+          })
+      }
+    }
+  }
+
+  //-------------------------------------------------------------------
   def doLogin = NoCache {
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
         formContext.loginForm.Instance.bindFromRequest.fold(
           formWithErrors => {
-            // User did not fill everything properly
+            // user did not fill everything properly
             BadRequest(views.html.login(auth, userService, formWithErrors))
           },
-          _ => {
-            // Everything was filled
-            JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext))
+          formSuccess => {
+            // everything was filled
+            JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext, formSuccess.isRememberMe))
           }
         )
       }
@@ -97,13 +131,12 @@ class Application @Inject() (implicit
       verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
         form.fold(
           formWithErrors => {
-            // User did not fill everything properly
+            // user did not fill everything properly
             BadRequest(views.html.signup(auth, userService, formWithErrors))
           },
           _ => {
-            // Everything was filled
-            // do something with your part of the form before handling the user
-            // signup
+            // everything was filled:
+            // do something with your part of the form before handling the user signup
             JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
           }
         )

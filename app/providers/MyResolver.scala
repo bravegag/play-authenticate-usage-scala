@@ -16,6 +16,12 @@ class MyResolver extends Resolver {
   }
 
   //------------------------------------------------------------------------
+  override def relogin: Call = {
+    // Your login page
+    routes.Application.relogin
+  }
+
+  //------------------------------------------------------------------------
   override def afterAuth: Call = {
     // The user will be redirected to this page after authentication
     // if no original URL was saved

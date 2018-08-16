@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "3.1.1",
   "com.typesafe.slick" %% "slick-codegen" % "3.1.1",
   "org.postgresql" % "postgresql" % "9.4.1212",
-  "com.feth" %% "play-authenticate" % "0.8.3",
+  "com.feth" %% "play-authenticate" % "0.8.4-SNAPSHOT",
   "be.objectify"  %% "deadbolt-scala" % "2.5.0",
   "org.webjars" %% "webjars-play" % "2.5.0",
   "org.webjars" % "bootstrap" % "3.3.7-1" exclude("org.webjars", "jquery"),

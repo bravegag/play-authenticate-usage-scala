@@ -30,19 +30,14 @@
                     <div class="form-bottom">
                         @* Display proprietary login form *@
                         @b3.vertical.form(routes.Application.doLogin) { implicit vfc =>
-                            @b3.inputWrapped("email", loginForm("email"), '_label -> messagesApi("playauthenticate.login.email.placeholder"), '_showConstraints -> false, 'placeholder -> "example@mail.com") { input =>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-                                    @input
-                                </div>
-                            }
-                            @b3.inputWrapped("password", loginForm("password"), '_label -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
+                            @b3.hidden("email", loginForm("email"))
+                            @b3.inputWrapped("password", loginForm("password"), '_hiddenLabel -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
                                 <div class="input-group">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
                                     @input
                                 </div>
                             }
-                            @b3.checkbox(loginForm("rememberMe"), '_text -> messagesApi("playauthenticate.login.rememberme.placeholder") )
+                            @b3.hidden("rememberMe", loginForm("rememberMe"))
                             @b3.submit('class -> "btn btn-default") {
                                 @messagesApi("playauthenticate.login.now")
                             }

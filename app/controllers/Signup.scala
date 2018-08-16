@@ -71,16 +71,16 @@ class Signup @Inject() (implicit
         val jContext = JavaHelpers.createJavaContext(request)
         formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
           formWithErrors => {
-            // User did not fill in his/her email
+            // user did not fill in his/her email
             BadRequest(views.html.account.signup.password_forgot(userService, formWithErrors))
           },
           formSuccess => {
-            // The email address given *BY AN UNKNWON PERSON* to the form - we
+            // the email address given *BY AN UNKNWON PERSON* to the form - we
             // should find out if we actually have a user with this email
             // address and whether password login is enabled for him/her. Also
             // only send if the email address of the user has been verified.
             val email = formSuccess.email
-            // We don't want to expose whether a given email address is signed
+            // we don't want to expose whether a given email address is signed
             // up, so just say an email has been sent, even though it might not
             // be true - that's protecting our user privacy.
             var flashValues = ArrayBuffer[(String, String)]()
@@ -94,18 +94,18 @@ class Signup @Inject() (implicit
               // User exists
               if (user.emailValidated) {
                 authProvider.sendPasswordResetMailing(user, jContext)
-                // In case you actually want to let (the unknown person)
+                // in case you actually want to let (the unknown person)
                 // know whether a user was found/an email was sent, use,
                 // change the flash message
               } else {
-                // We need to change the message here, otherwise the user
+                // we need to change the message here, otherwise the user
                 // does not understand whats going on - we should not verify
                 // with the password reset, as a "bad" user could then sign
                 // up with a fake email via OAuth and get it verified by an
                 // a unsuspecting user that clicks the link.
                 flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
 
-                // You might want to re-send the verification email here...
+                // you might want to re-send the verification email here...
                 authProvider.sendVerifyEmailMailingAfterSignup(user, jContext)
               }
             }
@@ -144,7 +144,7 @@ class Signup @Inject() (implicit
                 var flashValues = ArrayBuffer[(String, String)]()
                 val Some(user) = tokenAction.targetUser
                 try {
-                  // Pass true for the second parameter if you want to
+                  // pass true for the second parameter if you want to
                   // automatically create a password and the exception never to
                   // happen
                   user.resetPassword(new MySignupAuthUser(newPassword), false)

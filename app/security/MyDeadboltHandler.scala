@@ -18,7 +18,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
 	//------------------------------------------------------------------------
 	override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future {
 		val context = JavaHelpers.createJavaContext(request)
-		if (auth.isLoggedIn(context.session())) {
+		if (auth.isLoggedIn(context)) {
 			// user is logged in
 			None
 

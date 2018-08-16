@@ -87,7 +87,7 @@ class Account @Inject() (implicit
           val jContext = JavaHelpers.createJavaContext(request)
           formContext.passwordChangeForm.Instance.bindFromRequest.fold(
             formWithErrors => {
-              // User did not select whether to link or not link
+              // user did not select whether to link or not link
               BadRequest(views.html.account.password_change(userService, formWithErrors))
             },
             formSuccess => {
@@ -128,7 +128,7 @@ class Account @Inject() (implicit
             formContext.acceptForm.Instance.bindFromRequest.fold(
               formWithErrors => BadRequest(views.html.account.ask_link(userService, formWithErrors, user)),
               formSuccess => {
-                // User made a choice :)
+                // user made a choice :)
                 val link = formSuccess.accept
                 val result = JavaHelpers.createResult(jContext, auth.link(jContext, link))
                 link match {
@@ -159,7 +159,7 @@ class Account @Inject() (implicit
         // this is the user that was selected for a login
         Option(auth.getMergeUser(jContext.session)) match {
           case Some(userB) => {
-            // You could also get the local user object here via
+            // you could also get the local user object here via
             // User.findByAuthUserIdentity(newUser)
             Ok(views.html.account.ask_merge(userService, formContext.acceptForm.Instance, userA, userB))
           }
@@ -186,11 +186,11 @@ class Account @Inject() (implicit
           case Some(userB) => {
             val filledForm = formContext.acceptForm.Instance.bindFromRequest
             if (filledForm.hasErrors) {
-              // User did not select whether to merge or not merge
+              // user did not select whether to merge or not merge
               BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))
 
             } else {
-              // User made a choice :)
+              // user made a choice :)
               val merge = filledForm.get.accept
               val result = JavaHelpers.createResult(jContext, auth.merge(jContext, merge))
               merge match {
