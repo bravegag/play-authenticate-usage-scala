@@ -201,7 +201,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   //------------------------------------------------------------------------
   override def unlink(knownUser: AuthUser): Unit = {
     // deletes the linked account by provider and provider user id
-    daoContext.linkedAccountDao.deleteByKeyAndProviderUserId(knownUser.getProvider, knownUser.getId)
+    daoContext.linkedAccountDao.deleteByProvider(knownUser.getProvider, knownUser.getId)
   }
 
   //------------------------------------------------------------------------

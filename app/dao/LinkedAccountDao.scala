@@ -24,12 +24,18 @@ class LinkedAccountDao @Inject()(protected val dbConfigProvider: DatabaseConfigP
 
   //------------------------------------------------------------------------
   def findByProviderKey(user: UserRow, providerKey: String): Future[Seq[LinkedAccountRow]] = {
-    filter(linkedAccount => linkedAccount.userId === user.id &&
-      linkedAccount.providerKey === providerKey)
+    db.run(LinkedAccount.filter(linkedAccount => linkedAccount.userId === user.id &&
+      linkedAccount.providerKey === providerKey).result)
   }
 
   //------------------------------------------------------------------------
-  def deleteByKeyAndProviderUserId(providerKey: String, providerUserId: String): Future[Unit] = {
+  def findByProvider(providerKey: String, providerUserId: String): Future[Option[LinkedAccountRow]] = {
+    db.run(LinkedAccount.filter(linkedAccount => linkedAccount.providerKey === providerKey &&
+      linkedAccount.providerUserId === providerUserId).result.headOption)
+  }
+
+  //------------------------------------------------------------------------
+  def deleteByProvider(providerKey: String, providerUserId: String): Future[Unit] = {
     db.run(LinkedAccount.filter(linkedAccount => linkedAccount.providerKey === providerKey &&
       linkedAccount.providerUserId === providerUserId).delete).map(_ => ())
   }

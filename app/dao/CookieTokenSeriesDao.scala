@@ -8,6 +8,8 @@ import generated.Tables._
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
 class CookieTokenSeriesDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   extends GenericDaoImpl[CookieTokenSeries, CookieTokenSeriesRow, Long] (dbConfigProvider, CookieTokenSeries) {
@@ -20,9 +22,15 @@ class CookieTokenSeriesDao @Inject()(protected val dbConfigProvider: DatabaseCon
   }
 
   //------------------------------------------------------------------------
-  def findBySeries(user: UserRow, series: String): Future[Option[CookieTokenSeriesRow]] = {
-    db.run(CookieTokenSeries.filter(cookieTokenSeries => cookieTokenSeries.userId === user.id &&
+  def findBySeries(userId: Long, series: String): Future[Option[CookieTokenSeriesRow]] = {
+    db.run(CookieTokenSeries.filter(cookieTokenSeries => cookieTokenSeries.userId === userId &&
       cookieTokenSeries.series === series).result.headOption)
+  }
+
+  //------------------------------------------------------------------------
+  def deleteBySeries(userId: Long, series: String): Future[Unit] = {
+    db.run(CookieTokenSeries.filter(cookieTokenSeries => cookieTokenSeries.userId === userId &&
+      cookieTokenSeries.series === series).delete).map(_ => ())
   }
 
   //------------------------------------------------------------------------

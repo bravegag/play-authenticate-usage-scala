@@ -9,6 +9,7 @@ import javax.inject._
   * @param securityRoleDao
   * @param tokenActionDao
   * @param userDao
+  * @param cookieTokenSeriesDao
   */
 @Singleton
 class DaoContext @Inject()(val linkedAccountDao: LinkedAccountDao,
