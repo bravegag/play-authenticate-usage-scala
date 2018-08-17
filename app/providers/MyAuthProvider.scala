@@ -130,7 +130,7 @@ class MyAuthProvider @Inject()(implicit
 
         } else {
           val result = user.linkedAccounts.count { linkedAccount =>
-            getKey == linkedAccount.providerKey && authUser.checkPassword(linkedAccount.providerPassword, authUser.getPassword)
+            getKey == linkedAccount.providerKey && authUser.checkPassword(linkedAccount.providerUserId, authUser.getPassword)
           }
 
           result match {

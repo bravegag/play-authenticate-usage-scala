@@ -82,9 +82,11 @@ class Application @Inject() (implicit
     deadbolt.WithAuthRequest()() { implicit request =>
       Future {
         val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+        // taking chances here
+        val authUser = userService.findInSession(jContext.session).get
         // partially initialize the Login form to only miss the password
         val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
-          email = userService.findInSession(jContext.session).toString(), password = "", isRememberMe = true))
+          email = authUser.email, password = "", isRememberMe = true))
         updatedForm.bindFromRequest.fold(
           formWithErrors => {
             // user did not fill everything properly

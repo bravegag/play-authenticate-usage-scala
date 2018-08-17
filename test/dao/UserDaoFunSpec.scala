@@ -53,7 +53,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
 
       val result = (for {
         user <- dao.userDao.create(UserRow(id = 0L, username = "test", email = "test@test.test",
-          active = true, modified = None), securityRole, LinkedAccountRow(0L, "password", "xxx", None))
+          active = true, modified = None), securityRole, LinkedAccountRow(0L, "xxx", "password", None, None))
         linkedAccount <- dao.userDao.linkedAccounts(user)
         securityRoles <- dao.userDao.roles(user)
         permissions <- dao.userDao.permissions(user)
@@ -75,8 +75,8 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
         linkedAccounts.size should equal (1)
         val linkedAccount = linkedAccounts.head
         linkedAccount.userId should equal (user.id)
+        linkedAccount.providerUserId should equal("xxx")
         linkedAccount.providerKey should equal ("password")
-        linkedAccount.providerPassword should equal ("xxx")
         linkedAccount.modified should not be None
       }
 
@@ -170,8 +170,8 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
           linkedAccounts.size should equal (1)
           val linkedAccount = linkedAccounts.head
           linkedAccount.userId should equal (targetUser.id)
+          linkedAccount.providerUserId should equal("xxx")
           linkedAccount.providerKey should equal ("password")
-          linkedAccount.providerPassword should equal ("xxx")
           linkedAccount.modified should not be (None)
         }
 

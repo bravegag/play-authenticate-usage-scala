@@ -17,10 +17,20 @@ CREATE TABLE "user" (
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE cookie_token_series (
+    user_id BIGINT NOT NULL,
+    series VARCHAR(50) NOT NULL,
+    token VARCHAR(50) NOT NULL,
+    created TIMESTAMP DEFAULT now(),
+    modified TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES "user"(id)
+);
+
 CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
-	provider_key VARCHAR(255) NOT NULL,
-	provider_password VARCHAR(255) NOT NULL,
+    provider_user_id VARCHAR(100) NOT NULL,
+	provider_key VARCHAR(50) NOT NULL,
+	series VARCHAR(50),
 	modified TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
@@ -42,7 +52,7 @@ CREATE TABLE user_security_role (
 
 CREATE TABLE token_action (
 	user_id BIGINT NOT NULL,
-	token VARCHAR(255) UNIQUE NOT NULL,
+	token VARCHAR(50) UNIQUE NOT NULL,
 	"type" CHAR(2) NOT NULL,
 	created TIMESTAMP NOT NULL,
 	expires TIMESTAMP NOT NULL,
@@ -77,6 +87,7 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_modified_user BEFORE UPDATE OR INSERT ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_linked_account BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER cookie_token_series BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE OR INSERT ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_token_action BEFORE UPDATE OR INSERT ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_security_permission BEFORE UPDATE OR INSERT ON security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
@@ -96,6 +107,8 @@ DROP TABLE token_action CASCADE;
 DROP TABLE user_security_role CASCADE;
 
 DROP TABLE security_role CASCADE;
+
+DROP TABLE cookie_token_series CASCADE;
 
 DROP TABLE linked_account CASCADE;
 

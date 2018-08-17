@@ -53,7 +53,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
     val securityRole = daoContext.securityRoleDao.findByName(SecurityRoleKey.USER_ROLE).get
 
     // initialize linked account
-    val linkedAccount = LinkedAccountRow(0L, authUser.getProvider, authUser.getId, None)
+    val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None, None)
 
     daoContext.userDao.create(newUser, securityRole, linkedAccount)
   }
@@ -93,7 +93,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
       case Some(linkedAccount) => linkedAccount
       case None => {
         if (create) {
-          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getProvider, authUser.getId, None)
+          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getId, authUser.getProvider, None, None)
           daoContext.linkedAccountDao.create(newLinkedAccount)
           newLinkedAccount
 
@@ -102,7 +102,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
         }
       }
     }
-    daoContext.linkedAccountDao.update(linkedAccount.copy(providerPassword = authUser.getHashedPassword))
+    daoContext.linkedAccountDao.update(linkedAccount.copy(providerUserId = authUser.getHashedPassword))
   }
 
   //------------------------------------------------------------------------
@@ -189,7 +189,8 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
       (oldUserOpt, newUserOpt) match {
         case (Some(oldUser: UserRow), Some(_)) => {
           // link the two users
-          daoContext.linkedAccountDao.create(oldUser, newAuthUser.getProvider, newAuthUser.getId)
+          daoContext.linkedAccountDao.create(oldUser, providerUserId = newAuthUser.getId,
+            providerKey = newAuthUser.getProvider)
         }
         case _ => // TODO: the most sensible thing to do is to throw an exception
       }
@@ -198,12 +199,12 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   }
 
   //------------------------------------------------------------------------
-  override def unlink(otherAuthUser: AuthUser): Unit = {
-    // TODO: implement
-    ???
+  override def unlink(knownUser: AuthUser): Unit = {
+    // deletes the linked account by provider and provider user id
+    daoContext.linkedAccountDao.deleteByKeyAndProviderUserId(knownUser.getProvider, knownUser.getId)
   }
 
-    //------------------------------------------------------------------------
+  //------------------------------------------------------------------------
   override def update(authUser: AuthUser): AuthUser = {
     val option = findByAuthUser(authUser)
     option.map { user : UserRow =>
