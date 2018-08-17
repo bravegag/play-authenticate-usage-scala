@@ -54,8 +54,8 @@ class MyCookieAuthProvider @Inject()(implicit
     val timeUpdated = LocalDateTime.ofInstant(Instant.ofEpochMilli(cookieSeries.modified.get.getTime),
       TimeZone.getDefault().toZoneId())
 
-    val daysSinceCreated = LocalDateTime.from(timeCreated).until(LocalDateTime.now, ChronoUnit.DAYS)
-    val daysSinceUpdated = LocalDateTime.from(timeUpdated).until(LocalDateTime.now, ChronoUnit.DAYS)
+    val daysSinceCreated = ChronoUnit.DAYS.between(timeCreated, LocalDateTime.now)
+    val daysSinceUpdated = ChronoUnit.DAYS.between(timeUpdated, LocalDateTime.now)
 
     val timeoutDaysSinceCreated = auth.getConfiguration.getLong("cookie.timeoutDays.sinceFirstLogin")
 
