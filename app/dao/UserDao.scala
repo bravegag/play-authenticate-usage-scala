@@ -75,7 +75,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     }
 
   //------------------------------------------------------------------------
-  def findActiveByProviderKeyAndPassword(providerKey: String, providerPassword: String): Future[Option[UserRow]] = {
+  def findActiveByProviderKeyAndPassword(providerKey: String, providerUserId: String): Future[Option[UserRow]] = {
     val action = sql"""
           SELECT t1.*
           FROM "#${User.baseTableRow.tableName}" t1
@@ -83,7 +83,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
             AND EXISTS (SELECT * FROM #${LinkedAccount.baseTableRow.tableName} t2
                         WHERE t2.user_id=t1.id
                           AND t2.provider_key=$providerKey
-                          AND t2.provider_password=$providerPassword)
+                          AND t2.provider_user_id=$providerUserId)
       """.as[UserRow].headOption
     db.run(action)
   }

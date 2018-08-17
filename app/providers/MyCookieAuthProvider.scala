@@ -13,6 +13,8 @@ import dao.DaoContext
 import services.UserService
 import java.time._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
 class MyCookieAuthProvider @Inject()(implicit
                                      auth: PlayAuthenticate,
@@ -39,13 +41,11 @@ class MyCookieAuthProvider @Inject()(implicit
       return CheckResult.MISSING_SERIES
     }
 
-    val linkedAccount = daoContext.linkedAccountDao.findByProvider(PROVIDER_KEY, cookieAuthUser.getSeries).get
+    val linkedAccount = daoContext.linkedAccountDao.findByProvider(PROVIDER_KEY, cookieAuthUser.getSeries).
+      getOrElse(return CheckResult.ERROR)
 
-    if (linkedAccount == null) return CheckResult.ERROR
-
-    val cookieSeries = daoContext.cookieTokenSeriesDao.findBySeries(linkedAccount.userId, linkedAccount.providerUserId).get
-
-    if (cookieSeries == null) return CheckResult.MISSING_SERIES
+    val cookieSeries = daoContext.cookieTokenSeriesDao.findBySeries(linkedAccount.userId, linkedAccount.providerUserId).
+      getOrElse(return CheckResult.MISSING_SERIES)
 
     if (!(cookieSeries.token == cookieAuthUser.getToken)) return CheckResult.INVALID_TOKEN
 
@@ -61,9 +61,13 @@ class MyCookieAuthProvider @Inject()(implicit
 
     val timeoutDaysSinceUpdated = auth.getConfiguration.getLong("cookie.timeoutDays.sinceLastLogin")
 
-    if (daysSinceCreated > timeoutDaysSinceCreated) return CheckResult.EXPIRED
+    if (daysSinceCreated > timeoutDaysSinceCreated) {
+      return CheckResult.EXPIRED
+    }
 
-    if (daysSinceUpdated > timeoutDaysSinceUpdated) return CheckResult.EXPIRED
+    if (daysSinceUpdated > timeoutDaysSinceUpdated) {
+      return CheckResult.EXPIRED
+    }
 
     return CheckResult.SUCCESS
   }

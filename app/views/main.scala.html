@@ -53,7 +53,7 @@
                 <ul class="nav navbar-nav">
                     <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@messagesApi("playauthenticate.navigation.home")</a></li>
                     <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.restricted()">@messagesApi("playauthenticate.navigation.restricted")</a></li>
-                    <li class="@("active".when(nav == "restrictedForbidCookie"))"><a href="@routes.Application.restrictedForbidCookie()">@Messages("playauthenticate.navigation.restricted") (Forbid Cookie)</a></li>
+                    <li class="@("active".when(nav == "restrictedForbidCookie"))"><a href="@routes.Application.restrictedForbidCookie()">@messagesApi("playauthenticate.navigation.restricted") (Forbid Cookie)</a></li>
 
                     @subjectNotPresent() {
                     <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@messagesApi("playauthenticate.navigation.signup")</a></li>

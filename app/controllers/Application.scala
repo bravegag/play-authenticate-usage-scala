@@ -66,14 +66,12 @@ class Application @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  //@With(classOf[SudoForbidCookieAuthAction])
-  def restrictedForbidCookie = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
-        val localUser = userService.findInSession(jContext.session)
-        Ok(views.html.restrictedForbidCookie(userService, localUser))
-      }
+  @With(Array(classOf[SudoForbidCookieAuthAction]))
+  def restrictedForbidCookie = deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
+    Future {
+      val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
+      val localUser = userService.findInSession(jContext.session)
+      Ok(views.html.restrictedForbidCookie(userService, localUser))
     }
   }
 
