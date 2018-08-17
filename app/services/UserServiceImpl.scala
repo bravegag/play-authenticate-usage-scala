@@ -53,7 +53,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
     val securityRole = daoContext.securityRoleDao.findByName(SecurityRoleKey.USER_ROLE).get
 
     // initialize linked account
-    val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None, None)
+    val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None)
 
     daoContext.userDao.create(newUser, securityRole, linkedAccount)
   }
@@ -93,7 +93,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
       case Some(linkedAccount) => linkedAccount
       case None => {
         if (create) {
-          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getId, authUser.getProvider, None, None)
+          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getId, authUser.getProvider, None)
           daoContext.linkedAccountDao.create(newLinkedAccount)
           newLinkedAccount
 

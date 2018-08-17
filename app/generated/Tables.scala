@@ -61,21 +61,20 @@ trait Tables {
    *  @param userId Database column user_id SqlType(int8)
    *  @param providerUserId Database column provider_user_id SqlType(varchar), Length(100,true)
    *  @param providerKey Database column provider_key SqlType(varchar), Length(50,true)
-   *  @param series Database column series SqlType(varchar), Length(50,true), Default(None)
    *  @param modified Database column modified SqlType(timestamp), Default(None) */
-  case class LinkedAccountRow(userId: Long, providerUserId: String, providerKey: String, series: Option[String] = None, modified: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
+  case class LinkedAccountRow(userId: Long, providerUserId: String, providerKey: String, modified: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching LinkedAccountRow objects using plain SQL queries */
-  implicit def GetResultLinkedAccountRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[java.sql.Timestamp]]): GR[LinkedAccountRow] = GR{
+  implicit def GetResultLinkedAccountRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[LinkedAccountRow] = GR{
     prs => import prs._
-    LinkedAccountRow.tupled((<<[Long], <<[String], <<[String], <<?[String], <<?[java.sql.Timestamp]))
+    LinkedAccountRow.tupled((<<[Long], <<[String], <<[String], <<?[java.sql.Timestamp]))
   }
   /** Table description of table linked_account. Objects of this class serve as prototypes for rows in queries. */
   class LinkedAccount(_tableTag: Tag) extends profile.api.Table[LinkedAccountRow](_tableTag, "linked_account") with IdentifyableTable[Long] {
               override def id = userId
 
-    def * = (userId, providerUserId, providerKey, series, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
+    def * = (userId, providerUserId, providerKey, modified) <> (LinkedAccountRow.tupled, LinkedAccountRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(userId), Rep.Some(providerUserId), Rep.Some(providerKey), series, modified).shaped.<>({r=>import r._; _1.map(_=> LinkedAccountRow.tupled((_1.get, _2.get, _3.get, _4, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(userId), Rep.Some(providerUserId), Rep.Some(providerKey), modified).shaped.<>({r=>import r._; _1.map(_=> LinkedAccountRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")
@@ -83,8 +82,6 @@ trait Tables {
     val providerUserId: Rep[String] = column[String]("provider_user_id", O.Length(100,varying=true))
     /** Database column provider_key SqlType(varchar), Length(50,true) */
     val providerKey: Rep[String] = column[String]("provider_key", O.Length(50,varying=true))
-    /** Database column series SqlType(varchar), Length(50,true), Default(None) */
-    val series: Rep[Option[String]] = column[Option[String]]("series", O.Length(50,varying=true), O.Default(None))
     /** Database column modified SqlType(timestamp), Default(None) */
     val modified: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("modified", O.Default(None))
 

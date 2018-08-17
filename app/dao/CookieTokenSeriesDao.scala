@@ -15,8 +15,8 @@ class CookieTokenSeriesDao @Inject()(protected val dbConfigProvider: DatabaseCon
   // public
   //------------------------------------------------------------------------
   def create(user: UserRow, series: String, token: String) : Future[Unit] = {
-    val newCookieTokenSeries = CookieTokenSeriesRow(user.id, series, token, None)
-    create(newCookieTokenSeries)
+    val newCookieTokenSeriesRow = CookieTokenSeriesRow(user.id, series, token, None)
+    create(newCookieTokenSeriesRow)
   }
 
   //------------------------------------------------------------------------

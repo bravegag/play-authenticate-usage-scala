@@ -18,7 +18,7 @@ class LinkedAccountDao @Inject()(protected val dbConfigProvider: DatabaseConfigP
   // public
   //------------------------------------------------------------------------
   def create(user: UserRow, providerUserId: String, providerKey: String) : Future[Unit] = {
-    val newLinkedAccount = LinkedAccountRow(user.id, providerUserId, providerKey, None, None)
+    val newLinkedAccount = LinkedAccountRow(user.id, providerUserId, providerKey, None)
     create(newLinkedAccount)
   }
 
@@ -29,14 +29,8 @@ class LinkedAccountDao @Inject()(protected val dbConfigProvider: DatabaseConfigP
   }
 
   //------------------------------------------------------------------------
-  def findBySeries(user: UserRow, series: String): Future[Option[LinkedAccountRow]] = {
-    db.run(LinkedAccount.filter(linkedAccount => linkedAccount.userId === user.id &&
-      linkedAccount.series === series).result.headOption)
-  }
-
-  //------------------------------------------------------------------------
-  def deleteByKeyAndProviderUserId(key: String, providerUserId: String): Future[Unit] = {
-    db.run(LinkedAccount.filter(linkedAccount => linkedAccount.providerKey === key &&
+  def deleteByKeyAndProviderUserId(providerKey: String, providerUserId: String): Future[Unit] = {
+    db.run(LinkedAccount.filter(linkedAccount => linkedAccount.providerKey === providerKey &&
       linkedAccount.providerUserId === providerUserId).delete).map(_ => ())
   }
 }

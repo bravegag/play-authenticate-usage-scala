@@ -30,7 +30,6 @@ CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
     provider_user_id VARCHAR(100) NOT NULL,
 	provider_key VARCHAR(50) NOT NULL,
-	series VARCHAR(50),
 	modified TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );

@@ -14,4 +14,5 @@ import javax.inject._
 class DaoContext @Inject()(val linkedAccountDao: LinkedAccountDao,
                            val securityRoleDao: SecurityRoleDao,
                            val tokenActionDao: TokenActionDao,
-                           val userDao: UserDao)
+                           val userDao: UserDao,
+                           val cookieTokenSeriesDao: CookieTokenSeriesDao)
