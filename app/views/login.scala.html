@@ -60,7 +60,7 @@
                         @providerAvailable("basic") { available: java.lang.Boolean =>
                             @if(available) {
                                 <br>
-                                <a href='@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")'>@messagesApi("playauthenticate.login.basic")</a>
+                                <a href='@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic", false)'>@messagesApi("playauthenticate.login.basic")</a>
                             }
                         }
                     </div>
