@@ -184,10 +184,9 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   override def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): AuthUser = {
     if (!oldAuthUser.equals(newAuthUser)) {
       val oldUserOpt = findByAuthUser(oldAuthUser)
-      val newUserOpt = findByAuthUser(newAuthUser)
 
-      (oldUserOpt, newUserOpt) match {
-        case (Some(oldUser: UserRow), Some(_)) => {
+      oldUserOpt match {
+        case Some(oldUser: UserRow) => {
           // link the two users
           daoContext.linkedAccountDao.create(oldUser, providerUserId = newAuthUser.getId,
             providerKey = newAuthUser.getProvider)
