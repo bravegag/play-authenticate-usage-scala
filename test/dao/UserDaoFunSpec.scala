@@ -53,7 +53,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
 
       val result = (for {
         user <- dao.userDao.create(UserRow(id = 0L, username = "test", email = "test@test.test",
-          active = true, modified = None), securityRole, LinkedAccountRow(0L, "xxx", "password", None, None))
+          active = true, modified = None), securityRole, LinkedAccountRow(0L, "xxx", "password", None))
         linkedAccount <- dao.userDao.linkedAccounts(user)
         securityRoles <- dao.userDao.roles(user)
         permissions <- dao.userDao.permissions(user)
