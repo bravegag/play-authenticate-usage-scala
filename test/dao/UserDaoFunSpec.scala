@@ -113,7 +113,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
 
         // reuses the user created in the previous test
         val user: Option[UserRow] = (for {
-          user <- dao.userDao.findActiveByProviderKeyAndPassword("password", "xxx")
+          user <- dao.userDao.findActiveByProvider("password", "xxx")
         } yield user)
 
         it("the user was found") {

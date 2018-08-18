@@ -1,10 +1,14 @@
 package dao
 
+import java.sql.Timestamp
+
 import javax.inject._
 import dao.generic.GenericDaoImpl
 
 import scala.concurrent.Future
 import generated.Tables._
+import java.time._
+
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
@@ -17,7 +21,7 @@ class CookieTokenSeriesDao @Inject()(protected val dbConfigProvider: DatabaseCon
   // public
   //------------------------------------------------------------------------
   def create(user: UserRow, series: String, token: String) : Future[Unit] = {
-    val newCookieTokenSeriesRow = CookieTokenSeriesRow(user.id, series, token, None)
+    val newCookieTokenSeriesRow = CookieTokenSeriesRow(user.id, series, token, None) // Some(Timestamp.from(Instant.now))
     create(newCookieTokenSeriesRow)
   }
 

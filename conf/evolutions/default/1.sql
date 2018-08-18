@@ -21,10 +21,12 @@ CREATE TABLE cookie_token_series (
     user_id BIGINT NOT NULL,
     series VARCHAR(50) NOT NULL,
     token VARCHAR(50) NOT NULL,
-    created TIMESTAMP DEFAULT now(),
-    modified TIMESTAMP,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
+
+ALTER TABLE cookie_token_series ALTER COLUMN created SET DEFAULT now();;
 
 CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
@@ -86,7 +88,7 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_modified_user BEFORE UPDATE OR INSERT ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_linked_account BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER cookie_token_series BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_cookie_token_series BEFORE UPDATE OR INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE OR INSERT ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_token_action BEFORE UPDATE OR INSERT ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_security_permission BEFORE UPDATE OR INSERT ON security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
