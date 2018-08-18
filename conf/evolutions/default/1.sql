@@ -21,12 +21,10 @@ CREATE TABLE cookie_token_series (
     user_id BIGINT NOT NULL,
     series VARCHAR(50) NOT NULL,
     token VARCHAR(50) NOT NULL,
-    created TIMESTAMP NOT NULL,
-    modified TIMESTAMP NOT NULL,
+    created TIMESTAMP,
+    modified TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
-
-ALTER TABLE cookie_token_series ALTER COLUMN created SET DEFAULT now();;
 
 CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
@@ -78,6 +76,14 @@ CREATE TABLE user_security_permission (
 	FOREIGN KEY (security_permission_id) REFERENCES security_permission(id)	
 );
 
+CREATE OR REPLACE FUNCTION update_created()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.created = now();;
+    RETURN NEW;;
+END;;
+$$ language 'plpgsql';
+
 CREATE OR REPLACE FUNCTION update_modified()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -88,7 +94,8 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_modified_user BEFORE UPDATE OR INSERT ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_linked_account BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
-CREATE TRIGGER update_cookie_token_series BEFORE UPDATE OR INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_created_cookie_token_series BEFORE INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_created();
+CREATE TRIGGER update_modified_cookie_token_series BEFORE UPDATE OR INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE OR INSERT ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_token_action BEFORE UPDATE OR INSERT ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_security_permission BEFORE UPDATE OR INSERT ON security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
@@ -115,4 +122,6 @@ DROP TABLE linked_account CASCADE;
 
 DROP TABLE "user" CASCADE;
 
-DROP FUNCTION update_modified_column;
+DROP FUNCTION update_created;
+
+DROP FUNCTION update_modified;

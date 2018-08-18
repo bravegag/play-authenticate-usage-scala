@@ -18,7 +18,7 @@ class LinkedAccountDao @Inject()(protected val dbConfigProvider: DatabaseConfigP
   // public
   //------------------------------------------------------------------------
   def create(user: UserRow, providerUserId: String, providerKey: String) : Future[Unit] = {
-    val newLinkedAccount = LinkedAccountRow(user.id, providerUserId, providerKey, None)
+    val newLinkedAccount = LinkedAccountRow(user.id, providerUserId, providerKey)
     create(newLinkedAccount)
   }
 
