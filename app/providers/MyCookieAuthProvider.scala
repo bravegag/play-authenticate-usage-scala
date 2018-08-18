@@ -13,8 +13,6 @@ import dao.DaoContext
 import services.UserService
 import java.time._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 @Singleton
 class MyCookieAuthProvider @Inject()(implicit
                                      auth: PlayAuthenticate,
