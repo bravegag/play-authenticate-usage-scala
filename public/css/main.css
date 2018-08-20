@@ -31,3 +31,8 @@ form .error .help-inline {
 h1 {
     margin-bottom: 20px !important;
 }
+
+/* solves the checkbox vertical misalignment issue */
+input[type=checkbox] {
+    margin: 6px 0 0;
+}
