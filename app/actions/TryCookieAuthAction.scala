@@ -6,8 +6,9 @@ import play.core.j.JavaHelpers
 import play.mvc.Http
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import collection.JavaConverters._
+import scala.concurrent.duration._
 
 case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit auth: PlayAuthenticate) extends Action[A] {
   def apply(request: Request[A]): Future[Result] = {
@@ -17,7 +18,7 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
         auth.tryAuthenticateWithCookie(jContext)
       }
 
-      val scalaResult = action(jContext)(request)
+      val scalaResult: Future[Result] = Await.ready(action(jContext)(request), 20 seconds)
 
       val session : Seq[(String, String)] = jContext.session().keySet().toArray.map(key => (key.toString, jContext.session().get(key)))
       val cookies : Seq[Cookie] = jContext.response().cookies().asScala.toSeq.map(cookie => Cookie(cookie.name(), cookie.value()))
@@ -29,5 +30,5 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
 }
 
 object TryCookieAuthAction {
-  def apply[A](action: Action[A]) = TryCookieAuthAction(_ => action)
+  def apply[A](action: Action[A])(implicit auth: PlayAuthenticate): TryCookieAuthAction[A] = TryCookieAuthAction(_ => action)
 }

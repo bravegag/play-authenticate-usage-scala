@@ -9,7 +9,6 @@ import play.i18n.Lang
 import play.inject.ApplicationLifecycle
 import play.mvc.{Call, Http}
 import com.feth.play.module.mail.Mailer.Mail.Body
-
 import services._
 import views.form._
 import javax.inject.Inject
@@ -23,6 +22,7 @@ import play.api.i18n.MessagesApi
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider._
+import play.api.mvc.Request
 
 @Singleton
 class MyAuthProvider @Inject()(implicit
@@ -78,7 +78,7 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  override protected def getSignup(context: Http.Context): Signup = {
+  override protected def getSignup(context: Request): Signup = {
     require(context.request()._underlyingRequest != null, "request _underlying must not be null")
     val filledForm = formContext.signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
     filledForm.get
