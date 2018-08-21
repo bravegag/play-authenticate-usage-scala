@@ -5,11 +5,11 @@ import play.api.mvc._
 import play.core.j.JavaHelpers
 import play.mvc.Http
 
+import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import collection.JavaConverters._
 
-case class TryCookieAuthAction(action: Http.Context => play.mvc.Result)(implicit auth: PlayAuthenticate) extends Action[AnyContent] {
+case class JavaContext(action: Http.Context => play.mvc.Result)(implicit auth: PlayAuthenticate) extends Action[AnyContent] {
   def apply(request: Request[AnyContent]): Future[Result] =
     Future {
       val jContext = JavaHelpers.createJavaContext(request)
@@ -22,7 +22,6 @@ case class TryCookieAuthAction(action: Http.Context => play.mvc.Result)(implicit
       val cookies : Seq[Cookie] = jContext.response().cookies().asScala.toSeq.map(cookie => Cookie(cookie.name(), cookie.value()))
 
       val javaResult = action(request)
-
 
       JavaHelpers.createResult(jContext, javaResult)
     }

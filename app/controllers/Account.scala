@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject._
-import actions.{TryCookieAuthAction, NoCache}
+import actions.{JavaContext, NoCache, TryCookieAuthAction}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
@@ -9,6 +9,7 @@ import generated.Tables.UserRow
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Controller
 import play.core.j.JavaHelpers
+import play.mvc.Results
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
 import views.form._
@@ -29,12 +30,13 @@ class Account @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def link = NoCache {
-    TryCookieAuthAction {
-      deadbolt.SubjectPresent()() { implicit request =>
-        Future {
-          Ok(views.html.account.link(userService, auth))
-        }
-      }
+//      deadbolt.SubjectPresent()() { implicit request =>
+//        Future {
+//          Ok(views.html.account.link(userService, auth))
+//        }
+//      }
+    JavaContext { context =>
+      Results.ok(views.html.account.link(userService, auth))
     }
   }
 
