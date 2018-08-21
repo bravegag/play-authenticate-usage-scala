@@ -118,10 +118,9 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doLogin = NoCache {
-    TryCookieAuthAction {
+    TryCookieAuthAction(jContext =>{
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
           formContext.loginForm.Instance.bindFromRequest.fold(
             formWithErrors => {
               // user did not fill everything properly
@@ -134,7 +133,7 @@ class Application @Inject() (implicit
           )
         }
       }
-    }
+    })
   }
 
   //-------------------------------------------------------------------
