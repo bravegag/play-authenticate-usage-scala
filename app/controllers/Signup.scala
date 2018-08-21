@@ -1,8 +1,7 @@
 package controllers
 
 import javax.inject._
-
-import actions.NoCache
+import actions.{Auth, NoCache}
 
 import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
@@ -34,189 +33,213 @@ class Signup @Inject() (implicit
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
-  def unverified = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        Ok(views.html.account.signup.unverified(userService))
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def forgotPassword(email: String) = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        val form = Option(email) match {
-          case Some(email) => {
-            if (!email.trim.isEmpty) {
-              formContext.forgotPasswordForm.Instance.fill(ForgotPassword(email))
-
-            } else {
-              formContext.forgotPasswordForm.Instance
-            }
-          }
-          case None => {
-            formContext.forgotPasswordForm.Instance
+  def unverified =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            Ok(views.html.account.signup.unverified(userService))
           }
         }
-        Ok(views.html.account.signup.password_forgot(userService, form))
       }
     }
-  }
 
   //-------------------------------------------------------------------
-  def doForgotPassword = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        val jContext = JavaHelpers.createJavaContext(request)
-        formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
-          formWithErrors => {
-            // user did not fill in his/her email
-            BadRequest(views.html.account.signup.password_forgot(userService, formWithErrors))
-          },
-          formSuccess => {
-            // the email address given *BY AN UNKNWON PERSON* to the form - we
-            // should find out if we actually have a user with this email
-            // address and whether password login is enabled for him/her. Also
-            // only send if the email address of the user has been verified.
-            val email = formSuccess.email
-            // we don't want to expose whether a given email address is signed
-            // up, so just say an email has been sent, even though it might not
-            // be true - that's protecting our user privacy.
-            var flashValues = ArrayBuffer[(String, String)]()
-            flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
-
-            val userOption = userService.findByEmail(email)
-            userOption.map { user =>
-              // yep, we have a user with this email that is active - we do
-              // not know if the user owning that account has requested this
-              // reset, though.
-              // User exists
-              if (user.emailValidated) {
-                authProvider.sendPasswordResetMailing(user, jContext)
-                // in case you actually want to let (the unknown person)
-                // know whether a user was found/an email was sent, use,
-                // change the flash message
-              } else {
-                // we need to change the message here, otherwise the user
-                // does not understand whats going on - we should not verify
-                // with the password reset, as a "bad" user could then sign
-                // up with a fake email via OAuth and get it verified by an
-                // a unsuspecting user that clicks the link.
-                flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
-
-                // you might want to re-send the verification email here...
-                authProvider.sendVerifyEmailMailingAfterSignup(user, jContext)
-              }
-            }
-            Redirect(routes.Application.index).flashing(flashValues: _*)
-          }
-        )
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def resetPassword(token: String) = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
-          case Some(_) => Ok(views.html.account.signup.password_reset(userService,
-            formContext.passwordResetForm.Instance.fill(PasswordReset("", "", token))))
-          case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
-        }
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def doResetPassword = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        val jContext = JavaHelpers.createJavaContext(request)
-        formContext.passwordResetForm.Instance.bindFromRequest.fold(
-          formWithErrors => BadRequest(views.html.account.signup.password_reset(userService, formWithErrors)),
-          formSuccess => {
-            val token = formSuccess.token
-            val newPassword = formSuccess.password
-            tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
-              case Some(tokenAction) => {
-                var flashValues = ArrayBuffer[(String, String)]()
-                val Some(user) = tokenAction.targetUser
-                try {
-                  // pass true for the second parameter if you want to
-                  // automatically create a password and the exception never to
-                  // happen
-                  user.resetPassword(new MySignupAuthUser(newPassword), false)
-                }
-                catch {
-                  case _ : RuntimeException => {
-                    flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
-                      preferred(request)("playauthenticate.reset_password.message.no_password_account"))
-                  }
-                }
-                val login = authProvider.isLoginAfterPasswordReset
-                if (login) {
-                  // automatically log in
-                  flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
-                    preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
-                  auth.loginAndRedirect(jContext, new MyLoginAuthUser(user.email))
+  def forgotPassword(email: String) =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            val form = Option(email) match {
+              case Some(email) => {
+                if (!email.trim.isEmpty) {
+                  formContext.forgotPasswordForm.Instance.fill(ForgotPassword(email))
 
                 } else {
-                  // send the user to the login page
-                  flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
-                    preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+                  formContext.forgotPasswordForm.Instance
                 }
-                Redirect(routes.Application.login).flashing(flashValues: _*)
+              }
+              case None => {
+                formContext.forgotPasswordForm.Instance
+              }
+            }
+            Ok(views.html.account.signup.password_forgot(userService, form))
+          }
+        }
+      }
+    }
+
+  //-------------------------------------------------------------------
+  def doForgotPassword =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            val jContext = JavaHelpers.createJavaContext(request)
+            formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
+              formWithErrors => {
+                // user did not fill in his/her email
+                BadRequest(views.html.account.signup.password_forgot(userService, formWithErrors))
+              },
+              formSuccess => {
+                // the email address given *BY AN UNKNWON PERSON* to the form - we
+                // should find out if we actually have a user with this email
+                // address and whether password login is enabled for him/her. Also
+                // only send if the email address of the user has been verified.
+                val email = formSuccess.email
+                // we don't want to expose whether a given email address is signed
+                // up, so just say an email has been sent, even though it might not
+                // be true - that's protecting our user privacy.
+                var flashValues = ArrayBuffer[(String, String)]()
+                flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.instructions_sent", email))
+
+                val userOption = userService.findByEmail(email)
+                userOption.map { user =>
+                  // yep, we have a user with this email that is active - we do
+                  // not know if the user owning that account has requested this
+                  // reset, though.
+                  // User exists
+                  if (user.emailValidated) {
+                    authProvider.sendPasswordResetMailing(user, jContext)
+                    // in case you actually want to let (the unknown person)
+                    // know whether a user was found/an email was sent, use,
+                    // change the flash message
+                  } else {
+                    // we need to change the message here, otherwise the user
+                    // does not understand whats going on - we should not verify
+                    // with the password reset, as a "bad" user could then sign
+                    // up with a fake email via OAuth and get it verified by an
+                    // a unsuspecting user that clicks the link.
+                    flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.preferred(request)("playauthenticate.reset_password.message.email_not_verified"))
+
+                    // you might want to re-send the verification email here...
+                    authProvider.sendVerifyEmailMailingAfterSignup(user, jContext)
+                  }
+                }
+                Redirect(routes.Application.index).flashing(flashValues: _*)
+              }
+            )
+          }
+        }
+      }
+    }
+
+  //-------------------------------------------------------------------
+  def resetPassword(token: String) =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
+              case Some(_) => Ok(views.html.account.signup.password_reset(userService,
+                formContext.passwordResetForm.Instance.fill(PasswordReset("", "", token))))
+              case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
+            }
+          }
+        }
+      }
+    }
+
+  //-------------------------------------------------------------------
+  def doResetPassword =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            val jContext = JavaHelpers.createJavaContext(request)
+            formContext.passwordResetForm.Instance.bindFromRequest.fold(
+              formWithErrors => BadRequest(views.html.account.signup.password_reset(userService, formWithErrors)),
+              formSuccess => {
+                val token = formSuccess.token
+                val newPassword = formSuccess.password
+                tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
+                  case Some(tokenAction) => {
+                    var flashValues = ArrayBuffer[(String, String)]()
+                    val Some(user) = tokenAction.targetUser
+                    try {
+                      // pass true for the second parameter if you want to
+                      // automatically create a password and the exception never to
+                      // happen
+                      user.resetPassword(new MySignupAuthUser(newPassword), false)
+                    }
+                    catch {
+                      case _: RuntimeException => {
+                        flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                          preferred(request)("playauthenticate.reset_password.message.no_password_account"))
+                      }
+                    }
+                    val login = authProvider.isLoginAfterPasswordReset
+                    if (login) {
+                      // automatically log in
+                      flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                        preferred(request)("playauthenticate.reset_password.message.success.auto_login"))
+                      auth.loginAndRedirect(jContext, new MyLoginAuthUser(user.email))
+
+                    } else {
+                      // send the user to the login page
+                      flashValues += (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                        preferred(request)("playauthenticate.reset_password.message.success.manual_login"))
+                    }
+                    Redirect(routes.Application.login).flashing(flashValues: _*)
+                  }
+                  case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
+                }
+              }
+            )
+          }
+        }
+      }
+    }
+
+  //-------------------------------------------------------------------
+  def oAuthDenied(getProviderKey: String) =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            Ok(views.html.account.signup.oAuthDenied(userService, getProviderKey))
+          }
+        }
+      }
+    }
+
+  //-------------------------------------------------------------------
+  def exists =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            Ok(views.html.account.signup.exists(userService))
+          }
+        }
+      }
+    }
+
+  //-------------------------------------------------------------------
+  def verify(token: String) =
+    Auth {
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            val jContext = JavaHelpers.createJavaContext(request)
+            tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION) match {
+              case Some(tokenAction) => {
+                val Some(user) = tokenAction.targetUser
+                val email = user.email
+                user.verify
+                val flashValues = (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
+                  preferred(request)("playauthenticate.verify_email.success", email))
+                userService.findInSession(jContext.session) match {
+                  case Some(_) => Redirect(routes.Application.index).flashing(flashValues)
+                  case None => Redirect(routes.Application.login).flashing(flashValues)
+                }
               }
               case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
             }
           }
-        )
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def oAuthDenied(getProviderKey: String) = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        Ok(views.html.account.signup.oAuthDenied(userService, getProviderKey))
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def exists = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        Ok(views.html.account.signup.exists(userService))
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------
-  def verify(token: String) = NoCache {
-    deadbolt.WithAuthRequest()() { implicit request =>
-      Future {
-        val jContext = JavaHelpers.createJavaContext(request)
-        tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION) match {
-          case Some(tokenAction) => {
-            val Some(user) =  tokenAction.targetUser
-            val email = user.email
-            user.verify
-            val flashValues = (FlashKey.FLASH_MESSAGE_KEY -> messagesApi.
-              preferred(request)("playauthenticate.verify_email.success", email))
-            userService.findInSession(jContext.session) match {
-              case Some(_) => Redirect(routes.Application.index).flashing(flashValues)
-              case None => Redirect(routes.Application.login).flashing(flashValues)
-            }
-          }
-          case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
         }
       }
     }
-  }
 
   //-------------------------------------------------------------------
   // private
