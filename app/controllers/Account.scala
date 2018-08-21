@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject._
-import actions.{JavaContext, NoCache, TryCookieAuthAction}
+import actions.{NoCache, TryCookieAuthAction}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
@@ -30,21 +30,19 @@ class Account @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def link = NoCache {
-//      deadbolt.SubjectPresent()() { implicit request =>
-//        Future {
-//          Ok(views.html.account.link(userService, auth))
-//        }
-//      }
-    JavaContext { context =>
-      Results.ok(views.html.account.link(userService, auth))
-    }
+      TryCookieAuthAction {
+        deadbolt.SubjectPresent()() { implicit request =>
+          Future {
+            Ok(views.html.account.link(userService, auth))
+          }
+        }
+      }
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = NoCache { TryCookieAuthAction {
+  def verifyEmail = NoCache { TryCookieAuthAction(jContext => {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
           // TODO: change because this is cowboy style
           val Some(user) = userService.findInSession(jContext.session)
           val tuple =
@@ -61,14 +59,13 @@ class Account @Inject() (implicit
           Redirect(routes.Application.profile).flashing(tuple)
         }
       }
-    }
+    })
   }
 
   //-------------------------------------------------------------------
-  def changePassword = NoCache { TryCookieAuthAction {
+  def changePassword = NoCache { TryCookieAuthAction(jContext => {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
           // TODO: change because this is cowboy style
           val Some(user) = userService.findInSession(jContext.session)
           val result =
@@ -81,7 +78,7 @@ class Account @Inject() (implicit
           result
         }
       }
-    }
+    })
   }
 
     //-------------------------------------------------------------------

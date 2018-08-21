@@ -1,7 +1,8 @@
 package controllers
 
 import javax.inject._
-import actions.{JavaContext, NoCache, TryCookieAuthAction}
+import actions.NoCache
+import actions.TryCookieAuthAction
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.feth.play.module.pa.providers.cookie.SudoForbidCookieAuthAction
@@ -13,7 +14,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
 import play.mvc.Http.RequestBody
-import play.mvc.{Results, With}
+import play.mvc.With
 import providers.MyAuthProvider
 import views.form._
 
@@ -35,16 +36,11 @@ class Application @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def index =
-//    TryCookieAuthAction {
-//      deadbolt.WithAuthRequest()() { implicit request =>
-//        Future {
-//          Ok(views.html.index(userService))
-//        }
-//      }
-//    }
-    NoCache {
-      JavaContext { context =>
-        Results.ok(views.html.index(userService))
+    TryCookieAuthAction {
+      deadbolt.WithAuthRequest()() { implicit request =>
+        Future {
+          Ok(views.html.index(userService))
+        }
       }
     }
 
