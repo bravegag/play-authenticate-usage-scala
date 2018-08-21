@@ -22,18 +22,23 @@ class MyCookieAuthProvider @Inject()(implicit
   import utils.AwaitUtils._
   import CookieAuthProvider._
 
+  //-------------------------------------------------------------------
+  // public
+  //-------------------------------------------------------------------
   override def save(cookieAuthUser: CookieAuthUser, loginUser: AuthUser): Unit = {
     auth.getUserService.link(loginUser, cookieAuthUser)
     val userRow = userService.findByAuthUser(loginUser).get
     daoContext.cookieTokenSeriesDao.create(userRow, cookieAuthUser.getSeries, cookieAuthUser.getToken)
   }
 
+  //-------------------------------------------------------------------
   override def deleteSeries(authUser: AuthUser, series: String): Unit = {
     val linkedAccountRow = daoContext.linkedAccountDao.findByProvider(getKey(), series).get
     getAuth.getUserService.unlink(authUser)
     daoContext.cookieTokenSeriesDao.deleteBySeries(linkedAccountRow.userId, series)
   }
 
+  //-------------------------------------------------------------------
   override def check(cookieAuthUser: CookieAuthUser): CookieAuthProvider.CheckResult = {
     if (cookieAuthUser.getSeries == null) {
       return CheckResult.MISSING_SERIES
@@ -70,6 +75,7 @@ class MyCookieAuthProvider @Inject()(implicit
     return CheckResult.SUCCESS
   }
 
+  //-------------------------------------------------------------------
   override def renew(cookieAuthUser: CookieAuthUser, newToken: String): Unit = {
     val linkedAccountRow = daoContext.linkedAccountDao.findByProvider(PROVIDER_KEY, cookieAuthUser.getSeries).get
 
