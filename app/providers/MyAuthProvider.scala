@@ -22,7 +22,9 @@ import play.api.i18n.MessagesApi
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider._
-import play.api.mvc.Request
+import play.api.mvc.{AnyContent, AnyContentAsFormUrlEncoded, Request}
+import play.core.j.RequestHeaderImpl
+import play.mvc.Http.RequestBody
 
 @Singleton
 class MyAuthProvider @Inject()(implicit
@@ -78,16 +80,17 @@ class MyAuthProvider @Inject()(implicit
   }
 
   //-------------------------------------------------------------------
-  override protected def getSignup(context: Request): Signup = {
+  override protected def getSignup(context: Http.Context): Signup = {
     require(context.request()._underlyingRequest != null, "request _underlying must not be null")
     val filledForm = formContext.signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
     filledForm.get
   }
 
+  import collection.JavaConverters._
   //-------------------------------------------------------------------
   override protected def getLogin(context: Http.Context): Login = {
-    require(context.request()._underlyingRequest != null, "request _underlying must not be null")
-    val filledForm = formContext.loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    val form = context.request().asInstanceOf[RequestHeaderImpl]._underlyingHeader().asInstanceOf[Request[Any]].body.asInstanceOf[AnyContentAsFormUrlEncoded].asFormUrlEncoded.get
+    val filledForm = formContext.loginForm.Instance.bindFromRequest(form)
     filledForm.get
   }
 

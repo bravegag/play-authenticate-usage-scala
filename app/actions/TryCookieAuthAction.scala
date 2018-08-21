@@ -18,10 +18,13 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
         auth.tryAuthenticateWithCookie(jContext)
       }
 
-      val scalaResult: Future[Result] = Await.ready(action(jContext)(request), 20 seconds)
+      val scalaResult: Future[Result] = Await.ready(action(jContext)(request), 60 seconds)
 
       val session : Seq[(String, String)] = jContext.session().keySet().toArray.map(key => (key.toString, jContext.session().get(key)))
-      val cookies : Seq[Cookie] = jContext.response().cookies().asScala.toSeq.map(cookie => Cookie(cookie.name(), cookie.value()))
+      val cookies : Seq[Cookie] = jContext.response().cookies().asScala.toSeq.map(cookie =>
+        Cookie(cookie.name(), cookie.value(), maxAge = Option(cookie.maxAge()), path = cookie.path(), domain = Option(cookie.domain()),
+          secure = cookie.secure(), httpOnly = cookie.httpOnly())
+      )
 
       scalaResult.map(_.withSession(session : _*).withCookies(cookies : _*))
     }
