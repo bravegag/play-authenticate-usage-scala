@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 import actions.NoCache
-import actions.Auth
+import actions.TryCookieAuthAction
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.feth.play.module.pa.providers.cookie.SudoForbidCookieAuthAction
@@ -36,7 +36,7 @@ class Application @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def index =
-    Auth {
+    TryCookieAuthAction {
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           Ok(views.html.index(userService))
@@ -46,7 +46,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def restricted =
-    Auth {
+    TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -58,7 +58,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def profile =
-    Auth {
+    TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -70,7 +70,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def login =
-    Auth {
+    TryCookieAuthAction {
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           Ok(views.html.login(auth, userService, formContext.loginForm.Instance))
@@ -81,7 +81,7 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   @With(Array(classOf[SudoForbidCookieAuthAction]))
   def restrictedForbidCookie =
-    Auth {
+    TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
@@ -93,7 +93,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def relogin = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
@@ -118,7 +118,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doLogin = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
@@ -139,7 +139,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def signup =
-    Auth {
+    TryCookieAuthAction {
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           Ok(views.html.signup(auth, userService, formContext.signupForm.Instance))
@@ -149,7 +149,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doSignup =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])

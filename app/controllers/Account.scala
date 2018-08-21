@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject._
-import actions.{Auth, NoCache}
+import actions.{TryCookieAuthAction, NoCache}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
@@ -29,7 +29,7 @@ class Account @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def link = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
           Ok(views.html.account.link(userService, auth))
@@ -39,7 +39,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = NoCache { Auth {
+  def verifyEmail = NoCache { TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -63,7 +63,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def changePassword = NoCache { Auth {
+  def changePassword = NoCache { TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -84,7 +84,7 @@ class Account @Inject() (implicit
 
     //-------------------------------------------------------------------
     def doChangePassword = NoCache {
-      Auth {
+      TryCookieAuthAction {
         deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
           Future {
             val jContext = JavaHelpers.createJavaContext(request)
@@ -108,7 +108,7 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def askLink = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -126,7 +126,7 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doLink = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -157,7 +157,7 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def askMerge = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)
@@ -184,7 +184,7 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doMerge = NoCache {
-    Auth {
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
           val jContext = JavaHelpers.createJavaContext(request)

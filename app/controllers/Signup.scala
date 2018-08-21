@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject._
-import actions.{Auth, NoCache}
+import actions.{TryCookieAuthAction, NoCache}
 
 import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
@@ -34,7 +34,7 @@ class Signup @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def unverified =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -46,7 +46,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def forgotPassword(email: String) =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -71,7 +71,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doForgotPassword =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -126,7 +126,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def resetPassword(token: String) =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -142,7 +142,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doResetPassword =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -193,7 +193,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def oAuthDenied(getProviderKey: String) =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -205,7 +205,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def exists =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -217,7 +217,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def verify(token: String) =
-    Auth {
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
