@@ -29,6 +29,8 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
           secure = cookie.secure(), httpOnly = cookie.httpOnly())
       )
 
+      TryCookieAuthAction.jContextDv -= request.id
+
       scalaResult.map(_.withSession(session : _*).withCookies(cookies : _*))
     }
 
