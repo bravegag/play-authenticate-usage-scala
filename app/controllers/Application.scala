@@ -94,7 +94,7 @@ class Application @Inject() (implicit
           val authUser = userService.findInSession(jContext.session).get
           // partially initialize the Login form to only miss the password
           val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
-            email = authUser.email, password = "", isRememberMe = true))
+            email = authUser.email.toString, password = "", isRememberMe = true))
           // everything was filled
           Ok(views.html.relogin(auth, userService, updatedForm))
         }

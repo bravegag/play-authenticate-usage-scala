@@ -4,15 +4,15 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, reLoginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
 @main(userService, messagesApi("playauthenticate.login.title"), jContext, "relogin") {
-    @if(loginForm.hasGlobalErrors) {
-        <p class="alert alert-warning">@loginForm.globalError.get.message</p>
+    @if(reLoginForm.hasGlobalErrors) {
+        <p class="alert alert-warning">@reLoginForm.globalError.get.message</p>
     }
     <div class="inner-bg">
         <div class="container">
@@ -30,14 +30,14 @@
                     <div class="form-bottom">
                         @* Display proprietary login form *@
                         @b3.vertical.form(routes.Application.doLogin) { implicit vfc =>
-                            @b3.hidden("email", loginForm("email"))
-                            @b3.inputWrapped("password", loginForm("password"), '_hiddenLabel -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
+                            @b3.hidden("email", reLoginForm.data("email"))
+                            @b3.inputWrapped("password", reLoginForm("password"), '_hiddenLabel -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
                                 <div class="input-group">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
                                     @input
                                 </div>
                             }
-                            @b3.hidden("rememberMe", loginForm("rememberMe"))
+                            @b3.hidden("rememberMe", reLoginForm.data("rememberMe"))
                             @b3.submit('class -> "btn btn-default") {
                                 @messagesApi("playauthenticate.login.now")
                             }
