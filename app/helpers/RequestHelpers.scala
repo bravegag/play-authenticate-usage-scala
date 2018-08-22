@@ -5,7 +5,7 @@ import play.core.j.RequestHeaderImpl
 import play.mvc._
 
 object RequestHelpers {
-  def parseRequest(request: Http.Request) = {
+  def parseRequest(request: Http.Request): Map[String, Seq[String]] = {
     request.asInstanceOf[RequestHeaderImpl]._underlyingHeader().asInstanceOf[Request[Any]].
       body.asInstanceOf[AnyContentAsFormUrlEncoded].asFormUrlEncoded.get
   }
