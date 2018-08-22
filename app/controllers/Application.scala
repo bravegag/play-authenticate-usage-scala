@@ -95,15 +95,8 @@ class Application @Inject() (implicit
           // partially initialize the Login form to only miss the password
           val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
             email = authUser.email, password = "", isRememberMe = true))
-          updatedForm.bindFromRequest.fold(
-            formWithErrors => {
-              // user did not fill everything properly
-              BadRequest(views.html.login(auth, userService, formWithErrors))
-            },
-            formSuccess => {
-              // everything was filled
-              Ok(views.html.relogin(auth, userService, formContext.loginForm.Instance))
-            })
+          // everything was filled
+          Ok(views.html.relogin(auth, userService, updatedForm))
         }
       }
     }
