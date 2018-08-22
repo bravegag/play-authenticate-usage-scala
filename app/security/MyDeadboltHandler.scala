@@ -3,6 +3,7 @@ package security
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler, ExecutionContextProvider}
 import com.feth.play.module.pa.PlayAuthenticate
+import helpers.ScalaRequestToJavaContext
 import play.api.mvc._
 import play.core.j.JavaHelpers
 import services.UserService
@@ -17,7 +18,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
 	// public
 	//------------------------------------------------------------------------
 	override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future {
-		val context = JavaHelpers.createJavaContext(request)
+		val context = ScalaRequestToJavaContext.get(request.id)
 		if (auth.isLoggedIn(context)) {
 			// user is logged in
 			None
@@ -37,7 +38,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
 
 	//------------------------------------------------------------------------
 	override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = Future {
-		val context = JavaHelpers.createJavaContext(request)
+		val context = ScalaRequestToJavaContext.get(request.id)
     val authUser = auth.getUser(context)
 		// Caching might be a good idea here
 		val user = userService.findByAuthUser(authUser)

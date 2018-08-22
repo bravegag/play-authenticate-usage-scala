@@ -1,6 +1,7 @@
 package actions
 
 import com.feth.play.module.pa.PlayAuthenticate
+import helpers.ScalaRequestToJavaContext
 import play.api.mvc._
 import play.core.j.JavaHelpers
 import play.mvc.Http
@@ -14,6 +15,8 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
   def apply(request: Request[A]): Future[Result] = {
       val jContext = JavaHelpers.createJavaContext(request)
 
+      ScalaRequestToJavaContext.put(request.id, jContext)
+
       if(!auth.isLoggedIn(jContext)) {
         auth.tryAuthenticateWithCookie(jContext)
       }
@@ -25,6 +28,8 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
         Cookie(cookie.name(), cookie.value(), maxAge = Option(cookie.maxAge()), path = cookie.path(), domain = Option(cookie.domain()),
           secure = cookie.secure(), httpOnly = cookie.httpOnly())
       )
+
+    ScalaRequestToJavaContext.delete(request.id)
 
       scalaResult.map(_.withSession(session : _*).withCookies(cookies : _*))
     }
