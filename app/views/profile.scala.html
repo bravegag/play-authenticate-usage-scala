@@ -5,12 +5,12 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import com.feth.play.module.pa.views.html._
-@import utils.FormatUtils._
+@import helpers.FormatHelpers._
 
-@main(userService, messagesApi("playauthenticate.profile.title"),"profile") {
+@main(userService, messagesApi("playauthenticate.profile.title"), jContext, "profile") {
 
 <h1>@messagesApi("playauthenticate.profile.title")</h1>
 <p>

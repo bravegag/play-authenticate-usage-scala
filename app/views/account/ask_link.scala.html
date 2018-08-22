@@ -3,7 +3,7 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, acceptForm: Form[Accept], newAccount: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets)
+@(userService: UserService, acceptForm: Form[Accept], newAccount: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import helper._
 @import b3.vertical.fieldConstructor
@@ -13,7 +13,7 @@
 	@_providerIcon(newAccount.getProvider()) @messagesApi("playauthenticate.link.account.question", newAccount)
 }
 
-@main(userService, messagesApi("playauthenticate.link.account.title")) {
+@main(userService, messagesApi("playauthenticate.link.account.title"), jContext) {
     @if(acceptForm.hasGlobalErrors) {
         <p class="alert alert-danger">@acceptForm.globalError.get.message</p>
     }

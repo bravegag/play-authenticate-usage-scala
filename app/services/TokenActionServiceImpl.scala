@@ -12,7 +12,7 @@ import dao._
 @Singleton
 class TokenActionServiceImpl @Inject()(auth : PlayAuthenticate,
                                        daoContext: DaoContext) extends TokenActionService {
-  import utils.AwaitUtils._
+  import helpers.AwaitHelpers._
 
   //------------------------------------------------------------------------
   // public

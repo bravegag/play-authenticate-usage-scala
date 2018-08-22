@@ -4,11 +4,11 @@ import constants.SecurityRoleKey
 import generated.Tables.{LinkedAccountRow, SecurityRoleRow, UserRow}
 import org.scalatest.Matchers
 import play.api.test.WithApplication
-import utils.AwaitUtils
+import helpers.AwaitHelpers
 import be.objectify.deadbolt.scala.models.{Role, Permission}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import utils.AwaitUtils._
+import helpers.AwaitHelpers._
 
 class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
   //------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       val result = (for {
         user <- dao.userDao.createAndFetch(UserRow(id = 0L, username = "test", email = "test@test.test", modified = None))
@@ -46,7 +46,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       // initialize the security role as we know it exists
       val securityRole = SecurityRoleRow(id = 1L, name = SecurityRoleKey.USER_ROLE.toString)

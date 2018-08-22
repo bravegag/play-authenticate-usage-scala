@@ -3,10 +3,10 @@ package dao
 import generated.Tables.{LinkedAccountRow, UserRow}
 import org.scalatest.Matchers
 import play.api.test.WithApplication
-import utils.AwaitUtils
+import helpers.AwaitHelpers
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import utils.AwaitUtils._
+import helpers.AwaitHelpers._
 
 import scala.Long
 
@@ -18,7 +18,7 @@ class LinkedAccountDaoFunSpec extends AbstractDaoFunSpec with Matchers {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       val user = UserRow(id = 0L, username = "test", email = "test@test.test", modified = None)
 

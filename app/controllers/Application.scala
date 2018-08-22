@@ -13,7 +13,6 @@ import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
-import play.mvc.Http.RequestBody
 import play.mvc.With
 import providers.MyAuthProvider
 import views.form._
@@ -36,7 +35,7 @@ class Application @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def index =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           Ok(views.html.index(userService))
@@ -46,10 +45,9 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def restricted =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
           val localUser = userService.findInSession(jContext.session)
           Ok(views.html.restricted(userService, localUser))
         }
@@ -58,10 +56,9 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def profile =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
           val localUser = userService.findInSession(jContext.session)
           Ok(views.html.profile(auth, localUser.get))
         }
@@ -70,7 +67,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def login =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           Ok(views.html.login(auth, userService, formContext.loginForm.Instance))
@@ -81,10 +78,9 @@ class Application @Inject() (implicit
   //-------------------------------------------------------------------
   @With(Array(classOf[SudoForbidCookieAuthAction]))
   def restrictedForbidCookie =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
           val localUser = userService.findInSession(jContext.session)
           Ok(views.html.restrictedForbidCookie(userService, localUser))
         }
@@ -93,10 +89,9 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def relogin = NoCache {
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
           // taking chances here
           val authUser = userService.findInSession(jContext.session).get
           // partially initialize the Login form to only miss the password
@@ -118,7 +113,7 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doLogin = NoCache {
-    TryCookieAuthAction(jContext =>{
+    TryCookieAuthAction( implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           formContext.loginForm.Instance.bindFromRequest.fold(
@@ -132,13 +127,12 @@ class Application @Inject() (implicit
             }
           )
         }
-      }
     })
   }
 
   //-------------------------------------------------------------------
   def signup =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
           Ok(views.html.signup(auth, userService, formContext.signupForm.Instance))
@@ -148,10 +142,9 @@ class Application @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doSignup =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
-          val jContext = JavaHelpers.createJavaContext(request.asInstanceOf[Request[RequestBody]])
           verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
             form.fold(
               formWithErrors => {

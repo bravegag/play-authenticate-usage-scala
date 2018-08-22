@@ -4,9 +4,9 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
-@main(userService, messagesApi("playauthenticate.index.title")) {
+@main(userService, messagesApi("playauthenticate.index.title"), jContext) {
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
     <h1>@messagesApi("playauthenticate.index.intro")</h1>

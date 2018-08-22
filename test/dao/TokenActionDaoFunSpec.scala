@@ -7,8 +7,8 @@ import constants.TokenActionKey
 import generated.Tables.{TokenActionRow, UserRow}
 import org.scalatest.Matchers
 import play.api.test.WithApplication
-import utils.AwaitUtils
-import utils.AwaitUtils._
+import helpers.AwaitHelpers
+import helpers.AwaitHelpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -21,7 +21,7 @@ class TokenActionDaoFunSpec extends AbstractDaoFunSpec with Matchers {
       val dao = daoContext
 
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       val user = UserRow(id = 0L, username = "test", email = "test@test.test", modified = None)
       val uuid = UUID.randomUUID.toString

@@ -34,7 +34,7 @@ class Signup @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def unverified =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -46,7 +46,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def forgotPassword(email: String) =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -71,11 +71,10 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doForgotPassword =
-    TryCookieAuthAction {
+    TryCookieAuthAction {  implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            val jContext = JavaHelpers.createJavaContext(request)
             formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not fill in his/her email
@@ -126,7 +125,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def resetPassword(token: String) =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -142,11 +141,10 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doResetPassword =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            val jContext = JavaHelpers.createJavaContext(request)
             formContext.passwordResetForm.Instance.bindFromRequest.fold(
               formWithErrors => BadRequest(views.html.account.signup.password_reset(userService, formWithErrors)),
               formSuccess => {
@@ -193,7 +191,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def oAuthDenied(getProviderKey: String) =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -205,7 +203,7 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def exists =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
@@ -217,11 +215,10 @@ class Signup @Inject() (implicit
 
   //-------------------------------------------------------------------
   def verify(token: String) =
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            val jContext = JavaHelpers.createJavaContext(request)
             tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION) match {
               case Some(tokenAction) => {
                 val Some(user) = tokenAction.targetUser

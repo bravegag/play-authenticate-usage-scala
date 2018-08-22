@@ -4,13 +4,13 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, messagesApi("playauthenticate.login.title"),"login") {
+@main(userService, messagesApi("playauthenticate.login.title"), jContext, "login") {
     @if(loginForm.hasGlobalErrors) {
         <p class="alert alert-danger">@loginForm.globalError.get.message</p>
     }

@@ -19,7 +19,7 @@ class MyCookieAuthProvider @Inject()(implicit
                                      lifecycle: ApplicationLifecycle,
                                      val userService: UserService,
                                      daoContext: DaoContext) extends CookieAuthProvider(auth, lifecycle) {
-  import utils.AwaitUtils._
+  import helpers.AwaitHelpers._
   import CookieAuthProvider._
 
   //-------------------------------------------------------------------

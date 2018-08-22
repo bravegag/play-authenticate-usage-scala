@@ -1,4 +1,4 @@
-package utils
+package helpers
 
 import scala.concurrent.{Await, Future}
 import generated.Tables._
@@ -8,7 +8,7 @@ import scala.concurrent.duration.Duration
 /**
   * Blocks until the future is done, implicitly
   */
-object AwaitUtils {
+object AwaitHelpers {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

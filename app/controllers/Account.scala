@@ -30,7 +30,7 @@ class Account @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def link = NoCache {
-      TryCookieAuthAction {
+      TryCookieAuthAction { implicit jContext =>
         deadbolt.SubjectPresent()() { implicit request =>
           Future {
             Ok(views.html.account.link(userService, auth))
@@ -40,7 +40,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = NoCache { TryCookieAuthAction(jContext => {
+  def verifyEmail = NoCache { TryCookieAuthAction( implicit jContext => {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           // TODO: change because this is cowboy style
@@ -63,7 +63,7 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def changePassword = NoCache { TryCookieAuthAction(jContext => {
+  def changePassword = NoCache { TryCookieAuthAction( implicit jContext => {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           // TODO: change because this is cowboy style
@@ -83,10 +83,9 @@ class Account @Inject() (implicit
 
     //-------------------------------------------------------------------
     def doChangePassword = NoCache {
-      TryCookieAuthAction {
+      TryCookieAuthAction { implicit jContext =>
         deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
           Future {
-            val jContext = JavaHelpers.createJavaContext(request)
             formContext.passwordChangeForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not select whether to link or not link
@@ -107,10 +106,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def askLink = NoCache {
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => Ok(views.html.account.ask_link(userService, formContext.acceptForm.Instance, user))
             case None => {
@@ -125,10 +123,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doLink = NoCache {
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => {
               formContext.acceptForm.Instance.bindFromRequest.fold(
@@ -156,11 +153,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def askMerge = NoCache {
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
-
           // this is the currently logged in user
           val userA = auth.getUser(jContext.session)
 
@@ -183,11 +178,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doMerge = NoCache {
-    TryCookieAuthAction {
+    TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          val jContext = JavaHelpers.createJavaContext(request)
-
           // this is the currently logged in user
           val userA = auth.getUser(jContext.session)
 

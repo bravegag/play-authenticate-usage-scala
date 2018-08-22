@@ -4,9 +4,9 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
+@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
-@main(userService, messagesApi("playauthenticate.navigation.restricted"), "restricted") {
+@main(userService, messagesApi("playauthenticate.navigation.restricted"), jContext, "restricted") {
 <h1>@messagesApi("playauthenticate.navigation.restricted")</h1>
 <p>
     @messagesApi("playauthenticate.restricted.secrets")
