@@ -9,6 +9,7 @@ import services.UserService
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import TryCookieAuthAction.RequestToContext
 
 class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService) extends DeadboltHandler {
 	import services.PluggableUserService._
@@ -18,7 +19,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
 	//------------------------------------------------------------------------
 	override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future {
     Option(auth).flatMap { auth =>
-      TryCookieAuthAction.jContextDv.get(request.id) match {
+      request.jContextOption match {
         case Some(context) => {
           if (auth.isLoggedIn(context)) {
             // user is logged in
@@ -44,7 +45,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
 	//------------------------------------------------------------------------
 	override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = Future {
     Option(auth).flatMap { auth =>
-      TryCookieAuthAction.jContextDv.get(request.id) match {
+      request.jContextOption match {
         case Some(context) => {
           val authUser = auth.getUser(context)
           // Caching might be a good idea here

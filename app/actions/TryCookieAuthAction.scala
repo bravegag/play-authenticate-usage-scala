@@ -38,7 +38,12 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
 }
 
 object TryCookieAuthAction {
-  lazy val jContextDv = TrieMap[Long, play.mvc.Http.Context]()
+  private lazy val jContextDv = TrieMap[Long, play.mvc.Http.Context]()
+
+  implicit class RequestToContext[A](request: Request[A]) {
+    def jContextOption : Option[Http.Context] = jContextDv.get(request.id)
+    def jContext : Http.Context = jContextDv(request.id)
+  }
 
   def apply[A](action: Action[A])(implicit auth: PlayAuthenticate): TryCookieAuthAction[A] = TryCookieAuthAction(_ => action)
 }
