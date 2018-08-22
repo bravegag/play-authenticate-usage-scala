@@ -1,11 +1,9 @@
 package controllers
 
 import javax.inject._
-import actions.NoCache
-import actions.TryCookieAuthAction
+import actions.{NoCache, SudoForbidCookieAuthAction, TryCookieAuthAction}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
-import com.feth.play.module.pa.providers.cookie.SudoForbidCookieAuthAction
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.SecurityRoleKey
 import play.api.mvc._
@@ -13,7 +11,6 @@ import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
-import play.mvc.With
 import providers.MyAuthProvider
 import views.form._
 
@@ -76,13 +73,14 @@ class Application @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  @With(Array(classOf[SudoForbidCookieAuthAction]))
   def restrictedForbidCookie =
     TryCookieAuthAction { implicit jContext =>
-      deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-        Future {
-          val localUser = userService.findInSession(jContext.session)
-          Ok(views.html.restrictedForbidCookie(userService, localUser))
+      SudoForbidCookieAuthAction {
+        deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
+          Future {
+            val localUser = userService.findInSession(jContext.session)
+            Ok(views.html.restrictedForbidCookie(userService, localUser))
+          }
         }
       }
     }
