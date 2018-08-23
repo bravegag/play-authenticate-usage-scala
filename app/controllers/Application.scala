@@ -116,7 +116,7 @@ class Application @Inject() (implicit
               // everything was filled
               val result = JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext, formSuccess.isRememberMe))
               Option(jContext.session().remove(SessionKey.REDIRECT_TO_URI_KEY)).map { uri =>
-                result.withHeaders("location" -> uri)
+                result.withHeaders(LOCATION -> uri)
               }.getOrElse(result)
             }
           )
