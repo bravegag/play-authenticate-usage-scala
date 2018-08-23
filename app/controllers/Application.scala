@@ -5,7 +5,7 @@ import actions.{NoCache, SudoForbidCookieAuthAction, TryCookieAuthAction}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
-import constants.SecurityRoleKey
+import constants.{SecurityRoleKey, SessionKey}
 import play.api.mvc._
 import services.UserService
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -114,6 +114,9 @@ class Application @Inject() (implicit
             },
             formSuccess => {
               // everything was filled
+              Option(jContext.session().remove(SessionKey.REDIRECT_TO_URI_KEY)).map { uri =>
+                jContext.session().put("pa.url.orig", uri)
+              }
               JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext, formSuccess.isRememberMe))
             }
           )

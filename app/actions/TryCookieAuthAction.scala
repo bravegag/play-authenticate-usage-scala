@@ -11,6 +11,12 @@ import collection.JavaConverters._
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration._
 
+/**
+  * Action hook that attempts to authenticate the user using cookies.
+  * @param action The inner action
+  * @param auth the PlayAuthenticate framework
+  * @tparam A The request body type
+  */
 case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit auth: PlayAuthenticate) extends Action[A] {
   def apply(request: Request[A]): Future[Result] = {
     val jContext = JavaHelpers.createJavaContext(request)
@@ -40,6 +46,11 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
 object TryCookieAuthAction {
   private lazy val jContextDv = TrieMap[Long, play.mvc.Http.Context]()
 
+  /**
+    * Extracts the Java context given a request
+    * @param request The request
+    * @tparam A The request body type
+    */
   implicit class RequestToContext[A](request: Request[A]) {
     def jContextOption : Option[Http.Context] = jContextDv.get(request.id)
     def jContext : Http.Context = jContextDv(request.id)
