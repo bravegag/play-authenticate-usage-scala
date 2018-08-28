@@ -16,7 +16,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Array(CookieTokenSeries.schema, LinkedAccount.schema, PlayEvolutions.schema, SecurityPermission.schema, SecurityRole.schema, TokenAction.schema, User.schema, UserSecurityPermission.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
+  lazy val schema: profile.SchemaDescription = Array(CookieTokenSeries.schema, GauthRecoveryToken.schema, LinkedAccount.schema, PlayEvolutions.schema, SecurityPermission.schema, SecurityRole.schema, TokenAction.schema, User.schema, UserDevice.schema, UserSecurityPermission.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -24,9 +24,9 @@ trait Tables {
    *  @param userId Database column user_id SqlType(int8)
    *  @param series Database column series SqlType(varchar), Length(50,true)
    *  @param token Database column token SqlType(varchar), Length(50,true)
-   *  @param created Database column created SqlType(timestamp)
+   *  @param created Database column created SqlType(timestamp), Default(None)
    *  @param modified Database column modified SqlType(timestamp), Default(None) */
-  case class CookieTokenSeriesRow(userId: Long, series: String, token: String, created: Option[java.sql.Timestamp], modified: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
+  case class CookieTokenSeriesRow(userId: Long, series: String, token: String, created: Option[java.sql.Timestamp] = None, modified: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching CookieTokenSeriesRow objects using plain SQL queries */
   implicit def GetResultCookieTokenSeriesRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[java.sql.Timestamp]]): GR[CookieTokenSeriesRow] = GR{
     prs => import prs._
@@ -46,8 +46,8 @@ trait Tables {
     val series: Rep[String] = column[String]("series", O.Length(50,varying=true))
     /** Database column token SqlType(varchar), Length(50,true) */
     val token: Rep[String] = column[String]("token", O.Length(50,varying=true))
-    /** Database column created SqlType(timestamp) */
-    val created: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("created")
+    /** Database column created SqlType(timestamp), Default(None) */
+    val created: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("created", O.Default(None))
     /** Database column modified SqlType(timestamp), Default(None) */
     val modified: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("modified", O.Default(None))
 
@@ -56,6 +56,38 @@ trait Tables {
               }
   /** Collection-like TableQuery object for table CookieTokenSeries */
   lazy val CookieTokenSeries = new TableQuery(tag => new CookieTokenSeries(tag))
+
+  /** Entity class storing rows of table GauthRecoveryToken
+   *  @param userId Database column user_id SqlType(int8)
+   *  @param token Database column token SqlType(varchar), Length(60,true)
+   *  @param created Database column created SqlType(timestamp)
+   *  @param used Database column used SqlType(timestamp), Default(None) */
+  case class GauthRecoveryTokenRow(userId: Long, token: String, created: java.sql.Timestamp, used: Option[java.sql.Timestamp] = None) 
+  /** GetResult implicit for fetching GauthRecoveryTokenRow objects using plain SQL queries */
+  implicit def GetResultGauthRecoveryTokenRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[GauthRecoveryTokenRow] = GR{
+    prs => import prs._
+    GauthRecoveryTokenRow.tupled((<<[Long], <<[String], <<[java.sql.Timestamp], <<?[java.sql.Timestamp]))
+  }
+  /** Table description of table gauth_recovery_token. Objects of this class serve as prototypes for rows in queries. */
+  class GauthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GauthRecoveryTokenRow](_tableTag, "gauth_recovery_token") {
+              def * = (userId, token, created, used) <> (GauthRecoveryTokenRow.tupled, GauthRecoveryTokenRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(userId), Rep.Some(token), Rep.Some(created), used).shaped.<>({r=>import r._; _1.map(_=> GauthRecoveryTokenRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column user_id SqlType(int8) */
+    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column token SqlType(varchar), Length(60,true) */
+    val token: Rep[String] = column[String]("token", O.Length(60,varying=true))
+    /** Database column created SqlType(timestamp) */
+    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
+    /** Database column used SqlType(timestamp), Default(None) */
+    val used: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("used", O.Default(None))
+
+    /** Foreign key referencing User (database name gauth_recovery_token_user_id_fkey) */
+    lazy val userFk = foreignKey("gauth_recovery_token_user_id_fkey", userId, User)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+              }
+  /** Collection-like TableQuery object for table GauthRecoveryToken */
+  lazy val GauthRecoveryToken = new TableQuery(tag => new GauthRecoveryToken(tag))
 
   /** Entity class storing rows of table LinkedAccount
    *  @param userId Database column user_id SqlType(int8)
@@ -272,6 +304,40 @@ trait Tables {
               }
   /** Collection-like TableQuery object for table User */
   lazy val User = new TableQuery(tag => new User(tag))
+
+  /** Entity class storing rows of table UserDevice
+   *  @param userId Database column user_id SqlType(int8)
+   *  @param `type` Database column type SqlType(varchar), Length(50,true)
+   *  @param fingerprint Database column fingerprint SqlType(varchar), Length(500,true)
+   *  @param created Database column created SqlType(timestamp) */
+  case class UserDeviceRow(userId: Long, `type`: String, fingerprint: String, created: java.sql.Timestamp) 
+  /** GetResult implicit for fetching UserDeviceRow objects using plain SQL queries */
+  implicit def GetResultUserDeviceRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[UserDeviceRow] = GR{
+    prs => import prs._
+    UserDeviceRow.tupled((<<[Long], <<[String], <<[String], <<[java.sql.Timestamp]))
+  }
+  /** Table description of table user_device. Objects of this class serve as prototypes for rows in queries.
+   *  NOTE: The following names collided with Scala keywords and were escaped: type */
+  class UserDevice(_tableTag: Tag) extends profile.api.Table[UserDeviceRow](_tableTag, "user_device") {
+              def * = (userId, `type`, fingerprint, created) <> (UserDeviceRow.tupled, UserDeviceRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(userId), Rep.Some(`type`), Rep.Some(fingerprint), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> UserDeviceRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column user_id SqlType(int8) */
+    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column type SqlType(varchar), Length(50,true)
+     *  NOTE: The name was escaped because it collided with a Scala keyword. */
+    val `type`: Rep[String] = column[String]("type", O.Length(50,varying=true))
+    /** Database column fingerprint SqlType(varchar), Length(500,true) */
+    val fingerprint: Rep[String] = column[String]("fingerprint", O.Length(500,varying=true))
+    /** Database column created SqlType(timestamp) */
+    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
+
+    /** Foreign key referencing User (database name user_device_user_id_fkey) */
+    lazy val userFk = foreignKey("user_device_user_id_fkey", userId, User)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+              }
+  /** Collection-like TableQuery object for table UserDevice */
+  lazy val UserDevice = new TableQuery(tag => new UserDevice(tag))
 
   /** Entity class storing rows of table UserSecurityPermission
    *  @param userId Database column user_id SqlType(int8)
