@@ -10,10 +10,14 @@ import javax.inject._
   * @param tokenActionDao
   * @param userDao
   * @param cookieTokenSeriesDao
+  * @param gauthRecoveryTokenDao
+  * @param userDeviceDao
   */
 @Singleton
 class DaoContext @Inject()(val linkedAccountDao: LinkedAccountDao,
                            val securityRoleDao: SecurityRoleDao,
                            val tokenActionDao: TokenActionDao,
                            val userDao: UserDao,
-                           val cookieTokenSeriesDao: CookieTokenSeriesDao)
+                           val cookieTokenSeriesDao: CookieTokenSeriesDao,
+                           val gauthRecoveryTokenDao: GauthRecoveryTokenDao,
+                           val userDeviceDao: UserDeviceDao)

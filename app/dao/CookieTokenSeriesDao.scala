@@ -1,13 +1,10 @@
 package dao
 
-import java.sql.Timestamp
-
 import javax.inject._
 import dao.generic.GenericDaoImpl
 
 import scala.concurrent.Future
 import generated.Tables._
-import java.time._
 
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._

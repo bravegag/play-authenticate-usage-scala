@@ -1,14 +1,12 @@
 package dao
 
 import dao.generic.GenericDaoImpl
-import generated.Tables.{GauthRecoveryTokenRow, _}
+import generated.Tables._
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
-
 import scala.concurrent.Future
 
 class UserDeviceDao  @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
@@ -21,5 +19,4 @@ class UserDeviceDao  @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def exists(userId: Long, deviceType: String, fingerprint: String): Future[Boolean] = {
     get(userId, deviceType, fingerprint).map(_.isDefined)
   }
-
 }

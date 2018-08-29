@@ -77,23 +77,19 @@ CREATE TABLE user_security_permission (
 );
 
 CREATE TABLE user_device (
-  id BIGINT NOT NULL,
   user_id BIGINT NOT NULL,
   "type" VARCHAR(50) NOT NULL,
   fingerprint VARCHAR(500) NOT NULL,
   created TIMESTAMP NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES "user"(id),
-  PRIMARY KEY (id)
+  FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
 CREATE TABLE gauth_recovery_token (
-  id BIGINT NOT NULL,
   user_id BIGINT NOT NULL,
   token VARCHAR(60) NOT NULL,
   created TIMESTAMP NOT NULL,
   used TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES "user"(id),
-  PRIMARY KEY (id)
+  FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
 CREATE OR REPLACE FUNCTION update_created()
