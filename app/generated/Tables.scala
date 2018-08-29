@@ -63,14 +63,14 @@ trait Tables {
    *  @param token Database column token SqlType(varchar), Length(60,true)
    *  @param created Database column created SqlType(timestamp)
    *  @param used Database column used SqlType(timestamp), Default(None) */
-  case class GauthRecoveryTokenRow(id: Long, userId: Long, token: String, created: java.sql.Timestamp, used: Option[java.sql.Timestamp] = None) 
+  case class GauthRecoveryTokenRow(id: Long, userId: Long, token: String, created: java.sql.Timestamp, used: Option[java.sql.Timestamp] = None) extends Entity[Long]
   /** GetResult implicit for fetching GauthRecoveryTokenRow objects using plain SQL queries */
   implicit def GetResultGauthRecoveryTokenRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[GauthRecoveryTokenRow] = GR{
     prs => import prs._
     GauthRecoveryTokenRow.tupled((<<[Long], <<[Long], <<[String], <<[java.sql.Timestamp], <<?[java.sql.Timestamp]))
   }
   /** Table description of table gauth_recovery_token. Objects of this class serve as prototypes for rows in queries. */
-  class GauthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GauthRecoveryTokenRow](_tableTag, "gauth_recovery_token") {
+  class GauthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GauthRecoveryTokenRow](_tableTag, "gauth_recovery_token") with IdentifyableTable[Long] {
               def * = (id, userId, token, created, used) <> (GauthRecoveryTokenRow.tupled, GauthRecoveryTokenRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(token), Rep.Some(created), used).shaped.<>({r=>import r._; _1.map(_=> GauthRecoveryTokenRow.tupled((_1.get, _2.get, _3.get, _4.get, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
@@ -314,7 +314,7 @@ trait Tables {
    *  @param `type` Database column type SqlType(varchar), Length(50,true)
    *  @param fingerprint Database column fingerprint SqlType(varchar), Length(500,true)
    *  @param created Database column created SqlType(timestamp) */
-  case class UserDeviceRow(id: Long, userId: Long, `type`: String, fingerprint: String, created: java.sql.Timestamp) 
+  case class UserDeviceRow(id: Long, userId: Long, `type`: String, fingerprint: String, created: java.sql.Timestamp) extends Entity[Long]
   /** GetResult implicit for fetching UserDeviceRow objects using plain SQL queries */
   implicit def GetResultUserDeviceRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[UserDeviceRow] = GR{
     prs => import prs._
@@ -322,7 +322,7 @@ trait Tables {
   }
   /** Table description of table user_device. Objects of this class serve as prototypes for rows in queries.
    *  NOTE: The following names collided with Scala keywords and were escaped: type */
-  class UserDevice(_tableTag: Tag) extends profile.api.Table[UserDeviceRow](_tableTag, "user_device") {
+  class UserDevice(_tableTag: Tag) extends profile.api.Table[UserDeviceRow](_tableTag, "user_device") with IdentifyableTable[Long] {
               def * = (id, userId, `type`, fingerprint, created) <> (UserDeviceRow.tupled, UserDeviceRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(`type`), Rep.Some(fingerprint), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> UserDeviceRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
