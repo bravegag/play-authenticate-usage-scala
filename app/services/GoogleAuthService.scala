@@ -4,6 +4,8 @@ trait GoogleAuthService {
 
   protected val PROVIDER_KEY : String = "gauth"
 
+  def getProviderKey: String = PROVIDER_KEY
+
   def isKnownDevice(userId: Long, deviceType: String, fingerprint: String): Boolean
 
   def isValidGAuthCode(userId: Long, code: Int): Boolean

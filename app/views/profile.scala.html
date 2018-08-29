@@ -5,7 +5,8 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@import services.GoogleAuthService
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow, gauthService: GoogleAuthService, showSecrets: Boolean = false)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import com.feth.play.module.pa.views.html._
 @import helpers.FormatHelpers._
@@ -42,6 +43,24 @@
     <br/>
     }
     }
+
+    <p>
+        @if(gauthService.isEnabled(localUser.id)) {
+            @if(showSecrets) {
+                Secrets here
+            } else {
+                <form action="@{routes.Application.disableGoogleAuthenticator()}">
+                    <input type="submit" class="btn btn-primary" value="Disable 2-Factor Auth"/>
+                </form>
+            }
+        } else {
+                <h2>2 factor auth with Google Authenticator is not enabled</h2>
+                <form action="@{routes.Application.enableGoogleAuthenticator()}">
+                    <input type="submit" class="btn btn-primary" value="Enable"/>
+                </form>
+        }
+    </p>
+
 
     <br/>
     @play.core.j.JavaHelpers.withContext(request) { jContext =>

@@ -6,6 +6,9 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
+
 import scala.concurrent.Future
 
 class UserDeviceDao  @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)

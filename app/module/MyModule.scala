@@ -18,6 +18,7 @@ class MyModule extends AbstractModule {
 
     bind(classOf[Resolver]).to(classOf[MyResolver])
     bind(classOf[UserService]).to(classOf[UserServiceImpl]).asEagerSingleton()
+    bind(classOf[GoogleAuthService]).to(classOf[MyGoogleAuthService]).asEagerSingleton()
     bind(classOf[TokenActionService]).to(classOf[TokenActionServiceImpl]).asEagerSingleton()
     bind(classOf[MyAuthProvider]).asEagerSingleton()
     bind(classOf[OpenIdAuthProvider]).asEagerSingleton()

@@ -5,13 +5,14 @@ import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler, ExecutionContextProvider}
 import com.feth.play.module.pa.PlayAuthenticate
 import play.api.mvc._
-import services.UserService
+import services.{GoogleAuthService, UserService}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import TryCookieAuthAction.RequestToContext
+import providers.MyResolver
 
-class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService) extends DeadboltHandler {
+class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService, googleAuthService: GoogleAuthService) extends DeadboltHandler {
 	import services.PluggableUserService._
 
 	//------------------------------------------------------------------------
@@ -22,8 +23,18 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
       request.jContextOption match {
         case Some(context) => {
           if (auth.isLoggedIn(context)) {
-            // user is logged in
-            None
+
+            val user = auth.getUser(context)
+
+            // TODO
+            val fingerprint = context.request().remoteAddress()
+
+            if(googleAuthService.isEnabled(user.getId.toLong) && user.getProvider != googleAuthService.getProviderKey && googleAuthService.isKnownDevice(user.getId.toLong, "web", fingerprint)) {
+              Some(Results.Redirect(auth.getResolver.asInstanceOf[MyResolver].googleAuthenticaton.asInstanceOf[play.api.mvc.Call]))
+            } else {
+              // user is logged in
+              None
+            }
 
           } else {
             // user is not logged in

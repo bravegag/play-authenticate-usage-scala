@@ -12,6 +12,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
 class MyGoogleAuthService @Inject() (
                                       gauthRecoveryTokenDao: GauthRecoveryTokenDao,
@@ -57,7 +59,7 @@ class MyGoogleAuthService @Inject() (
     val tokens : Seq[String] =
       for(_ <- 1 to 8) yield {
         val token = UUID.randomUUID().toString
-        await(gauthRecoveryTokenDao.create(GauthRecoveryTokenRow(userId, token, new Timestamp(new Date().getTime))))
+//        await(gauthRecoveryTokenDao.create(GauthRecoveryTokenRow(userId, token, new Timestamp(new Date().getTime))))
         token
       }
 

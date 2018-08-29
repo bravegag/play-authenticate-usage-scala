@@ -9,6 +9,7 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import generated.Tables._
 import profile.api._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

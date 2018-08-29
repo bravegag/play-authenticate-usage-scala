@@ -82,7 +82,8 @@ CREATE TABLE user_device (
   "type" VARCHAR(50) NOT NULL,
   fingerprint VARCHAR(500) NOT NULL,
   created TIMESTAMP NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES "user"(id)
+  FOREIGN KEY (user_id) REFERENCES "user"(id),
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE gauth_recovery_token (
@@ -91,7 +92,8 @@ CREATE TABLE gauth_recovery_token (
   token VARCHAR(60) NOT NULL,
   created TIMESTAMP NOT NULL,
   used TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES "user"(id)
+  FOREIGN KEY (user_id) REFERENCES "user"(id),
+  PRIMARY KEY (id)
 );
 
 CREATE OR REPLACE FUNCTION update_created()

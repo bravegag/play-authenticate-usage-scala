@@ -7,7 +7,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.{SecurityRoleKey, SessionKey}
 import play.api.mvc._
-import services.UserService
+import services.{GoogleAuthService, UserService}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
@@ -24,7 +24,8 @@ class Application @Inject() (implicit
                              auth: PlayAuthenticate,
                              userService: UserService,
                              authProvider: MyAuthProvider,
-                             formContext: FormContext) extends Controller with I18nSupport {
+                             formContext: FormContext,
+                             googleAuthService: GoogleAuthService) extends Controller with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
 
@@ -57,7 +58,7 @@ class Application @Inject() (implicit
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val localUser = userService.findInSession(jContext.session)
-          Ok(views.html.profile(auth, localUser.get))
+          Ok(views.html.profile(auth, localUser.get, googleAuthService))
         }
       }
     }
@@ -151,6 +152,39 @@ class Application @Inject() (implicit
                 JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
               }
             )
+          }
+        }
+      }
+    }
+
+  def enableGoogleAuthenticator =
+    TryCookieAuthAction { implicit jContext =>
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            Ok("")
+          }
+        }
+      }
+    }
+
+  def disableGoogleAuthenticator =
+    TryCookieAuthAction { implicit jContext =>
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            Ok("")
+          }
+        }
+      }
+    }
+
+  def googleAuthentication =
+    TryCookieAuthAction { implicit jContext =>
+      NoCache {
+        deadbolt.WithAuthRequest()() { implicit request =>
+          Future {
+            Ok("")
           }
         }
       }
