@@ -162,7 +162,13 @@ class Application @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            Ok("")
+            userService.findInSession(jContext.session) match {
+              case Some(user) =>
+                googleAuthService.regenerateKey(user.id)
+                Ok(views.html.profile(auth, user, googleAuthService, showSecrets = true))
+              case None =>
+                Ok("Current user not found")
+            }
           }
         }
       }
@@ -173,7 +179,13 @@ class Application @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            Ok("")
+            userService.findInSession(jContext.session) match {
+              case Some(user) =>
+                googleAuthService.disable(user.id)
+                Redirect(profile.asInstanceOf[Call])
+              case None =>
+                Ok("Current user not found")
+            }
           }
         }
       }

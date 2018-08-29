@@ -76,7 +76,7 @@ trait Tables {
     def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(token), Rep.Some(created), used).shaped.<>({r=>import r._; _1.map(_=> GauthRecoveryTokenRow.tupled((_1.get, _2.get, _3.get, _4.get, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(int8), PrimaryKey */
-    val id: Rep[Long] = column[Long]("id", O.PrimaryKey)
+    val id: Rep[Long] = column[Long]("id", O.PrimaryKey, O.AutoInc)
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column token SqlType(varchar), Length(60,true) */
@@ -328,7 +328,7 @@ trait Tables {
     def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(`type`), Rep.Some(fingerprint), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> UserDeviceRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(int8), PrimaryKey */
-    val id: Rep[Long] = column[Long]("id", O.PrimaryKey)
+    val id: Rep[Long] = column[Long]("id", O.PrimaryKey, O.AutoInc)
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column type SqlType(varchar), Length(50,true)

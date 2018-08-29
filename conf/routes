@@ -20,6 +20,12 @@ GET     /authenticate/:provider             com.feth.play.module.pa.controllers.
 GET     /signup                             controllers.Application.signup
 POST    /signup                             controllers.Application.doSignup
 
+POST    /enableGoogleAuthenticator          controllers.Application.enableGoogleAuthenticator
+POST    /disableGoogleAuthenticator         controllers.Application.disableGoogleAuthenticator
+POST    /gauth                              controllers.Application.googleAuthentication
+GET     /enableGoogleAuthenticator          controllers.Application.profile
+
+
 GET     /accounts/unverified                controllers.Signup.unverified
 GET     /authenticate/:provider/denied      controllers.Signup.oAuthDenied(provider: String)
 

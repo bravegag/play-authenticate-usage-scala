@@ -13,9 +13,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class GauthRecoveryTokenDao  @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
+class GauthRecoveryTokenDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   extends GenericDaoImpl[GauthRecoveryToken, GauthRecoveryTokenRow, Long] (dbConfigProvider, GauthRecoveryToken) {
-
 
   def findByToken(userId: Long, token: String): Future[Option[GauthRecoveryTokenRow]] = {
     db.run(GauthRecoveryToken.filter(t => t.userId === userId && t.token === token).result.headOption)
@@ -23,5 +22,9 @@ class GauthRecoveryTokenDao  @Inject()(protected val dbConfigProvider: DatabaseC
 
   def markAsUsed(gauthRecoveryTokenRow: GauthRecoveryTokenRow): Future[Unit] = {
     db.run(GauthRecoveryToken.update(gauthRecoveryTokenRow.copy(used = Some(new Timestamp(new Date().getTime))))).map(_ => ())
+  }
+
+  def findByUser(userId: Long): Future[Seq[GauthRecoveryTokenRow]] = {
+    db.run(GauthRecoveryToken.filter(t => t.userId === userId && t.used.isDefined).result)
   }
 }

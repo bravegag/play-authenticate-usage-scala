@@ -24,8 +24,10 @@ class MyGoogleAuthService @Inject() (
 
   private val googleAuthenticator = new GoogleAuthenticator()
 
-  override def isKnownDevice(userId: Long, deviceType: String, fingerprint: String): Boolean = {
-    Await.result(userDeviceDao.exists(userId, deviceType, fingerprint), 10 seconds)
+  override def isKnownDevice(userEmail: String, deviceType: String, fingerprint: String): Boolean = {
+    getUserIdByEmail(userEmail).fold(false) { userId =>
+      await(userDeviceDao.exists(userId, deviceType, fingerprint))
+    }
   }
 
   override def isValidGAuthCode(userId: Long, code: Int): Boolean = {
@@ -59,7 +61,7 @@ class MyGoogleAuthService @Inject() (
     val tokens : Seq[String] =
       for(_ <- 1 to 8) yield {
         val token = UUID.randomUUID().toString
-//        await(gauthRecoveryTokenDao.create(GauthRecoveryTokenRow(userId, token, new Timestamp(new Date().getTime))))
+        await(gauthRecoveryTokenDao.create(GauthRecoveryTokenRow(id = -1, userId, token, new Timestamp(new Date().getTime))))
         token
       }
 
@@ -85,5 +87,23 @@ class MyGoogleAuthService @Inject() (
 
   private def await[T](f : Future[T]): T = {
     Await.result(f, 10 seconds)
+  }
+
+  override def isEnabled(email: String): Boolean = {
+    getUserIdByEmail(email).fold(false) { userId =>
+      isEnabled(userId)
+    }
+  }
+
+  private def getUserIdByEmail(email: String): Option[Long] = {
+    await(userDao.findByEmail(email)).headOption.map(_.id)
+  }
+
+  override def getUserSharedKey(userId: Long): SharedSecret = {
+    getSharedSecret(userId).map(_.providerUserId).get
+  }
+
+  override def getUserRecoveryTokens(userId: Long): Seq[RecoveryToken] = {
+    await(gauthRecoveryTokenDao.findByUser(userId)).map(_.token)
   }
 }

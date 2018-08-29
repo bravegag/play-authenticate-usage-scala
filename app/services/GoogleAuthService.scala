@@ -6,7 +6,7 @@ trait GoogleAuthService {
 
   def getProviderKey: String = PROVIDER_KEY
 
-  def isKnownDevice(userId: Long, deviceType: String, fingerprint: String): Boolean
+  def isKnownDevice(userEmail: String, deviceType: String, fingerprint: String): Boolean
 
   def isValidGAuthCode(userId: Long, code: Int): Boolean
 
@@ -16,7 +16,13 @@ trait GoogleAuthService {
   type SharedSecret = String
   def regenerateKey(userId: Long): (SharedSecret, Seq[RecoveryToken])
 
+  def getUserSharedKey(userId: Long): SharedSecret
+
+  def getUserRecoveryTokens(userId: Long): Seq[RecoveryToken]
+
   def disable(userId: Long): Unit
 
   def isEnabled(userId: Long): Boolean
+
+  def isEnabled(email: String): Boolean
 }

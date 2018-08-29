@@ -29,7 +29,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
             // TODO
             val fingerprint = context.request().remoteAddress()
 
-            if(googleAuthService.isEnabled(user.getId.toLong) && user.getProvider != googleAuthService.getProviderKey && googleAuthService.isKnownDevice(user.getId.toLong, "web", fingerprint)) {
+            if(googleAuthService.isEnabled(user.getId) && user.getProvider != googleAuthService.getProviderKey && googleAuthService.isKnownDevice(user.getId, "web", fingerprint)) {
               Some(Results.Redirect(auth.getResolver.asInstanceOf[MyResolver].googleAuthenticaton.asInstanceOf[play.api.mvc.Call]))
             } else {
               // user is logged in

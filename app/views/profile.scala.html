@@ -47,15 +47,28 @@
     <p>
         @if(gauthService.isEnabled(localUser.id)) {
             @if(showSecrets) {
-                Secrets here
+                <h2>2 factor auth with Google Authenticator is enabled</h2>
+                <h2>Shared key:</h2>
+                <img src="https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr&chl=@helper.urlEncode("otpauth://totp/" + localUser.email.split("@")(0) + "?secret=" + gauthService.getUserSharedKey(localUser.id))"/>
+                <h2>Recovery tokens:</h2>
+                <li>
+                    @for(token <- gauthService.getUserRecoveryTokens(localUser.id)) {
+                        <ul>@{token}</ul>
+                    }
+                </li>
             } else {
-                <form action="@{routes.Application.disableGoogleAuthenticator()}">
+                <h2>2 factor auth with Google Authenticator is enabled</h2>
+
+                <form action="@{routes.Application.enableGoogleAuthenticator()}" method="POST">
+                    <input type="submit" class="btn btn-primary" value="Regenerate keys for 2-Factor auth"/>
+                </form>
+                <form action="@{routes.Application.disableGoogleAuthenticator()}" method="POST">
                     <input type="submit" class="btn btn-primary" value="Disable 2-Factor Auth"/>
                 </form>
             }
         } else {
                 <h2>2 factor auth with Google Authenticator is not enabled</h2>
-                <form action="@{routes.Application.enableGoogleAuthenticator()}">
+                <form action="@{routes.Application.enableGoogleAuthenticator()}" method="POST">
                     <input type="submit" class="btn btn-primary" value="Enable"/>
                 </form>
         }
