@@ -23,19 +23,7 @@ class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionCon
       request.jContextOption match {
         case Some(context) => {
           if (auth.isLoggedIn(context)) {
-
-            val user = auth.getUser(context)
-
-            // TODO
-            val fingerprint = context.request().remoteAddress()
-
-            if(googleAuthService.isEnabled(user.getId) && user.getProvider != googleAuthService.getProviderKey && googleAuthService.isKnownDevice(user.getId, "web", fingerprint)) {
-              Some(Results.Redirect(auth.getResolver.asInstanceOf[MyResolver].googleAuthenticaton.asInstanceOf[play.api.mvc.Call]))
-            } else {
-              // user is logged in
-              None
-            }
-
+            None
           } else {
             // user is not logged in
             // call this if you want to redirect your visitor to the page that

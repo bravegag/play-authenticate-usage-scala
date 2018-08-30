@@ -4,15 +4,16 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, reLoginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@import services.GoogleAuthService
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, messagesApi("playauthenticate.login.title"), jContext, "relogin") {
-    @if(reLoginForm.hasGlobalErrors) {
-        <p class="alert alert-warning">@reLoginForm.globalError.get.message</p>
+@main(userService, messagesApi("playauthenticate.login.title"), jContext, "login") {
+    @if(loginForm.hasGlobalErrors) {
+        <p class="alert alert-danger">@loginForm.globalError.get.message</p>
     }
     <div class="inner-bg">
         <div class="container">
@@ -20,8 +21,8 @@
                 <div class="col-sm-6 col-sm-offset-3 form-box">
                     <div class="form-top">
                         <div class="form-top-left">
-                            <h3>Accessing sensitive information</h3>
-                            <p>Please reenter your password to continue:</p>
+                            <h3>Login to our site</h3>
+                            <p>Enter your username and password to log on:</p>
                         </div>
                         <div class="form-top-right">
                             <i class="fa fa-key"></i>
@@ -30,18 +31,62 @@
                     <div class="form-bottom">
                         @* Display proprietary login form *@
                         @b3.vertical.form(routes.Application.doLogin) { implicit vfc =>
-                            @b3.hidden("email", reLoginForm.data("email"))
-                            @b3.inputWrapped("password", reLoginForm("password"), '_hiddenLabel -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
+                            @b3.inputWrapped("email", loginForm("email"), 'disabled -> "", '_label -> messagesApi("playauthenticate.login.email.placeholder"), '_showConstraints -> false, 'placeholder -> "example@mail.com") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                                    @input
+                                </div>
+                            }
+                            @b3.inputWrapped("password", loginForm("password"), 'disabled -> "", '_label -> messagesApi("playauthenticate.login.password.placeholder"), '_showConstraints -> false, 'placeholder -> "Password") { input =>
                                 <div class="input-group">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
                                     @input
                                 </div>
                             }
-                            @b3.hidden("rememberMe", reLoginForm.data("rememberMe"))
+                            <input type="hidden" name="email" value="@loginForm("email").value"/>
+                            <input type="hidden" name="password" value="@loginForm("password").value"/>
+
+
+                            @* Using \u00a0 instead of &nbsp; so that it doesn't get copied verbatim *@
+
+                            <h2>Please input one of the following:</h2>
+
+                            @b3.inputWrapped("gauthCode", loginForm("gauthCode"), '_label -> messagesApi("playauthenticate.login.gauthCode.placeholder"), '_showConstraints -> false, 'placeholder -> "Google Authenticator Code") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                    @input
+                                </div>
+                            }
+                            <p>or</p>
+                            @b3.inputWrapped("recoveryToken", loginForm("recoveryToken"), '_label -> messagesApi("playauthenticate.login.recoveryToken.placeholder"), '_showConstraints -> false, 'placeholder -> "Recovery Code") { input =>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                    @input
+                                </div>
+                            }
+
+                            @b3.checkbox(loginForm("rememberMe"), '_text -> ("\u00a0" + messagesApi("playauthenticate.login.rememberme.placeholder")))
+
+
                             @b3.submit('class -> "btn btn-default") {
                                 @messagesApi("playauthenticate.login.now")
                             }
                             <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@messagesApi("playauthenticate.login.forgot.password")</a>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 social-login">
+                    <div class="social-login-buttons">
+                        @messagesApi("playauthenticate.login.oauth")
+                        @* Display list of available providers *@
+                        @_providerPartial(playAuth, skipCurrent=false)
+                        @providerAvailable("basic") { available: java.lang.Boolean =>
+                            @if(available) {
+                                <br>
+                                <a href='@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic", false)'>@messagesApi("playauthenticate.login.basic")</a>
+                            }
                         }
                     </div>
                 </div>

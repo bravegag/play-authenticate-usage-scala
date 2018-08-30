@@ -115,10 +115,29 @@ class Application @Inject() (implicit
             },
             formSuccess => {
               // everything was filled
+
               val result = JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext, formSuccess.isRememberMe))
-              Option(jContext.session().remove(SessionKey.REDIRECT_TO_URI_KEY)).map { uri =>
-                result.withHeaders(LOCATION -> uri)
-              }.getOrElse(result)
+
+              def authorize(): Result =
+                Option(jContext.session().remove(SessionKey.REDIRECT_TO_URI_KEY)).map { uri =>
+                  result.withHeaders(LOCATION -> uri)
+                }.getOrElse(result)
+
+              auth.getUser(jContext) match {
+                case null =>
+                  result
+                case user if googleAuthService.isEnabled(user.getId) =>
+                  (formSuccess.gauthCode, formSuccess.recoveryCode) match {
+                    case (Some(gauthCode), _) if googleAuthService.isValidGAuthCode(user.getId, gauthCode) =>
+                      authorize()
+                    case (_, Some(recoveryCode)) if googleAuthService.tryAuthenticateWithRecoveryToken(user.getId, recoveryCode) =>
+                      authorize()
+                    case _ =>
+                      auth.logout(jContext)
+                      Ok(views.html.googleAuthentication(auth, userService, formContext.loginForm.Instance.fill(formSuccess)))
+                  }
+                case user => authorize()
+              }
             }
           )
         }
@@ -182,27 +201,10 @@ class Application @Inject() (implicit
             userService.findInSession(jContext.session) match {
               case Some(user) =>
                 googleAuthService.disable(user.id)
-                Redirect(profile.asInstanceOf[Call])
+                Redirect(routes.Application.profile)
               case None =>
                 Ok("Current user not found")
             }
-          }
-        }
-      }
-    }
-
-  def googleAuthentication =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
-        deadbolt.WithAuthRequest()() { implicit request =>
-          Future {
-            // taking chances here
-            val authUser = userService.findInSession(jContext.session).get
-            // partially initialize the Login form to only miss the password
-            val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
-              email = authUser.email.toString, password = "", isRememberMe = true))
-            // everything was filled
-            Ok(views.html.googleAuthentication(auth, userService, updatedForm))
           }
         }
       }

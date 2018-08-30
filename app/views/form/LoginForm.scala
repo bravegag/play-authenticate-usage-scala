@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.MessagesApi
 
-case class Login(email: String, password: String, isRememberMe: Boolean) extends MyUsernamePassword
+case class Login(email: String, password: String, isRememberMe: Boolean, gauthCode: Option[Int] = None, recoveryCode: Option[String] = None) extends MyUsernamePassword
 
 @Singleton
 class LoginForm @Inject() (implicit val messagesApi: MessagesApi) {
@@ -14,7 +14,9 @@ class LoginForm @Inject() (implicit val messagesApi: MessagesApi) {
     mapping(
       "email" -> email,
       "password" -> nonEmptyText(minLength = 5),
-      "rememberMe" -> boolean
+      "rememberMe" -> boolean,
+      "gauthCode" -> optional(number),
+      "recoveryCode" -> optional(text)
     )(Login.apply)(Login.unapply)
   }
 }

@@ -25,16 +25,21 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
     }
   }
 
-  override def isValidGAuthCode(userId: Long, code: Int): Boolean = {
-    val sharedSecretOpt : Option[String] = getSharedSecret(userId).map(_.providerUserId)
-    sharedSecretOpt.fold(false) { secret =>
-      googleAuthenticator.authorize(secret, code)
+  override def isValidGAuthCode(userEmail: String, code: Int): Boolean = {
+    getUserIdByEmail(userEmail).fold(false) { userId => {
+        val sharedSecretOpt : Option[String] = getSharedSecret(userId).map(_.providerUserId)
+        sharedSecretOpt.fold(false) { secret =>
+          googleAuthenticator.authorize(secret, code)
+        }
+      }
     }
   }
 
-  override def tryAuthenticateWithRecoveryToken(userId: Long, recoveryToken: String): Boolean = {
-    daoContext.gauthRecoveryTokenDao.findByToken(userId, recoveryToken).fold(false) { token =>
-      daoContext.gauthRecoveryTokenDao.markAsUsed(token).map(_ => true)
+  override def tryAuthenticateWithRecoveryToken(userEmail: String, recoveryToken: String): Boolean = {
+    getUserIdByEmail(userEmail).fold(false) { userId =>
+      daoContext.gauthRecoveryTokenDao.findByToken(userId, recoveryToken).fold(false) { token =>
+        daoContext.gauthRecoveryTokenDao.markAsUsed(token).map(_ => true)
+      }
     }
   }
 
@@ -58,7 +63,8 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
   }
 
   override def disable(userId: Long): Unit = {
-    getSharedSecret(userId).map(_.id).map(linkedAccountDao.delete)
+    getSharedSecret(userId).map(_.providerUserId).foreach(key => await(linkedAccountDao.deleteByProvider(PROVIDER_KEY, key)))
+    await(daoContext.gauthRecoveryTokenDao.delete(userId))
   }
 
   override def isEnabled(userId: Long): Boolean = {

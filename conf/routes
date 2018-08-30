@@ -22,7 +22,6 @@ POST    /signup                             controllers.Application.doSignup
 
 POST    /enableGoogleAuthenticator          controllers.Application.enableGoogleAuthenticator
 POST    /disableGoogleAuthenticator         controllers.Application.disableGoogleAuthenticator
-POST    /gauth                              controllers.Application.googleAuthentication
 GET     /enableGoogleAuthenticator          controllers.Application.profile
 
 

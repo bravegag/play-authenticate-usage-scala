@@ -21,10 +21,6 @@ class MyResolver extends Resolver {
     routes.Application.relogin
   }
 
-  def googleAuthenticaton: Call = {
-    routes.Application.googleAuthentication
-  }
-
   //------------------------------------------------------------------------
   override def afterAuth: Call = {
     // The user will be redirected to this page after authentication

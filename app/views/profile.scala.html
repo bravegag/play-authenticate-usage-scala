@@ -49,7 +49,7 @@
             @if(showSecrets) {
                 <h2>2 factor auth with Google Authenticator is enabled</h2>
                 <h2>Shared key:</h2>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=@helper.urlEncode("otpauth://totp/" + localUser.email.split("@")(0) + "?secret=" + gauthService.getUserSharedKey(localUser.id))"/>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=@helper.urlEncode("otpauth://totp/" + localUser.email.split("@")(0) + "@scala-usage?secret=" + gauthService.getUserSharedKey(localUser.id))"/>
                 <h2>Recovery tokens:</h2>
                 <ul>
                     @for(token <- gauthService.getUserRecoveryTokens(localUser.id)) {

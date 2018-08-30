@@ -8,9 +8,9 @@ trait GoogleAuthService {
 
   def isKnownDevice(userEmail: String, deviceType: String, fingerprint: String): Boolean
 
-  def isValidGAuthCode(userId: Long, code: Int): Boolean
+  def isValidGAuthCode(userEmail: String, code: Int): Boolean
 
-  def tryAuthenticateWithRecoveryToken(userId: Long, recoveryToken: String): Boolean
+  def tryAuthenticateWithRecoveryToken(userEmail: String, recoveryToken: String): Boolean
 
   type RecoveryToken = String
   type SharedSecret = String
