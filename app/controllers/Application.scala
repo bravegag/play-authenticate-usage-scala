@@ -196,7 +196,13 @@ class Application @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            Ok("")
+            // taking chances here
+            val authUser = userService.findInSession(jContext.session).get
+            // partially initialize the Login form to only miss the password
+            val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
+              email = authUser.email.toString, password = "", isRememberMe = true))
+            // everything was filled
+            Ok(views.html.googleAuthentication(auth, userService, updatedForm))
           }
         }
       }

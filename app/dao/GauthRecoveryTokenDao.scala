@@ -24,6 +24,6 @@ class GauthRecoveryTokenDao @Inject()(protected val dbConfigProvider: DatabaseCo
   }
 
   def findByUser(userId: Long): Future[Seq[GauthRecoveryTokenRow]] = {
-    db.run(GauthRecoveryToken.filter(t => t.userId === userId && t.used.isDefined).result)
+    db.run(GauthRecoveryToken.filter(t => t.userId === userId && !t.used.isDefined).result)
   }
 }
