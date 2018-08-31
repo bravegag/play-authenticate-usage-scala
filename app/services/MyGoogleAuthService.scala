@@ -38,7 +38,11 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
   override def tryAuthenticateWithRecoveryToken(userEmail: String, recoveryToken: String): Boolean = {
     getUserIdByEmail(userEmail).fold(false) { userId =>
       daoContext.gauthRecoveryTokenDao.findByToken(userId, recoveryToken).fold(false) { token =>
-        daoContext.gauthRecoveryTokenDao.markAsUsed(token).map(_ => true)
+        if(token.used.isEmpty) {
+          daoContext.gauthRecoveryTokenDao.markAsUsed(token).map(_ => true)
+        } else {
+          false
+        }
       }
     }
   }

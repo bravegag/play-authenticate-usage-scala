@@ -5,7 +5,7 @@ import actions.{NoCache, SudoForbidCookieAuthAction, TryCookieAuthAction}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
-import constants.{SecurityRoleKey, SessionKey}
+import constants.{FlashKey, SecurityRoleKey, SessionKey}
 import play.api.mvc._
 import services.{GoogleAuthService, UserService}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -133,8 +133,17 @@ class Application @Inject() (implicit
                     case (_, Some(recoveryCode)) if googleAuthService.tryAuthenticateWithRecoveryToken(user.getId, recoveryCode) =>
                       authorize()
                     case _ =>
+                      val form = formContext.loginForm.Instance.fill(formSuccess)
+                      val formWithError =
+                        if(formSuccess.gauthCode.isDefined) {
+                          form.withGlobalError(messagesApi("playauthenticate.gauthCode.login.invalid_code"))
+                        } else if(formSuccess.recoveryCode.exists(_.nonEmpty)) {
+                          form.withGlobalError(messagesApi("playauthenticate.recoveryToken.login.invalid_token"))
+                        } else {
+                          form
+                        }
                       auth.logout(jContext)
-                      Ok(views.html.googleAuthentication(auth, userService, formContext.loginForm.Instance.fill(formSuccess)))
+                      Ok(views.html.googleAuthentication(auth, userService, formWithError))
                   }
                 case user => authorize()
               }
