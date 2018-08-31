@@ -16,7 +16,7 @@ class LoginForm @Inject() (implicit val messagesApi: MessagesApi) {
       "password" -> nonEmptyText(minLength = 5),
       "rememberMe" -> boolean,
       "gauthCode" -> optional(number),
-      "recoveryCode" -> optional(text)
+      "recoveryToken" -> optional(text)
     )(Login.apply)(Login.unapply)
   }
 }

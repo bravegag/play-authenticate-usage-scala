@@ -20,7 +20,8 @@ class GauthRecoveryTokenDao @Inject()(protected val dbConfigProvider: DatabaseCo
   }
 
   def markAsUsed(gauthRecoveryTokenRow: GauthRecoveryTokenRow): Future[Unit] = {
-    db.run(GauthRecoveryToken.update(gauthRecoveryTokenRow.copy(used = Some(new Timestamp(new Date().getTime))))).map(_ => ())
+    db.run(GauthRecoveryToken.filter(t => t.userId === gauthRecoveryTokenRow.userId && t.token === gauthRecoveryTokenRow.token)
+      .update(gauthRecoveryTokenRow.copy(used = Some(new Timestamp(new Date().getTime))))).map(_ => ())
   }
 
   def findByUser(userId: Long): Future[Seq[GauthRecoveryTokenRow]] = {

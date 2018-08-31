@@ -66,6 +66,9 @@ playauthenticate.login.forgot.password=Forgot your password?
 playauthenticate.login.oauth=... or log in using one of the following providers:
 playauthenticate.login.basic=or try HTTP basic auth (as example/secret)
 
+playauthenticate.login.gauthCode.placeholder=Google Authenticator Code
+playauthenticate.login.recoveryToken.placeholder=One-time recovery token
+
 playauthenticate.signup.title=Signup
 playauthenticate.signup.name=Your name
 playauthenticate.signup.now=Sign up now
