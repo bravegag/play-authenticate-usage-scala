@@ -61,5 +61,8 @@ trait UserService {
   def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): AuthUser
 
   //------------------------------------------------------------------------
+  def unlink(otherAuthUser: AuthUser): Unit
+
+  //------------------------------------------------------------------------
   def update(authUser: AuthUser): AuthUser
 }

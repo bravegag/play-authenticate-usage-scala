@@ -4,14 +4,14 @@ import be.objectify.deadbolt.scala.{DeadboltHandler, ExecutionContextProvider, H
 import be.objectify.deadbolt.scala.cache.HandlerCache
 import javax.inject.Inject
 import javax.inject.Singleton
-
 import com.feth.play.module.pa.PlayAuthenticate
-import services.UserService;
+import services.{GoogleAuthService, UserService};
 
 @Singleton
 class MyHandlerCache @Inject() (auth: PlayAuthenticate,
 																context: ExecutionContextProvider,
-																userService: UserService) extends HandlerCache {
+																userService: UserService,
+																googleAuthService: GoogleAuthService) extends HandlerCache {
 	//------------------------------------------------------------------------
 	// public
 	//------------------------------------------------------------------------
@@ -23,5 +23,5 @@ class MyHandlerCache @Inject() (auth: PlayAuthenticate,
 	//------------------------------------------------------------------------
 	// private
 	//------------------------------------------------------------------------
-	private lazy val myDeadboltHandler = new MyDeadboltHandler()(auth, context, userService)
+	private lazy val myDeadboltHandler = new MyDeadboltHandler()(auth, context, userService, googleAuthService)
 }

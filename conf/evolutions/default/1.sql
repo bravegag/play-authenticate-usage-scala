@@ -17,10 +17,19 @@ CREATE TABLE "user" (
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE cookie_token_series (
+    user_id BIGINT NOT NULL,
+    series VARCHAR(50) NOT NULL,
+    token VARCHAR(50) NOT NULL,
+    created TIMESTAMP,
+    modified TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES "user"(id)
+);
+
 CREATE TABLE linked_account (
 	user_id BIGINT NOT NULL,
-	provider_key VARCHAR(255) NOT NULL,
-	provider_password VARCHAR(255) NOT NULL,
+    provider_user_id VARCHAR(100) NOT NULL,
+	provider_key VARCHAR(50) NOT NULL,
 	modified TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
@@ -42,7 +51,7 @@ CREATE TABLE user_security_role (
 
 CREATE TABLE token_action (
 	user_id BIGINT NOT NULL,
-	token VARCHAR(255) UNIQUE NOT NULL,
+	token VARCHAR(50) UNIQUE NOT NULL,
 	"type" CHAR(2) NOT NULL,
 	created TIMESTAMP NOT NULL,
 	expires TIMESTAMP NOT NULL,
@@ -64,8 +73,32 @@ CREATE TABLE user_security_permission (
 	modified TIMESTAMP,
 	PRIMARY KEY (user_id, security_permission_id),
 	FOREIGN KEY (user_id) REFERENCES "user"(id),
-	FOREIGN KEY (security_permission_id) REFERENCES security_permission(id)	
+	FOREIGN KEY (security_permission_id) REFERENCES security_permission(id)
 );
+
+CREATE TABLE user_device (
+  user_id BIGINT NOT NULL,
+  "type" VARCHAR(50) NOT NULL,
+  fingerprint VARCHAR(500) NOT NULL,
+  created TIMESTAMP NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES "user"(id)
+);
+
+CREATE TABLE gauth_recovery_token (
+  user_id BIGINT NOT NULL,
+  token VARCHAR(60) NOT NULL,
+  created TIMESTAMP NOT NULL,
+  used TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES "user"(id)
+);
+
+CREATE OR REPLACE FUNCTION update_created()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.created = now();;
+    RETURN NEW;;
+END;;
+$$ language 'plpgsql';
 
 CREATE OR REPLACE FUNCTION update_modified()
 RETURNS TRIGGER AS $$
@@ -77,6 +110,10 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_modified_user BEFORE UPDATE OR INSERT ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_linked_account BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
+CREATE TRIGGER update_created_cookie_token_series BEFORE INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_created();
+CREATE TRIGGER update_created_gauth_recovery_token BEFORE INSERT ON gauth_recovery_token FOR EACH ROW EXECUTE PROCEDURE update_created();
+CREATE TRIGGER update_created_user_device BEFORE INSERT ON user_device FOR EACH ROW EXECUTE PROCEDURE update_created();
+CREATE TRIGGER update_modified_cookie_token_series BEFORE UPDATE OR INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE OR INSERT ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_token_action BEFORE UPDATE OR INSERT ON token_action FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_security_permission BEFORE UPDATE OR INSERT ON security_permission FOR EACH ROW EXECUTE PROCEDURE update_modified();
@@ -97,8 +134,16 @@ DROP TABLE user_security_role CASCADE;
 
 DROP TABLE security_role CASCADE;
 
+DROP TABLE cookie_token_series CASCADE;
+
+DROP TABLE gauth_recovery_token CASCADE;
+
+DROP TABLE user_device CASCADE;
+
 DROP TABLE linked_account CASCADE;
 
 DROP TABLE "user" CASCADE;
 
-DROP FUNCTION update_modified_column;
+DROP FUNCTION update_created;
+
+DROP FUNCTION update_modified;

@@ -9,7 +9,6 @@ import play.i18n.Lang
 import play.inject.ApplicationLifecycle
 import play.mvc.{Call, Http}
 import com.feth.play.module.mail.Mailer.Mail.Body
-
 import services._
 import views.form._
 import javax.inject.Inject
@@ -23,6 +22,10 @@ import play.api.i18n.MessagesApi
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider._
+import helpers.RequestHelpers
+import play.api.mvc.{AnyContent, AnyContentAsFormUrlEncoded, Request}
+import play.core.j.RequestHeaderImpl
+import play.mvc.Http.RequestBody
 
 @Singleton
 class MyAuthProvider @Inject()(implicit
@@ -79,15 +82,15 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   override protected def getSignup(context: Http.Context): Signup = {
-    require(context.request()._underlyingRequest != null, "request _underlying must not be null")
-    val filledForm = formContext.signupForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    val request = RequestHelpers.parseRequest(context.request())
+    val filledForm = formContext.signupForm.Instance.bindFromRequest(request)
     filledForm.get
   }
 
   //-------------------------------------------------------------------
   override protected def getLogin(context: Http.Context): Login = {
-    require(context.request()._underlyingRequest != null, "request _underlying must not be null")
-    val filledForm = formContext.loginForm.Instance.bindFromRequest()(context.request()._underlyingRequest)
+    val request = RequestHelpers.parseRequest(context.request())
+    val filledForm = formContext.loginForm.Instance.bindFromRequest(request)
     filledForm.get
   }
 
@@ -130,7 +133,7 @@ class MyAuthProvider @Inject()(implicit
 
         } else {
           val result = user.linkedAccounts.count { linkedAccount =>
-            getKey == linkedAccount.providerKey && authUser.checkPassword(linkedAccount.providerPassword, authUser.getPassword)
+            getKey == linkedAccount.providerKey && authUser.checkPassword(linkedAccount.providerUserId, authUser.getPassword)
           }
 
           result match {

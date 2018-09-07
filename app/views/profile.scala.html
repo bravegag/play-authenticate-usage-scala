@@ -5,12 +5,13 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets)
+@import services.GoogleAuthService
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow, gauthService: GoogleAuthService, showSecrets: Boolean = false)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
 
 @import com.feth.play.module.pa.views.html._
-@import utils.FormatUtils._
+@import helpers.FormatHelpers._
 
-@main(userService, messagesApi("playauthenticate.profile.title"),"profile") {
+@main(userService, messagesApi("playauthenticate.profile.title"), jContext, "profile") {
 
 <h1>@messagesApi("playauthenticate.profile.title")</h1>
 <p>
@@ -42,6 +43,37 @@
     <br/>
     }
     }
+
+    <p>
+        @if(gauthService.isEnabled(localUser.id)) {
+            @if(showSecrets) {
+                <h2>2 factor auth with Google Authenticator is enabled</h2>
+                <h2>Shared key:</h2>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=@helper.urlEncode("otpauth://totp/" + localUser.email.split("@")(0) + "@scala-usage?secret=" + gauthService.getUserSharedKey(localUser.id))"/>
+                <h2>Recovery tokens:</h2>
+                <ul>
+                    @for(token <- gauthService.getUserRecoveryTokens(localUser.id)) {
+                        <li>@{token}</li>
+                    }
+                </ul>
+            } else {
+                <h2>2 factor auth with Google Authenticator is enabled</h2>
+
+                <form action="@{routes.Application.enableGoogleAuthenticator()}" method="POST">
+                    <input type="submit" class="btn btn-primary" value="Regenerate keys for 2-Factor auth"/>
+                </form>
+                <form action="@{routes.Application.disableGoogleAuthenticator()}" method="POST">
+                    <input type="submit" class="btn btn-primary" value="Disable 2-Factor Auth"/>
+                </form>
+            }
+        } else {
+                <h2>2 factor auth with Google Authenticator is not enabled</h2>
+                <form action="@{routes.Application.enableGoogleAuthenticator()}" method="POST">
+                    <input type="submit" class="btn btn-primary" value="Enable"/>
+                </form>
+        }
+    </p>
+
 
     <br/>
     @play.core.j.JavaHelpers.withContext(request) { jContext =>

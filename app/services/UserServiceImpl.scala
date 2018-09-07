@@ -18,7 +18,7 @@ import generated.Tables.{LinkedAccountRow, UserRow}
 @Singleton
 class UserServiceImpl @Inject()(auth : PlayAuthenticate,
                                 daoContext: DaoContext) extends AbstractUserService(auth) with UserService {
-  import utils.AwaitUtils._
+  import helpers.AwaitHelpers._
 
   //------------------------------------------------------------------------
   // public
@@ -53,7 +53,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
     val securityRole = daoContext.securityRoleDao.findByName(SecurityRoleKey.USER_ROLE).get
 
     // initialize linked account
-    val linkedAccount = LinkedAccountRow(0L, authUser.getProvider, authUser.getId, None)
+    val linkedAccount = LinkedAccountRow(0L, authUser.getId, authUser.getProvider, None)
 
     daoContext.userDao.create(newUser, securityRole, linkedAccount)
   }
@@ -93,7 +93,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
       case Some(linkedAccount) => linkedAccount
       case None => {
         if (create) {
-          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getProvider, authUser.getId, None)
+          val newLinkedAccount = LinkedAccountRow(user.id, authUser.getId, authUser.getProvider, None)
           daoContext.linkedAccountDao.create(newLinkedAccount)
           newLinkedAccount
 
@@ -102,7 +102,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
         }
       }
     }
-    daoContext.linkedAccountDao.update(linkedAccount.copy(providerPassword = authUser.getHashedPassword))
+    daoContext.linkedAccountDao.update(linkedAccount.copy(providerUserId = authUser.getHashedPassword))
   }
 
   //------------------------------------------------------------------------
@@ -131,7 +131,7 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   override def findByAuthUser(identity: AuthUserIdentity): Option[UserRow] = {
     Option(identity) match {
       case Some(authUser: UsernamePasswordAuthUser) => daoContext.userDao.findActiveByProviderKeyAndEmail(authUser.getProvider, authUser.getEmail)
-      case Some(authUser: AuthUserIdentity) => daoContext.userDao.findActiveByProviderKeyAndPassword(authUser.getProvider, authUser.getId)
+      case Some(authUser: AuthUserIdentity) => daoContext.userDao.findActiveByProvider(authUser.getProvider, authUser.getId)
       case _ => None
     }
   }
@@ -184,17 +184,23 @@ class UserServiceImpl @Inject()(auth : PlayAuthenticate,
   override def link(oldAuthUser: AuthUser, newAuthUser: AuthUser): AuthUser = {
     if (!oldAuthUser.equals(newAuthUser)) {
       val oldUserOpt = findByAuthUser(oldAuthUser)
-      val newUserOpt = findByAuthUser(newAuthUser)
 
-      (oldUserOpt, newUserOpt) match {
-        case (Some(oldUser: UserRow), Some(_)) => {
+      oldUserOpt match {
+        case Some(oldUser: UserRow) => {
           // link the two users
-          daoContext.linkedAccountDao.create(oldUser, newAuthUser.getProvider, newAuthUser.getId)
+          daoContext.linkedAccountDao.create(oldUser, providerUserId = newAuthUser.getId,
+            providerKey = newAuthUser.getProvider)
         }
         case _ => // TODO: the most sensible thing to do is to throw an exception
       }
     }
     newAuthUser
+  }
+
+  //------------------------------------------------------------------------
+  override def unlink(knownUser: AuthUser): Unit = {
+    // deletes the linked account by provider and provider user id
+    daoContext.linkedAccountDao.deleteByProvider(knownUser.getProvider, knownUser.getId)
   }
 
   //------------------------------------------------------------------------

@@ -5,13 +5,13 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import com.nappin.play.recaptcha.WidgetHelper
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, messagesApi("playauthenticate.signup.title"),"signup") {
+@main(userService, messagesApi("playauthenticate.signup.title"), jContext, "signup") {
     @if(signupForm.hasGlobalErrors) {
         <p class="alert alert-danger">@signupForm.globalError.get.message</p>
     }

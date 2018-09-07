@@ -1,10 +1,10 @@
-package utils
+package helpers
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import scala.util.DynamicVariable
 
-object FormatUtils {
+object FormatHelpers {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------

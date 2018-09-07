@@ -48,6 +48,8 @@ playauthenticate.change_password.success=Password has been changed successfully.
 
 playauthenticate.password.signup.error.passwords_not_same=Passwords do not match.
 playauthenticate.password.login.unknown_user_or_pw=Unknown user or password.
+playauthenticate.gauthCode.login.invalid_code=Invalid Google Authenticator code
+playauthenticate.recoveryToken.login.invalid_token=Invalid Recovery Token
 
 playauthenticate.password.verify_signup.subject=PlayAuthenticate: Complete your signup
 playauthenticate.password.verify_email.subject=PlayAuthenticate: Confirm your e-mail address
@@ -57,6 +59,7 @@ playauthenticate.password.reset_email.subject=PlayAuthenticate: How to reset you
 
 playauthenticate.login.email.placeholder=Your e-mail address
 playauthenticate.login.password.placeholder=Choose a password
+playauthenticate.login.rememberme.placeholder=Remember me?
 playauthenticate.login.password.repeat=Repeat chosen password
 playauthenticate.login.title=Login
 playauthenticate.login.password.placeholder=Password
@@ -64,6 +67,9 @@ playauthenticate.login.now=Login now
 playauthenticate.login.forgot.password=Forgot your password?
 playauthenticate.login.oauth=... or log in using one of the following providers:
 playauthenticate.login.basic=or try HTTP basic auth (as example/secret)
+
+playauthenticate.login.gauthCode.placeholder=Google Authenticator Code
+playauthenticate.login.recoveryToken.placeholder=One-time recovery token
 
 playauthenticate.signup.title=Signup
 playauthenticate.signup.name=Your name

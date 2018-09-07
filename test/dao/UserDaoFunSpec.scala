@@ -4,11 +4,11 @@ import constants.SecurityRoleKey
 import generated.Tables.{LinkedAccountRow, SecurityRoleRow, UserRow}
 import org.scalatest.Matchers
 import play.api.test.WithApplication
-import utils.AwaitUtils
+import helpers.AwaitHelpers
 import be.objectify.deadbolt.scala.models.{Role, Permission}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import utils.AwaitUtils._
+import helpers.AwaitHelpers._
 
 class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
   //------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       val result = (for {
         user <- dao.userDao.createAndFetch(UserRow(id = 0L, username = "test", email = "test@test.test", modified = None))
@@ -46,14 +46,14 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       // initialize the security role as we know it exists
       val securityRole = SecurityRoleRow(id = 1L, name = SecurityRoleKey.USER_ROLE.toString)
 
       val result = (for {
         user <- dao.userDao.create(UserRow(id = 0L, username = "test", email = "test@test.test",
-          active = true, modified = None), securityRole, LinkedAccountRow(0L, "password", "xxx", None))
+          active = true, modified = None), securityRole, LinkedAccountRow(0L, "xxx", "password", None))
         linkedAccount <- dao.userDao.linkedAccounts(user)
         securityRoles <- dao.userDao.roles(user)
         permissions <- dao.userDao.permissions(user)
@@ -75,8 +75,8 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
         linkedAccounts.size should equal (1)
         val linkedAccount = linkedAccounts.head
         linkedAccount.userId should equal (user.id)
+        linkedAccount.providerUserId should equal("xxx")
         linkedAccount.providerKey should equal ("password")
-        linkedAccount.providerPassword should equal ("xxx")
         linkedAccount.modified should not be None
       }
 
@@ -113,7 +113,7 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
 
         // reuses the user created in the previous test
         val user: Option[UserRow] = (for {
-          user <- dao.userDao.findActiveByProviderKeyAndPassword("password", "xxx")
+          user <- dao.userDao.findActiveByProvider("password", "xxx")
         } yield user)
 
         it("the user was found") {
@@ -170,8 +170,8 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers {
           linkedAccounts.size should equal (1)
           val linkedAccount = linkedAccounts.head
           linkedAccount.userId should equal (targetUser.id)
+          linkedAccount.providerUserId should equal("xxx")
           linkedAccount.providerKey should equal ("password")
-          linkedAccount.providerPassword should equal ("xxx")
           linkedAccount.modified should not be (None)
         }
 

@@ -75,7 +75,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     }
 
   //------------------------------------------------------------------------
-  def findActiveByProviderKeyAndPassword(providerKey: String, providerPassword: String): Future[Option[UserRow]] = {
+  def findActiveByProvider(providerKey: String, providerUserId: String): Future[Option[UserRow]] = {
     val action = sql"""
           SELECT t1.*
           FROM "#${User.baseTableRow.tableName}" t1
@@ -83,7 +83,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
             AND EXISTS (SELECT * FROM #${LinkedAccount.baseTableRow.tableName} t2
                         WHERE t2.user_id=t1.id
                           AND t2.provider_key=$providerKey
-                          AND t2.provider_password=$providerPassword)
+                          AND t2.provider_user_id=$providerUserId)
       """.as[UserRow].headOption
     db.run(action)
   }
@@ -102,7 +102,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     val selectAction = (for {
       linkedAccount <- LinkedAccount
       user <- User if user.id === sourceUser.id && user.id === linkedAccount.userId
-    } yield (targetUser.id, linkedAccount.providerKey, linkedAccount.providerPassword, linkedAccount.modified)).
+    } yield (targetUser.id, linkedAccount.providerUserId, linkedAccount.providerKey, linkedAccount.modified)).
       result.map(seq => seq.map(LinkedAccountRow.tupled))
 
     // define an insert DBIOAction to insert all the selected linked accounts from sourceUser to targetUser

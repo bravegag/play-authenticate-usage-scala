@@ -3,10 +3,10 @@ package dao
 import generated.Tables.{LinkedAccountRow, UserRow}
 import org.scalatest.Matchers
 import play.api.test.WithApplication
-import utils.AwaitUtils
+import helpers.AwaitHelpers
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import utils.AwaitUtils._
+import helpers.AwaitHelpers._
 
 import scala.Long
 
@@ -18,13 +18,13 @@ class LinkedAccountDaoFunSpec extends AbstractDaoFunSpec with Matchers {
     new WithApplication() {
       val dao = daoContext
       // ensure repeatability of the test
-      AwaitUtils.await(dao.userDao.deleteAll)
+      AwaitHelpers.await(dao.userDao.deleteAll)
 
       val user = UserRow(id = 0L, username = "test", email = "test@test.test", modified = None)
 
       val result: Option[LinkedAccountRow] = (for {
         user <- dao.userDao.createAndFetch(user)
-        _ <- dao.linkedAccountDao.create(user, "password", "xxx")
+        _ <- dao.linkedAccountDao.create(user, "xxx", "xxx")
         linkedAccount <- dao.linkedAccountDao.findById(user.id)
       } yield linkedAccount)
 
@@ -32,8 +32,8 @@ class LinkedAccountDaoFunSpec extends AbstractDaoFunSpec with Matchers {
         result should not be None
         val linkedAccount = result.get
         linkedAccount.userId should equal(1L)
+        linkedAccount.providerUserId should equal("xxx")
         linkedAccount.providerKey should equal("password")
-        linkedAccount.providerPassword should equal("xxx")
       }
     }
   }
@@ -54,8 +54,8 @@ class LinkedAccountDaoFunSpec extends AbstractDaoFunSpec with Matchers {
         linkedAccounts.size should be (1)
         val linkedAccount = linkedAccounts.head
         linkedAccount.userId should equal(1L)
+        linkedAccount.providerUserId should equal("xxx")
         linkedAccount.providerKey should equal("password")
-        linkedAccount.providerPassword should equal("xxx")
       }
     }
   }

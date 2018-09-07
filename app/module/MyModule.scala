@@ -6,7 +6,7 @@ import com.feth.play.module.pa.Resolver
 import com.feth.play.module.pa.providers.openid.OpenIdAuthProvider
 import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.FactoryModuleBuilder
-import providers.{MyAuthProvider, MyResolver}
+import providers.{MyAuthProvider, MyCookieAuthProvider, MyResolver}
 import services._
 
 class MyModule extends AbstractModule {
@@ -18,8 +18,10 @@ class MyModule extends AbstractModule {
 
     bind(classOf[Resolver]).to(classOf[MyResolver])
     bind(classOf[UserService]).to(classOf[UserServiceImpl]).asEagerSingleton()
+    bind(classOf[GoogleAuthService]).to(classOf[MyGoogleAuthService]).asEagerSingleton()
     bind(classOf[TokenActionService]).to(classOf[TokenActionServiceImpl]).asEagerSingleton()
     bind(classOf[MyAuthProvider]).asEagerSingleton()
     bind(classOf[OpenIdAuthProvider]).asEagerSingleton()
+    bind(classOf[MyCookieAuthProvider]).asEagerSingleton()
   }
 }
