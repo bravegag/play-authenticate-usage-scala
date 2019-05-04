@@ -62,19 +62,19 @@ trait Tables {
    *  @param token Database column token SqlType(varchar), Length(60,true)
    *  @param created Database column created SqlType(timestamp)
    *  @param used Database column used SqlType(timestamp), Default(None) */
-  case class GauthRecoveryTokenRow(userId: Long, token: String, created: java.sql.Timestamp, used: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
+  case class GoogleAuthRecoveryTokenRow(userId: Long, token: String, created: java.sql.Timestamp, used: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching GauthRecoveryTokenRow objects using plain SQL queries */
-  implicit def GetResultGauthRecoveryTokenRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[GauthRecoveryTokenRow] = GR{
+  implicit def GetResultGauthRecoveryTokenRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[GoogleAuthRecoveryTokenRow] = GR{
     prs => import prs._
-    GauthRecoveryTokenRow.tupled((<<[Long], <<[String], <<[java.sql.Timestamp], <<?[java.sql.Timestamp]))
+    GoogleAuthRecoveryTokenRow.tupled((<<[Long], <<[String], <<[java.sql.Timestamp], <<?[java.sql.Timestamp]))
   }
   /** Table description of table gauth_recovery_token. Objects of this class serve as prototypes for rows in queries. */
-  class GauthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GauthRecoveryTokenRow](_tableTag, "gauth_recovery_token") with IdentifyableTable[Long] {
+  class GauthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GoogleAuthRecoveryTokenRow](_tableTag, "gauth_recovery_token") with IdentifyableTable[Long] {
               override def id = userId
 
-    def * = (userId, token, created, used) <> (GauthRecoveryTokenRow.tupled, GauthRecoveryTokenRow.unapply)
+    def * = (userId, token, created, used) <> (GoogleAuthRecoveryTokenRow.tupled, GoogleAuthRecoveryTokenRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(userId), Rep.Some(token), Rep.Some(created), used).shaped.<>({r=>import r._; _1.map(_=> GauthRecoveryTokenRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(userId), Rep.Some(token), Rep.Some(created), used).shaped.<>({r=>import r._; _1.map(_=> GoogleAuthRecoveryTokenRow.tupled((_1.get, _2.get, _3.get, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(int8) */
     val userId: Rep[Long] = column[Long]("user_id")

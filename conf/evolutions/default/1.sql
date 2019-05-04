@@ -84,7 +84,7 @@ CREATE TABLE user_device (
   FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
-CREATE TABLE gauth_recovery_token (
+CREATE TABLE google_auth_recovery_token (
   user_id BIGINT NOT NULL,
   token VARCHAR(60) NOT NULL,
   created TIMESTAMP NOT NULL,
@@ -111,7 +111,7 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_modified_user BEFORE UPDATE OR INSERT ON "user" FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_linked_account BEFORE UPDATE OR INSERT ON linked_account FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_created_cookie_token_series BEFORE INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_created();
-CREATE TRIGGER update_created_gauth_recovery_token BEFORE INSERT ON gauth_recovery_token FOR EACH ROW EXECUTE PROCEDURE update_created();
+CREATE TRIGGER update_created_google_auth_recovery_token BEFORE INSERT ON google_auth_recovery_token FOR EACH ROW EXECUTE PROCEDURE update_created();
 CREATE TRIGGER update_created_user_device BEFORE INSERT ON user_device FOR EACH ROW EXECUTE PROCEDURE update_created();
 CREATE TRIGGER update_modified_cookie_token_series BEFORE UPDATE OR INSERT ON cookie_token_series FOR EACH ROW EXECUTE PROCEDURE update_modified();
 CREATE TRIGGER update_modified_user_security_role BEFORE UPDATE OR INSERT ON user_security_role FOR EACH ROW EXECUTE PROCEDURE update_modified();
@@ -136,7 +136,7 @@ DROP TABLE security_role CASCADE;
 
 DROP TABLE cookie_token_series CASCADE;
 
-DROP TABLE gauth_recovery_token CASCADE;
+DROP TABLE google_auth_recovery_token CASCADE;
 
 DROP TABLE user_device CASCADE;
 

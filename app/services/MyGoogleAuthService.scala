@@ -6,7 +6,7 @@ import java.util.UUID
 
 import com.warrenstrange.googleauth.GoogleAuthenticator
 import dao._
-import generated.Tables.{GauthRecoveryTokenRow, LinkedAccountRow}
+import generated.Tables.{GoogleAuthRecoveryTokenRow, LinkedAccountRow}
 import javax.inject.{Inject, Singleton}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -59,7 +59,7 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
     val tokens : Seq[String] =
       for(_ <- 1 to 8) yield {
         val token = UUID.randomUUID().toString
-        daoContext.gauthRecoveryTokenDao.create(GauthRecoveryTokenRow(userId, token, new Timestamp(new Date().getTime)))
+        daoContext.gauthRecoveryTokenDao.create(GoogleAuthRecoveryTokenRow(userId, token, new Timestamp(new Date().getTime)))
         token
       }
 
@@ -97,7 +97,7 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
   }
 
   override def getUserRecoveryTokens(userId: Long): Seq[RecoveryToken] = {
-    val recoveryTokens: Seq[GauthRecoveryTokenRow] = daoContext.gauthRecoveryTokenDao.findByUser(userId)
+    val recoveryTokens: Seq[GoogleAuthRecoveryTokenRow] = daoContext.gauthRecoveryTokenDao.findByUser(userId)
     recoveryTokens.map(_.token)
   }
 }

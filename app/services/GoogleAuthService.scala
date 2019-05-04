@@ -1,7 +1,6 @@
 package services
 
 trait GoogleAuthService {
-
   protected val PROVIDER_KEY : String = "gauth"
 
   def getProviderKey: String = PROVIDER_KEY
