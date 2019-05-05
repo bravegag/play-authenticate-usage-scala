@@ -3,8 +3,9 @@
 @import generated.Tables._
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
+@import org.webjars.play.WebJarAssets
 
-@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@(userService: UserService, localUser: Option[UserRow] = None)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @main(userService, messagesApi("playauthenticate.navigation.restricted"), jContext, "restricted") {
 <h1>@messagesApi("playauthenticate.navigation.restricted")</h1>

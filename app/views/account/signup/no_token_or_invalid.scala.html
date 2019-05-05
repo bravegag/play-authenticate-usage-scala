@@ -1,8 +1,9 @@
 @import services.UserService
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
+@import org.webjars.play.WebJarAssets
 
-@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @main(userService, messagesApi("playauthenticate.token.error.title"), jContext) {
 	<h1>@messagesApi("playauthenticate.token.error.title")</h1>

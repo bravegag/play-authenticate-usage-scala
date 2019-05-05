@@ -29,6 +29,7 @@ import play.mvc.Http.RequestBody
 
 @Singleton
 class MyAuthProvider @Inject()(implicit
+                               val lang: Lang,
                                val messagesApi: MessagesApi,
                                val userService: UserService,
                                val tokenActionService: TokenActionService,

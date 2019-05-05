@@ -6,8 +6,9 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Controller
+import org.webjars.play.WebJarAssets
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.mvc.{AbstractController, ControllerComponents}
 import play.core.j.JavaHelpers
 import play.mvc.Results
 import providers.{MyAuthProvider, MySignupAuthUser}
@@ -19,13 +20,14 @@ import ExecutionContext.Implicits.global
 
 @Singleton
 class Account @Inject() (implicit
-                         val messagesApi: MessagesApi,
+                         lang: Lang,
+                         controllerComponents: ControllerComponents,
                          webJarAssets: WebJarAssets,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
                          userService: UserService,
                          authProvider: MyAuthProvider,
-                         formContext: FormContext) extends Controller with I18nSupport {
+                         formContext: FormContext) extends AbstractController(controllerComponents) with I18nSupport {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------

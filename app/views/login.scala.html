@@ -3,8 +3,9 @@
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
+@import org.webjars.play.WebJarAssets
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import helper._
 @import b3.vertical.fieldConstructor

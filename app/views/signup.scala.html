@@ -4,8 +4,9 @@
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import com.nappin.play.recaptcha.WidgetHelper
+@import org.webjars.play.WebJarAssets
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import helper._
 @import b3.vertical.fieldConstructor

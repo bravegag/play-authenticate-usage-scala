@@ -1,14 +1,15 @@
 package controllers
 
 import javax.inject._
-import actions.{TryCookieAuthAction, NoCache}
+import actions.{NoCache, TryCookieAuthAction}
 
 import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, TokenActionKey}
+import org.webjars.play.WebJarAssets
 import play.api.mvc._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.core.j.JavaHelpers
 import providers._
 import services._
@@ -17,14 +18,15 @@ import views.form._
 
 @Singleton
 class Signup @Inject() (implicit
-                        val messagesApi: MessagesApi,
+                        lang: Lang,
+                        controllerComponents: ControllerComponents,
                         webJarAssets: WebJarAssets,
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
                         userService: UserService,
                         tokenActionService: TokenActionService,
                         authProvider: MyAuthProvider,
-                        formContext: FormContext) extends Controller with I18nSupport {
+                        formContext: FormContext) extends AbstractController(controllerComponents) with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
   import services.PluggableUserService._

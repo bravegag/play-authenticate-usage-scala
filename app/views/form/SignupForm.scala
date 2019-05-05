@@ -1,15 +1,14 @@
 package views.form
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
 
 case class Signup(email: String, password: String, repeatPassword: String, name: String) extends MyUsernamePassword
 
 @Singleton
-class SignupForm @Inject() (implicit val messagesApi: MessagesApi) {
+class SignupForm @Inject() (implicit val messagesApi: MessagesApi, lang: Lang) {
   val Instance = Form {
     mapping(
       "email" -> email,

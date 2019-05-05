@@ -3,8 +3,9 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import constants._
+@import org.webjars.play.WebJarAssets
 
-@(userService: UserService, title: String, jContext: play.mvc.Http.Context, nav: String = "")(content: Html)(implicit lang: Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
+@(userService: UserService, title: String, jContext: play.mvc.Http.Context, nav: String = "")(content: Html)(implicit lang: play.api.i18n.Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
 @import be.objectify.deadbolt.scala.views.html._
 

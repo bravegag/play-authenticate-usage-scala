@@ -13,8 +13,11 @@ import dao.DaoContext
 import services.UserService
 import java.time._
 
+import play.i18n.Lang
+
 @Singleton
 class MyCookieAuthProvider @Inject()(implicit
+                                     val lang: Lang,
                                      auth: PlayAuthenticate,
                                      lifecycle: ApplicationLifecycle,
                                      val userService: UserService,
