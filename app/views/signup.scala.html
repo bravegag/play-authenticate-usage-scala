@@ -6,7 +6,7 @@
 @import com.nappin.play.recaptcha.WidgetHelper
 @import org.webjars.play.WebJarsUtil
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, recaptchaWidget: recaptcha.recaptchaWidget, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import helper._
 @import b3.vertical.fieldConstructor
@@ -56,7 +56,7 @@
                                     @input
                                 </div>
                             }
-                            @_recaptchaFieldPartial(form=signupForm, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
+                            @_recaptchaFieldPartial(form=signupForm, recaptchaWidget=recaptchaWidget, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
                             @b3.submit('class -> "btn btn-default") {
                                 @messagesApi("playauthenticate.signup.now")
                             }

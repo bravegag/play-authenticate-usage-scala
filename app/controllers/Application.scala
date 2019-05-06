@@ -6,7 +6,7 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.{SecurityRoleKey, SessionKey}
-import org.webjars.play.{WebJarAssets, WebJarsUtil}
+import org.webjars.play._
 import play.api.mvc._
 import services.{GoogleAuthService, UserService}
 import play.api.i18n._
@@ -14,6 +14,7 @@ import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
 import providers.MyAuthProvider
 import views.form._
+import views.html.recaptcha
 
 @Singleton
 class Application @Inject() (implicit
@@ -27,7 +28,8 @@ class Application @Inject() (implicit
                              userService: UserService,
                              authProvider: MyAuthProvider,
                              formContext: FormContext,
-                             googleAuthService: GoogleAuthService) extends AbstractController(controllerComponents) with I18nSupport {
+                             googleAuthService: GoogleAuthService,
+                             recaptchaWidget: recaptcha.recaptchaWidget) extends AbstractController(controllerComponents) with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
 
