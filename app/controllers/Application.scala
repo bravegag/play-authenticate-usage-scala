@@ -6,7 +6,7 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.{SecurityRoleKey, SessionKey}
-import org.webjars.play.WebJarAssets
+import org.webjars.play.{WebJarAssets, WebJarsUtil}
 import play.api.mvc._
 import services.{GoogleAuthService, UserService}
 import play.api.i18n._
@@ -21,7 +21,7 @@ class Application @Inject() (implicit
                              lang: Lang,
                              controllerComponents: ControllerComponents,
                              widgetHelper: WidgetHelper,
-                             webJarAssets: WebJarAssets,
+                             webJarUtil: WebJarsUtil,
                              deadbolt: DeadboltActions,
                              auth: PlayAuthenticate,
                              userService: UserService,

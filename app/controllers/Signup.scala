@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, TokenActionKey}
-import org.webjars.play.WebJarAssets
+import org.webjars.play.{WebJarAssets, WebJarsUtil}
 import play.api.mvc._
 import play.api.i18n._
 import play.core.j.JavaHelpers
@@ -20,7 +20,7 @@ import views.form._
 class Signup @Inject() (implicit
                         lang: Lang,
                         controllerComponents: ControllerComponents,
-                        webJarAssets: WebJarAssets,
+                        webJarUtil: WebJarsUtil,
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
                         userService: UserService,

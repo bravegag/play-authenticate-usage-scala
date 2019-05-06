@@ -6,7 +6,7 @@ import be.objectify.deadbolt.scala.{DeadboltActions, DeadboltHandler}
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
-import org.webjars.play.WebJarAssets
+import org.webjars.play.WebJarsUtil
 import play.api.i18n._
 import play.api.mvc.{AbstractController, ControllerComponents}
 import play.core.j.JavaHelpers
@@ -21,7 +21,7 @@ import ExecutionContext.Implicits.global
 class Account @Inject() (implicit
                          lang: Lang,
                          controllerComponents: ControllerComponents,
-                         webJarAssets: WebJarAssets,
+                         webJarUtil: WebJarsUtil,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
                          userService: UserService,

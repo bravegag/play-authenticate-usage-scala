@@ -4,10 +4,10 @@
 @import generated.Tables._
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
-@import org.webjars.play.WebJarAssets
+@import org.webjars.play.WebJarsUtil
 
 @import services.GoogleAuthService
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow, gauthService: GoogleAuthService, showSecrets: Boolean = false)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow, gauthService: GoogleAuthService, showSecrets: Boolean = false)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import com.feth.play.module.pa.views.html._
 @import helpers.FormatHelpers._
