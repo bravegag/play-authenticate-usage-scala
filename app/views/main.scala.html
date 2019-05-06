@@ -27,9 +27,9 @@
         <link rel="stylesheet" href="@routes.Assets.versioned("css/azmind-style.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/azmind-form-elements.css")">
 
-        <script type="text/javascript" src="@webJarsUtil.requireJs(routes.Assets.versioned("jquery.min.js"))"></script>
-        <script type="text/javascript" src="@webJarsUtil.requireJs(routes.Assets.versioned("bootstrap.min.js"))"></script>
-        <script type="text/javascript" src="@webJarsUtil.requireJs(routes.Assets.versioned("bootstrap-datepicker.js"))"></script>
+        <script type="text/javascript" src="@webJarsUtil.locate("jquery.min.js").script()"></script>
+        <script type="text/javascript" src="@webJarsUtil.locate("bootstrap.min.js").script()"></script>
+        <script type="text/javascript" src="@webJarsUtil.locate("bootstrap-datepicker.js").script()"></script>
 
         <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
     </head>
