@@ -5,11 +5,11 @@ import actions.{NoCache, SudoForbidCookieAuthAction, TryCookieAuthAction}
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
-import constants.{FlashKey, SecurityRoleKey, SessionKey}
+import constants.{SecurityRoleKey, SessionKey}
 import org.webjars.play.WebJarAssets
 import play.api.mvc._
 import services.{GoogleAuthService, UserService}
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.i18n._
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
 import providers.MyAuthProvider

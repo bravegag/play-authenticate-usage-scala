@@ -180,7 +180,6 @@ class MyAuthProvider @Inject()(implicit
   override protected def getVerifyEmailMailingBody(token: String, user: MySignupAuthUser, ctx: Http.Context): Body = {
     val isSecure: Boolean = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url: String = routes.Signup.verify(token).absoluteURL(ctx.request, isSecure)
-    val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
     val langCode: String = lang.code
     val html: String = getEmailTemplate("views.html.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
     val text: String = getEmailTemplate("views.txt.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
@@ -216,7 +215,6 @@ class MyAuthProvider @Inject()(implicit
   protected def getPasswordResetMailingBody(token: String, user: UserRow, ctx: Http.Context) : Body = {
     val isSecure: Boolean = getConfiguration.getBoolean(SETTING_KEY_PASSWORD_RESET_LINK_SECURE)
     val url: String = routes.Signup.resetPassword(token).absoluteURL(ctx.request, isSecure)
-    val lang: Lang = Lang.preferred(ctx.request.acceptLanguages)
     val langCode: String = lang.code
     val html: String = getEmailTemplate("views.html.account.email.password_reset", langCode, url, token, user.username, user.email)
     val text: String = getEmailTemplate("views.txt.account.email.password_reset", langCode, url, token, user.username, user.email)
@@ -270,7 +268,6 @@ class MyAuthProvider @Inject()(implicit
   protected def getVerifyEmailMailingBodyAfterSignup(token: String, user: UserRow, ctx: Http.Context): Body = {
     val isSecure = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url = routes.Signup.verify(token).absoluteURL(ctx.request, isSecure)
-    val lang = Lang.preferred(ctx.request.acceptLanguages)
     val langCode = lang.code
     val html = getEmailTemplate("views.html.account.email.verify_email", langCode, url, token, user.username, user.email)
     val text = getEmailTemplate("views.txt.account.email.verify_email", langCode, url, token, user.username, user.email)

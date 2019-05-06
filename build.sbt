@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1212",
   "com.feth" %% "play-authenticate" % "0.9.1-SNAPSHOT",
   "be.objectify"  %% "deadbolt-scala" % "2.6.1",
+  "be.objectify" %% "deadbolt-java-gs" % "2.6.0",
   "org.webjars" %% "webjars-play" % "2.6.3",
   "org.webjars" % "bootstrap" % "3.3.7-1" exclude("org.webjars", "jquery"),
   "org.webjars" % "jquery" % "3.2.1",

@@ -7,6 +7,7 @@ import java.util.TimeZone
 import com.feth.play.module.pa.PlayAuthenticate
 import javax.inject.{Inject, Singleton}
 import play.inject.ApplicationLifecycle
+import play.Environment
 import com.feth.play.module.pa.providers.cookie._
 import com.feth.play.module.pa.user.AuthUser
 import dao.DaoContext
@@ -18,10 +19,11 @@ import play.i18n.Lang
 @Singleton
 class MyCookieAuthProvider @Inject()(implicit
                                      val lang: Lang,
+                                     env: Environment,
                                      auth: PlayAuthenticate,
                                      lifecycle: ApplicationLifecycle,
                                      val userService: UserService,
-                                     daoContext: DaoContext) extends CookieAuthProvider(auth, lifecycle) {
+                                     daoContext: DaoContext) extends CookieAuthProvider(auth, lifecycle, env) {
   import helpers.AwaitHelpers._
   import CookieAuthProvider._
 

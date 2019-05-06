@@ -9,7 +9,7 @@ import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, TokenActionKey}
 import org.webjars.play.WebJarAssets
 import play.api.mvc._
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.i18n._
 import play.core.j.JavaHelpers
 import providers._
 import services._

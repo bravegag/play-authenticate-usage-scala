@@ -2,15 +2,14 @@ package controllers
 
 import javax.inject._
 import actions.{NoCache, TryCookieAuthAction}
-import be.objectify.deadbolt.scala.DeadboltActions
+import be.objectify.deadbolt.scala.{DeadboltActions, DeadboltHandler}
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
 import org.webjars.play.WebJarAssets
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.i18n._
 import play.api.mvc.{AbstractController, ControllerComponents}
 import play.core.j.JavaHelpers
-import play.mvc.Results
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
 import views.form._

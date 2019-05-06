@@ -4,6 +4,7 @@
 @import be.objectify.deadbolt.scala._
 @import constants._
 @import org.webjars.play.WebJarAssets
+@import be.objectify.deadbolt.scala.views.html.di._
 
 @(userService: UserService, title: String, jContext: play.mvc.Http.Context, nav: String = "")(content: Html)(implicit lang: play.api.i18n.Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
 
