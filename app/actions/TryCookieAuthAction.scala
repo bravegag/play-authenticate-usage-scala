@@ -39,8 +39,6 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
 
     scalaResult.map(_.withSession(session : _*).withCookies(cookies : _*))
   }
-
-  lazy val parser: BodyParser[A] = action(new Http.Context(new Http.RequestBuilder())).parser
 }
 
 object TryCookieAuthAction {
