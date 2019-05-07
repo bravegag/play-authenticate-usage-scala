@@ -3,7 +3,9 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import org.webjars.play.WebJarsUtil
+@import be.objectify.deadbolt.scala.views.html.di._
 
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
 @(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import helper._
@@ -14,7 +16,7 @@
 	@messagesApi("playauthenticate.merge.accounts.question", aUser, bUser)
 }
 
-@main(userService, messagesApi("playauthenticate.merge.accounts.title"), jContext) {
+@main(userService, messagesApi("playauthenticate.merge.accounts.title"), jContext, subjectNotPresent, subjectPresentOr) {
     @if(acceptForm.hasGlobalErrors) {
         <p class="alert alert-danger">@acceptForm.globalError.get.message</p>
     }

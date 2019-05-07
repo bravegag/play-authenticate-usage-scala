@@ -4,14 +4,16 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
 @import org.webjars.play.WebJarsUtil
+@import be.objectify.deadbolt.scala.views.html.di._
 
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, reLoginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, messagesApi("playauthenticate.login.title"), jContext, "relogin") {
+@main(userService, messagesApi("playauthenticate.login.title"), jContext, subjectNotPresent, subjectPresentOr, "relogin") {
     @if(reLoginForm.hasGlobalErrors) {
         <p class="alert alert-warning">@reLoginForm.globalError.get.message</p>
     }

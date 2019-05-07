@@ -3,7 +3,9 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import org.webjars.play.WebJarsUtil
+@import be.objectify.deadbolt.scala.views.html.di._
 
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
 @(userService: UserService, acceptForm: Form[Accept], newAccount: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
 
 @import helper._
@@ -14,7 +16,7 @@
 	@_providerIcon(newAccount.getProvider()) @messagesApi("playauthenticate.link.account.question", newAccount)
 }
 
-@main(userService, messagesApi("playauthenticate.link.account.title"), jContext) {
+@main(userService, messagesApi("playauthenticate.link.account.title"), jContext, subjectNotPresent, subjectPresentOr) {
     @if(acceptForm.hasGlobalErrors) {
         <p class="alert alert-danger">@acceptForm.globalError.get.message</p>
     }

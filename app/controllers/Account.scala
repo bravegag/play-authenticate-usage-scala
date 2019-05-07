@@ -21,6 +21,11 @@ import ExecutionContext.Implicits.global
 class Account @Inject() (implicit
                          lang: Lang,
                          controllerComponents: ControllerComponents,
+                         linkView: views.html.account.link,
+                         unverifiedView: views.html.account.unverified,
+                         passwordChangeView: views.html.account.password_change,
+                         askLinkView: views.html.account.ask_link,
+                         askMergeView: views.html.account.ask_merge,
                          webJarUtil: WebJarsUtil,
                          deadbolt: DeadboltActions,
                          auth: PlayAuthenticate,
@@ -34,7 +39,7 @@ class Account @Inject() (implicit
       TryCookieAuthAction { implicit jContext =>
         deadbolt.SubjectPresent()() { implicit request =>
           Future {
-            Ok(views.html.account.link(userService, auth))
+            Ok(linkView(userService, auth))
           }
         }
       }
@@ -71,10 +76,10 @@ class Account @Inject() (implicit
           val Some(user) = userService.findInSession(jContext.session)
           val result =
             if (!user.emailValidated) {
-              Ok(views.html.account.unverified(userService))
+              Ok(unverifiedView(userService))
 
             } else {
-              Ok(views.html.account.password_change(userService, formContext.passwordChangeForm.Instance))
+              Ok(passwordChangeView(userService, formContext.passwordChangeForm.Instance))
             }
           result
         }
@@ -90,7 +95,7 @@ class Account @Inject() (implicit
             formContext.passwordChangeForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not select whether to link or not link
-                BadRequest(views.html.account.password_change(userService, formWithErrors))
+                BadRequest(passwordChangeView(userService, formWithErrors))
               },
               formSuccess => {
                 val Some(user: UserRow) = userService.findInSession(jContext.session)
@@ -111,7 +116,7 @@ class Account @Inject() (implicit
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
           Option(auth.getLinkUser(jContext.session)) match {
-            case Some(user) => Ok(views.html.account.ask_link(userService, formContext.acceptForm.Instance, user))
+            case Some(user) => Ok(askLinkView(userService, formContext.acceptForm.Instance, user))
             case None => {
               // account to link could not be found, silently redirect to login
               Redirect(routes.Application.index)
@@ -130,7 +135,7 @@ class Account @Inject() (implicit
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => {
               formContext.acceptForm.Instance.bindFromRequest.fold(
-                formWithErrors => BadRequest(views.html.account.ask_link(userService, formWithErrors, user)),
+                formWithErrors => BadRequest(askLinkView(userService, formWithErrors, user)),
                 formSuccess => {
                   // user made a choice :)
                   val link = formSuccess.accept
@@ -165,7 +170,7 @@ class Account @Inject() (implicit
             case Some(userB) => {
               // you could also get the local user object here via
               // User.findByAuthUserIdentity(newUser)
-              Ok(views.html.account.ask_merge(userService, formContext.acceptForm.Instance, userA, userB))
+              Ok(askMergeView(userService, formContext.acceptForm.Instance, userA, userB))
             }
             case None => {
               // user to merge with could not be found, silently redirect to login
@@ -191,7 +196,7 @@ class Account @Inject() (implicit
               val filledForm = formContext.acceptForm.Instance.bindFromRequest
               if (filledForm.hasErrors) {
                 // user did not select whether to merge or not merge
-                BadRequest(views.html.account.ask_merge(userService, filledForm, userA, userB))
+                BadRequest(askMergeView(userService, filledForm, userA, userB))
 
               } else {
                 // user made a choice :)

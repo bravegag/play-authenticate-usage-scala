@@ -6,7 +6,7 @@
 @import org.webjars.play.{WebJarsUtil, WebJarAssets }
 @import be.objectify.deadbolt.scala.views.html.di._
 
-@(userService: UserService, title: String, jContext: play.mvc.Http.Context, nav: String = "")(content: Html)(implicit lang: play.api.i18n.Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarsUtil: WebJarsUtil)
+@(userService: UserService, title: String, jContext: play.mvc.Http.Context, subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr, nav: String = "")(content: Html)(implicit lang: play.api.i18n.Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarsUtil: WebJarsUtil)
 
 @import be.objectify.deadbolt.scala.views.html._
 

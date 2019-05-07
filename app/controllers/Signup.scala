@@ -7,10 +7,9 @@ import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, TokenActionKey}
-import org.webjars.play.{WebJarAssets, WebJarsUtil}
+import org.webjars.play.WebJarsUtil
 import play.api.mvc._
 import play.api.i18n._
-import play.core.j.JavaHelpers
 import providers._
 import services._
 import generated.Tables.TokenActionRow
@@ -20,6 +19,12 @@ import views.form._
 class Signup @Inject() (implicit
                         lang: Lang,
                         controllerComponents: ControllerComponents,
+                        unverifiedView: views.html.account.signup.unverified,
+                        passwordForgotView: views.html.account.signup.password_forgot,
+                        passwordResetView: views.html.account.signup.password_reset,
+                        noTokenOrInvalidView: views.html.account.signup.no_token_or_invalid,
+                        oAuthDeniedView: views.html.account.signup.oauth_denied,
+                        existsView: views.html.account.signup.exists,
                         webJarUtil: WebJarsUtil,
                         deadbolt: DeadboltActions,
                         auth: PlayAuthenticate,
@@ -40,7 +45,7 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            Ok(views.html.account.signup.unverified(userService))
+            Ok(unverifiedView(userService))
           }
         }
       }
@@ -65,7 +70,7 @@ class Signup @Inject() (implicit
                 formContext.forgotPasswordForm.Instance
               }
             }
-            Ok(views.html.account.signup.password_forgot(userService, form))
+            Ok(passwordForgotView(userService, form))
           }
         }
       }
@@ -80,7 +85,7 @@ class Signup @Inject() (implicit
             formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not fill in his/her email
-                BadRequest(views.html.account.signup.password_forgot(userService, formWithErrors))
+                BadRequest(passwordForgotView(userService, formWithErrors))
               },
               formSuccess => {
                 // the email address given *BY AN UNKNWON PERSON* to the form - we
@@ -132,9 +137,9 @@ class Signup @Inject() (implicit
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
             tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
-              case Some(_) => Ok(views.html.account.signup.password_reset(userService,
+              case Some(_) => Ok(passwordResetView(userService,
                 formContext.passwordResetForm.Instance.fill(PasswordReset("", "", token))))
-              case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
+              case None => BadRequest(noTokenOrInvalidView(userService))
             }
           }
         }
@@ -148,7 +153,7 @@ class Signup @Inject() (implicit
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
             formContext.passwordResetForm.Instance.bindFromRequest.fold(
-              formWithErrors => BadRequest(views.html.account.signup.password_reset(userService, formWithErrors)),
+              formWithErrors => BadRequest(passwordResetView(userService, formWithErrors)),
               formSuccess => {
                 val token = formSuccess.token
                 val newPassword = formSuccess.password
@@ -182,7 +187,7 @@ class Signup @Inject() (implicit
                     }
                     Redirect(routes.Application.login).flashing(flashValues: _*)
                   }
-                  case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
+                  case None => BadRequest(noTokenOrInvalidView(userService))
                 }
               }
             )
@@ -197,7 +202,7 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            Ok(views.html.account.signup.oAuthDenied(userService, getProviderKey))
+            Ok(oAuthDeniedView(userService, getProviderKey))
           }
         }
       }
@@ -209,7 +214,7 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            Ok(views.html.account.signup.exists(userService))
+            Ok(existsView(userService))
           }
         }
       }
@@ -233,7 +238,7 @@ class Signup @Inject() (implicit
                   case None => Redirect(routes.Application.login).flashing(flashValues)
                 }
               }
-              case None => BadRequest(views.html.account.signup.no_token_or_invalid(userService))
+              case None => BadRequest(noTokenOrInvalidView(userService))
             }
           }
         }

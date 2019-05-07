@@ -20,6 +20,14 @@ import views.html.recaptcha
 class Application @Inject() (implicit
                              val verifier: RecaptchaVerifier,
                              lang: Lang,
+                             indexView: views.html.index,
+                             restrictedView: views.html.restricted,
+                             profileView: views.html.profile,
+                             loginView: views.html.login,
+                             restrictedForbidCookieView: views.html.restricted_forbid_cookie,
+                             reloginView: views.html.relogin,
+                             googleAuthenticationView: views.html.google_authentication,
+                             signupView: views.html.signup,
                              controllerComponents: ControllerComponents,
                              widgetHelper: WidgetHelper,
                              webJarUtil: WebJarsUtil,
@@ -40,7 +48,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
-          Ok(views.html.index(userService))
+          Ok(indexView(userService))
         }
       }
     }
@@ -51,7 +59,7 @@ class Application @Inject() (implicit
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val localUser = userService.findInSession(jContext.session)
-          Ok(views.html.restricted(userService, localUser))
+          Ok(restrictedView(userService, localUser))
         }
       }
     }
@@ -62,7 +70,7 @@ class Application @Inject() (implicit
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
           val localUser = userService.findInSession(jContext.session)
-          Ok(views.html.profile(auth, localUser.get, googleAuthService))
+          Ok(profileView(auth, localUser.get, googleAuthService))
         }
       }
     }
@@ -72,7 +80,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
-          Ok(views.html.login(auth, userService, formContext.loginForm.Instance))
+          Ok(loginView(auth, userService, formContext.loginForm.Instance))
         }
       }
     }
@@ -84,7 +92,7 @@ class Application @Inject() (implicit
         deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
           Future {
             val localUser = userService.findInSession(jContext.session)
-            Ok(views.html.restrictedForbidCookie(userService, localUser))
+            Ok(restrictedForbidCookieView(userService, localUser))
           }
         }
       }
@@ -101,7 +109,7 @@ class Application @Inject() (implicit
           val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
             email = authUser.email.toString, password = "", isRememberMe = true))
           // everything was filled
-          Ok(views.html.relogin(auth, userService, updatedForm))
+          Ok(reloginView(auth, userService, updatedForm))
         }
       }
     }
@@ -115,7 +123,7 @@ class Application @Inject() (implicit
           formContext.loginForm.Instance.bindFromRequest.fold(
             formWithErrors => {
               // user did not fill everything properly
-              BadRequest(views.html.login(auth, userService, formWithErrors))
+              BadRequest(loginView(auth, userService, formWithErrors))
             },
             formSuccess => {
               // everything was filled
@@ -147,7 +155,7 @@ class Application @Inject() (implicit
                           form
                         }
                       auth.logout(jContext)
-                      Ok(views.html.googleAuthentication(auth, userService, formWithError))
+                      Ok(googleAuthenticationView(auth, userService, formWithError))
                   }
                 case user => authorize()
               }
@@ -162,7 +170,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
-          Ok(views.html.signup(auth, userService, formContext.signupForm.Instance))
+          Ok(signupView(auth, userService, formContext.signupForm.Instance))
         }
       }
     }
@@ -176,7 +184,7 @@ class Application @Inject() (implicit
             form.fold(
               formWithErrors => {
                 // user did not fill everything properly
-                BadRequest(views.html.signup(auth, userService, formWithErrors))
+                BadRequest(signupView(auth, userService, formWithErrors))
               },
               _ => {
                 // everything was filled:
@@ -197,7 +205,7 @@ class Application @Inject() (implicit
             userService.findInSession(jContext.session) match {
               case Some(user) =>
                 googleAuthService.regenerateKey(user.id)
-                Ok(views.html.profile(auth, user, googleAuthService, showSecrets = true))
+                Ok(profileView(auth, user, googleAuthService, showSecrets = true))
               case None =>
                 Ok("Current user not found")
             }
