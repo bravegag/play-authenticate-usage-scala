@@ -33,6 +33,5 @@ case class SudoForbidCookieAuthAction[A](action: Action[A])(implicit auth: PlayA
 
   override def executionContext = global
 
-  // TODO: find the correct value to set
-  override val parser: BodyParser[A] = null
+  override val parser: BodyParser[A] = new play.mvc.BodyParser.Empty().asInstanceOf[BodyParser[A]]
 }
