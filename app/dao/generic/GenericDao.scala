@@ -2,7 +2,7 @@ package dao.generic
 
 import generated.Tables.profile.api._
 import play.api.db.slick._
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 import slick.lifted.CanBeQueryCondition
 
 import scala.concurrent._
