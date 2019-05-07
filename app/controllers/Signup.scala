@@ -19,8 +19,6 @@ import views.form._
 
 @Singleton
 class Signup @Inject() (implicit
-                        lang: Lang,
-                        controllerComponents: ControllerComponents,
                         config: Configuration,
                         env: Environment,
                         mat: Materializer,
@@ -36,7 +34,7 @@ class Signup @Inject() (implicit
                         userService: UserService,
                         tokenActionService: TokenActionService,
                         authProvider: MyAuthProvider,
-                        formContext: FormContext) extends AbstractController(controllerComponents) with I18nSupport {
+                        formContext: FormContext) extends InjectedController with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
   import services.PluggableUserService._

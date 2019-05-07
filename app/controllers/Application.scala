@@ -24,7 +24,6 @@ class Application @Inject() (implicit
                              config: Configuration,
                              env: Environment,
                              mat: Materializer,
-                             lang: Lang,
                              indexView: views.html.index,
                              restrictedView: views.html.restricted,
                              profileView: views.html.profile,
@@ -33,7 +32,6 @@ class Application @Inject() (implicit
                              reloginView: views.html.relogin,
                              googleAuthenticationView: views.html.google_authentication,
                              signupView: views.html.signup,
-                             controllerComponents: ControllerComponents,
                              widgetHelper: WidgetHelper,
                              webJarUtil: WebJarsUtil,
                              deadbolt: DeadboltActions,
@@ -42,7 +40,7 @@ class Application @Inject() (implicit
                              authProvider: MyAuthProvider,
                              formContext: FormContext,
                              googleAuthService: GoogleAuthService,
-                             recaptchaWidget: recaptcha.recaptchaWidget) extends AbstractController(controllerComponents) with I18nSupport {
+                             recaptchaWidget: recaptcha.recaptchaWidget) extends InjectedController with I18nSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
 

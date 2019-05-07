@@ -10,7 +10,7 @@ import generated.Tables.UserRow
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Environment}
 import play.api.i18n._
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, ControllerComponents, InjectedController}
 import play.core.j.JavaHelpers
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
@@ -21,8 +21,6 @@ import ExecutionContext.Implicits.global
 
 @Singleton
 class Account @Inject() (implicit
-                         lang: Lang,
-                         controllerComponents: ControllerComponents,
                          config: Configuration,
                          env: Environment,
                          mat: Materializer,
@@ -36,7 +34,7 @@ class Account @Inject() (implicit
                          auth: PlayAuthenticate,
                          userService: UserService,
                          authProvider: MyAuthProvider,
-                         formContext: FormContext) extends AbstractController(controllerComponents) with I18nSupport {
+                         formContext: FormContext) extends InjectedController with I18nSupport {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
