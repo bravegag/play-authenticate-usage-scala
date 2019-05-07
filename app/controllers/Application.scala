@@ -2,11 +2,13 @@ package controllers
 
 import javax.inject._
 import actions.{NoCache, SudoForbidCookieAuthAction, TryCookieAuthAction}
+import akka.stream.Materializer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.{SecurityRoleKey, SessionKey}
 import org.webjars.play._
+import play.api.{Configuration, Environment}
 import play.api.mvc._
 import services.{GoogleAuthService, UserService}
 import play.api.i18n._
@@ -19,6 +21,9 @@ import views.html.recaptcha
 @Singleton
 class Application @Inject() (implicit
                              val verifier: RecaptchaVerifier,
+                             config: Configuration,
+                             env: Environment,
+                             mat: Materializer,
                              lang: Lang,
                              indexView: views.html.index,
                              restrictedView: views.html.restricted,

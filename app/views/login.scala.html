@@ -1,4 +1,5 @@
 @import services.UserService
+@import play.api._
 @import play.api.mvc._
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
@@ -7,7 +8,8 @@
 @import be.objectify.deadbolt.scala.views.html.di._
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any],
+  messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang, config: Configuration, env: Environment)
 
 @import helper._
 @import b3.vertical.fieldConstructor

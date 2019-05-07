@@ -2,12 +2,14 @@ package controllers
 
 import javax.inject._
 import actions.{NoCache, TryCookieAuthAction}
+import akka.stream.Materializer
 
 import scala.collection.mutable.ArrayBuffer
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, TokenActionKey}
 import org.webjars.play.WebJarsUtil
+import play.api._
 import play.api.mvc._
 import play.api.i18n._
 import providers._
@@ -19,6 +21,9 @@ import views.form._
 class Signup @Inject() (implicit
                         lang: Lang,
                         controllerComponents: ControllerComponents,
+                        config: Configuration,
+                        env: Environment,
+                        mat: Materializer,
                         unverifiedView: views.html.account.signup.unverified,
                         passwordForgotView: views.html.account.signup.password_forgot,
                         passwordResetView: views.html.account.signup.password_reset,

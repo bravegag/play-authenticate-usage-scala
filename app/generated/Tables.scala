@@ -2,12 +2,12 @@ package generated
 // AUTO-GENERATED Slick data model
 /** Stand-alone Slick data model for immediate use */
 object Tables extends {
-  val profile = slick.driver.PostgresDriver
+  val profile = slick.jdbc.PostgresProfile
 } with Tables
 
 /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
 trait Tables {
-  val profile: slick.driver.JdbcProfile
+  val profile: slick.jdbc.JdbcProfile
   import profile.api._
   import be.objectify.deadbolt.scala.models._
   import dao.generic._
@@ -16,7 +16,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Array(CookieTokenSeries.schema, GauthRecoveryToken.schema, LinkedAccount.schema, PlayEvolutions.schema, SecurityPermission.schema, SecurityRole.schema, TokenAction.schema, User.schema, UserDevice.schema, UserSecurityPermission.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
+  lazy val schema: profile.SchemaDescription = Array(CookieTokenSeries.schema, GoogleAuthRecoveryToken.schema, LinkedAccount.schema, PlayEvolutions.schema, SecurityPermission.schema, SecurityRole.schema, TokenAction.schema, User.schema, UserDevice.schema, UserSecurityPermission.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -57,19 +57,19 @@ trait Tables {
   /** Collection-like TableQuery object for table CookieTokenSeries */
   lazy val CookieTokenSeries = new TableQuery(tag => new CookieTokenSeries(tag))
 
-  /** Entity class storing rows of table GauthRecoveryToken
+  /** Entity class storing rows of table GoogleAuthRecoveryToken
    *  @param userId Database column user_id SqlType(int8)
    *  @param token Database column token SqlType(varchar), Length(60,true)
    *  @param created Database column created SqlType(timestamp)
    *  @param used Database column used SqlType(timestamp), Default(None) */
   case class GoogleAuthRecoveryTokenRow(userId: Long, token: String, created: java.sql.Timestamp, used: Option[java.sql.Timestamp] = None) extends Entity[Long] { override def id = userId }
-  /** GetResult implicit for fetching GauthRecoveryTokenRow objects using plain SQL queries */
-  implicit def GetResultGauthRecoveryTokenRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[GoogleAuthRecoveryTokenRow] = GR{
+  /** GetResult implicit for fetching GoogleAuthRecoveryTokenRow objects using plain SQL queries */
+  implicit def GetResultGoogleAuthRecoveryTokenRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[java.sql.Timestamp]]): GR[GoogleAuthRecoveryTokenRow] = GR{
     prs => import prs._
     GoogleAuthRecoveryTokenRow.tupled((<<[Long], <<[String], <<[java.sql.Timestamp], <<?[java.sql.Timestamp]))
   }
-  /** Table description of table gauth_recovery_token. Objects of this class serve as prototypes for rows in queries. */
-  class GauthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GoogleAuthRecoveryTokenRow](_tableTag, "gauth_recovery_token") with IdentifyableTable[Long] {
+  /** Table description of table google_auth_recovery_token. Objects of this class serve as prototypes for rows in queries. */
+  class GoogleAuthRecoveryToken(_tableTag: Tag) extends profile.api.Table[GoogleAuthRecoveryTokenRow](_tableTag, "google_auth_recovery_token") with IdentifyableTable[Long] {
               override def id = userId
 
     def * = (userId, token, created, used) <> (GoogleAuthRecoveryTokenRow.tupled, GoogleAuthRecoveryTokenRow.unapply)
@@ -85,11 +85,11 @@ trait Tables {
     /** Database column used SqlType(timestamp), Default(None) */
     val used: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("used", O.Default(None))
 
-    /** Foreign key referencing User (database name gauth_recovery_token_user_id_fkey) */
-    lazy val userFk = foreignKey("gauth_recovery_token_user_id_fkey", userId, User)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing User (database name google_auth_recovery_token_user_id_fkey) */
+    lazy val userFk = foreignKey("google_auth_recovery_token_user_id_fkey", userId, User)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
               }
-  /** Collection-like TableQuery object for table GauthRecoveryToken */
-  lazy val GauthRecoveryToken = new TableQuery(tag => new GauthRecoveryToken(tag))
+  /** Collection-like TableQuery object for table GoogleAuthRecoveryToken */
+  lazy val GoogleAuthRecoveryToken = new TableQuery(tag => new GoogleAuthRecoveryToken(tag))
 
   /** Entity class storing rows of table LinkedAccount
    *  @param userId Database column user_id SqlType(int8)

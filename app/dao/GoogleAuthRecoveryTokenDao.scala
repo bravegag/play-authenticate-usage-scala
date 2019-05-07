@@ -17,18 +17,18 @@ import scala.concurrent.Future
   * @param dbConfigProvider
   */
 class GoogleAuthRecoveryTokenDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
-  extends GenericDaoImpl[GauthRecoveryToken, GoogleAuthRecoveryTokenRow, Long] (dbConfigProvider, GauthRecoveryToken) {
+  extends GenericDaoImpl[GoogleAuthRecoveryToken, GoogleAuthRecoveryTokenRow, Long] (dbConfigProvider, GoogleAuthRecoveryToken) {
 
   def findByToken(userId: Long, token: String): Future[Option[GoogleAuthRecoveryTokenRow]] = {
-    db.run(GauthRecoveryToken.filter(t => t.userId === userId && t.token === token).result.headOption)
+    db.run(GoogleAuthRecoveryToken.filter(t => t.userId === userId && t.token === token).result.headOption)
   }
 
   def markAsUsed(gauthRecoveryTokenRow: GoogleAuthRecoveryTokenRow): Future[Unit] = {
-    db.run(GauthRecoveryToken.filter(t => t.userId === gauthRecoveryTokenRow.userId && t.token === gauthRecoveryTokenRow.token)
+    db.run(GoogleAuthRecoveryToken.filter(t => t.userId === gauthRecoveryTokenRow.userId && t.token === gauthRecoveryTokenRow.token)
       .update(gauthRecoveryTokenRow.copy(used = Some(new Timestamp(new Date().getTime))))).map(_ => ())
   }
 
   def findByUser(userId: Long): Future[Seq[GoogleAuthRecoveryTokenRow]] = {
-    db.run(GauthRecoveryToken.filter(t => t.userId === userId && !t.used.isDefined).result)
+    db.run(GoogleAuthRecoveryToken.filter(t => t.userId === userId && !t.used.isDefined).result)
   }
 }

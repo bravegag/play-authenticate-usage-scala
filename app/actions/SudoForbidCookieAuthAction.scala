@@ -7,6 +7,9 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 import play.api.mvc.Results._
+import play.mvc.Http
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Custom action that checks whether an user is attempting to access a sudo protected area e.g. accessing payments
@@ -28,5 +31,8 @@ case class SudoForbidCookieAuthAction[A](action: Action[A])(implicit auth: PlayA
     }
   }
 
-  lazy val parser: BodyParser[A] = action.parser
+  override def executionContext = global
+
+  // TODO: find the correct value to set
+  override val parser: BodyParser[A] = null
 }

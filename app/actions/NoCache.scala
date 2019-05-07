@@ -36,5 +36,8 @@ case class NoCache[A](action: Action[A]) extends Action[A] with HeaderNames {
     }
   }
 
-  lazy val parser = action.parser
+  override def executionContext = global
+
+  // TODO: find the correct value to set
+  override val parser: BodyParser[A] = null
 }

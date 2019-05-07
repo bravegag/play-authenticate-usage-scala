@@ -1,12 +1,14 @@
 package actions
 
+import akka.stream._
 import com.feth.play.module.pa.PlayAuthenticate
+import play.api._
 import play.api.mvc._
 import play.core.j.JavaHelpers
 import play.mvc.Http
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
+import scala.concurrent._
 import collection.JavaConverters._
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration._
@@ -17,9 +19,9 @@ import scala.concurrent.duration._
   * @param auth the PlayAuthenticate framework
   * @tparam A The request body type
   */
-case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit auth: PlayAuthenticate) extends Action[A] {
+case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit auth: PlayAuthenticate, config: Configuration, env: Environment, mat: Materializer) extends Action[A] {
   def apply(request: Request[A]): Future[Result] = {
-    val jContext = JavaHelpers.createJavaContext(request)
+    val jContext = JavaHelpers.createJavaContext(request, JavaHelpers.createContextComponents(config, env))
 
     TryCookieAuthAction.jContextDv += (request.id -> jContext)
 
@@ -39,6 +41,10 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
 
     scalaResult.map(_.withSession(session : _*).withCookies(cookies : _*))
   }
+
+  override def executionContext = global
+
+  override val parser: BodyParser[A] = action(Http.Context.current).parser
 }
 
 object TryCookieAuthAction {
@@ -54,5 +60,5 @@ object TryCookieAuthAction {
     def jContext : Http.Context = jContextDv(request.id)
   }
 
-  def apply[A](action: Action[A])(implicit auth: PlayAuthenticate): TryCookieAuthAction[A] = TryCookieAuthAction(_ => action)
+  def apply[A](action: Action[A])(implicit auth: PlayAuthenticate, config: Configuration, env: Environment, mat: Materializer): TryCookieAuthAction[A] = TryCookieAuthAction(_ => action)
 }

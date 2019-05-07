@@ -2,14 +2,17 @@
 @import services.PluggableUserService._
 @import generated._
 @import generated.Tables._
+@import play.api._
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import org.webjars.play.WebJarsUtil
 @import services.GoogleAuthService
+@import play.core.j.JavaHelpers
 @import be.objectify.deadbolt.scala.views.html.di._
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow, gauthService: GoogleAuthService, showSecrets: Boolean = false)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, userService: UserService, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: UserRow, gauthService: GoogleAuthService, showSecrets: Boolean = false)(implicit request: AuthenticatedRequest[Any],
+  messagesApi: MessagesApi, userService: UserService, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang, config: Configuration, env: Environment)
 
 @import com.feth.play.module.pa.views.html._
 @import helpers.FormatHelpers._
@@ -79,7 +82,7 @@
 
 
     <br/>
-    @play.core.j.JavaHelpers.withContext(request) { jContext =>
+    @JavaHelpers.withContext(request, JavaHelpers.createContextComponents(config, env)) { jContext =>
         @currentAuth(playAuth) { auth =>
             @messagesApi("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
             @if(auth.expires() != -1){

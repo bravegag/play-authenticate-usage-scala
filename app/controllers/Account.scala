@@ -2,11 +2,13 @@ package controllers
 
 import javax.inject._
 import actions.{NoCache, TryCookieAuthAction}
+import akka.stream.Materializer
 import be.objectify.deadbolt.scala.{DeadboltActions, DeadboltHandler}
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
 import org.webjars.play.WebJarsUtil
+import play.api.{Configuration, Environment}
 import play.api.i18n._
 import play.api.mvc.{AbstractController, ControllerComponents}
 import play.core.j.JavaHelpers
@@ -21,6 +23,9 @@ import ExecutionContext.Implicits.global
 class Account @Inject() (implicit
                          lang: Lang,
                          controllerComponents: ControllerComponents,
+                         config: Configuration,
+                         env: Environment,
+                         mat: Materializer,
                          linkView: views.html.account.link,
                          unverifiedView: views.html.account.unverified,
                          passwordChangeView: views.html.account.password_change,

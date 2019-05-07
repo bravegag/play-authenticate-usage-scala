@@ -1,5 +1,6 @@
 @import services.UserService
 @import views.form._
+@import play.api._
 @import play.api.mvc._
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
@@ -9,7 +10,7 @@
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
 @(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil,
-  recaptchaWidget: recaptcha.recaptchaWidget, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
+  recaptchaWidget: recaptcha.recaptchaWidget, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang, config: Configuration, env: Environment)
 
 @import helper._
 @import b3.vertical.fieldConstructor
