@@ -22,16 +22,17 @@
         <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
         <meta name="author" content="The Play Authenticate Team">
 
-        <link rel="stylesheet" href="@webJarsUtil.locate("bootstrap.min.css").css()">
-        <link rel="stylesheet" href="@webJarsUtil.locate("font-awesome.min.css").css()">
-        <link rel="stylesheet" href="@webJarsUtil.locate("bootstrap-datepicker3.css").css()">
+        @webJarsUtil.locate("bootstrap.min.css").css()
+        @webJarsUtil.locate("font-awesome.min.css").css()
+        @webJarsUtil.locate("bootstrap-datepicker3.css").css()
+
         <link rel="stylesheet" href="@routes.Assets.versioned("css/main.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/azmind-style.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/azmind-form-elements.css")">
 
-        <script type="text/javascript" src="@webJarsUtil.locate("jquery.min.js").script()"></script>
-        <script type="text/javascript" src="@webJarsUtil.locate("bootstrap.min.js").script()"></script>
-        <script type="text/javascript" src="@webJarsUtil.locate("bootstrap-datepicker.js").script()"></script>
+        @webJarsUtil.locate("jquery.min.js").script()
+        @webJarsUtil.locate("bootstrap.min.js").script()
+        @webJarsUtil.locate("bootstrap-datepicker.js").script()
 
         <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
     </head>
