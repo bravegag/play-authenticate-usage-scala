@@ -8,8 +8,8 @@ import play.api.i18n.{Lang, MessagesApi}
 case class PasswordReset(password: String, repeatPassword: String, token: String)
 
 @Singleton
-class PasswordResetForm @Inject() (implicit val messagesApi: MessagesApi, lang: Lang) {
-  val Instance = Form {
+class PasswordResetForm @Inject() (implicit val messagesApi: MessagesApi) {
+  def Instance(implicit lang: Lang) = Form {
     mapping(
       "password" -> nonEmptyText(minLength = 5),
       "repeatPassword" -> nonEmptyText(minLength = 5),

@@ -8,8 +8,8 @@ import play.api.i18n.{Lang, MessagesApi}
 case class Signup(email: String, password: String, repeatPassword: String, name: String) extends MyUsernamePassword
 
 @Singleton
-class SignupForm @Inject() (implicit val messagesApi: MessagesApi, lang: Lang) {
-  val Instance = Form {
+class SignupForm @Inject() (implicit val messagesApi: MessagesApi) {
+  def Instance(implicit lang: Lang) = Form {
     mapping(
       "email" -> email,
       "password" -> nonEmptyText(minLength = 5),
