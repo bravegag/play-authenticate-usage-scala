@@ -36,7 +36,7 @@ case class NoCache[A](action: Action[A]) extends Action[A] with HeaderNames {
     }
   }
 
-  override def executionContext = global
+  override def executionContext = action.executionContext
 
-  override val parser: BodyParser[A] = new play.mvc.BodyParser.Empty().asInstanceOf[BodyParser[A]]
+  override val parser: BodyParser[A] = action.parser
 }
