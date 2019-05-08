@@ -8,7 +8,7 @@
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
 @(userService: UserService, acceptForm: Form[Accept], newAccount: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any],
-  webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: Lang, messagesApi: MessagesApi, messages: Messages)
+  webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: Lang, messagesApi: MessagesApi, messages: MessagesProvider)
 
 @import helper._
 @import b3.vertical.fieldConstructor

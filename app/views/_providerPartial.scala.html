@@ -1,9 +1,10 @@
 @import play.api._
 @import play.core.j.JavaHelpers
 @import be.objectify.deadbolt.scala._
+@import play.api.i18n._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit messagesApi: MessagesApi,
-  request: AuthenticatedRequest[Any], config: Configuration, env: Environment)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit request: AuthenticatedRequest[Any],
+  config: Configuration, env: Environment, messagesApi: MessagesApi)
 
 @import com.feth.play.module.pa.views.html._
 
