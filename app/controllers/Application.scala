@@ -9,7 +9,7 @@ import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.{SecurityRoleKey, SessionKey}
 import org.webjars.play._
 import play.api.{Configuration, Environment}
-import play.api.mvc.{request, _}
+import play.api.mvc._
 import services.{GoogleAuthService, UserService}
 import play.api.i18n._
 import play.api.routing.JavaScriptReverseRouter
