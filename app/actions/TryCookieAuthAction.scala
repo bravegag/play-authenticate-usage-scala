@@ -20,8 +20,10 @@ import scala.concurrent.duration._
   * @tparam A The request body type
   */
 case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit auth: PlayAuthenticate, config: Configuration, env: Environment, mat: Materializer) extends Action[A] {
+  val contextComponents = JavaHelpers.createContextComponents(config, env)
+
   def apply(request: Request[A]): Future[Result] = {
-    val jContext = JavaHelpers.createJavaContext(request, JavaHelpers.createContextComponents(config, env))
+    val jContext = JavaHelpers.createJavaContext(request, contextComponents)
 
     TryCookieAuthAction.jContextDv += (request.id -> jContext)
 
@@ -44,7 +46,7 @@ case class TryCookieAuthAction[A](action: Http.Context => Action[A])(implicit au
 
   override def executionContext = global
 
-  override val parser: BodyParser[A] = action(Http.Context.current).parser
+  override val parser: BodyParser[A] = action(new Http.Context(new Http.RequestBuilder(), contextComponents)).parser
 }
 
 object TryCookieAuthAction {

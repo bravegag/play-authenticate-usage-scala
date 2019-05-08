@@ -18,7 +18,6 @@ import play.i18n.Lang
 
 @Singleton
 class MyCookieAuthProvider @Inject()(implicit
-                                     val lang: Lang,
                                      env: Environment,
                                      auth: PlayAuthenticate,
                                      lifecycle: ApplicationLifecycle,
