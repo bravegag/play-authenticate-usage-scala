@@ -2,10 +2,12 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
 @import be.objectify.deadbolt.scala.views.html.di._
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
-@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang))
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context,
+  lang: Lang, messagesApi: MessagesApi)
 
 @main(userService, messagesApi("playauthenticate.user.exists.title"), jContext, subjectNotPresent, subjectPresentOr) {
 	<h1>@messagesApi("playauthenticate.user.exists.title")</h1>

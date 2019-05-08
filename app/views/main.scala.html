@@ -4,9 +4,11 @@
 @import be.objectify.deadbolt.scala._
 @import constants._
 @import org.webjars.play.{WebJarsUtil, WebJarAssets }
+@import play.api.i18n._
 @import be.objectify.deadbolt.scala.views.html.di._
 
-@(userService: UserService, title: String, jContext: play.mvc.Http.Context, subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr, nav: String = "")(content: Html)(implicit lang: play.api.i18n.Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarsUtil: WebJarsUtil)
+@(userService: UserService, title: String, jContext: play.mvc.Http.Context, subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr, nav: String = "")(content: Html)(implicit request: AuthenticatedRequest[Any],
+  webJarsUtil: WebJarsUtil, lang: Lang, messagesApi: MessagesApi)
 
 @import be.objectify.deadbolt.scala.views.html._
 

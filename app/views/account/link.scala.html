@@ -3,11 +3,12 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
 @import be.objectify.deadbolt.scala.views.html.di._
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
 @(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: AuthenticatedRequest[Any],
-  messagesApi: MessagesApi, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang, config: Configuration, env: Environment)
+  webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, config: Configuration, env: Environment, lang: Lang, messagesApi: MessagesApi)
 
 @main(userService, messagesApi("playauthenticate.link.account.title"), jContext, subjectNotPresent, subjectPresentOr) {
     <h1>@messagesApi("playauthenticate.link.account.title")</h1>

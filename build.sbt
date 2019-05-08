@@ -32,6 +32,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap-datepicker" % "1.4.0",
   "com.warrenstrange" % "googleauth" % "1.1.2",
   cacheApi,
+  ehcache,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "com.h2database" % "h2" % "1.4.193" % Test,

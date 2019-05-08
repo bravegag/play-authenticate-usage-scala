@@ -48,6 +48,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             Ok(unverifiedView(userService))
           }
         }
@@ -60,6 +62,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             val form = Option(email) match {
               case Some(email) => {
                 if (!email.trim.isEmpty) {
@@ -85,6 +89,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not fill in his/her email
@@ -139,6 +145,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
               case Some(_) => Ok(passwordResetView(userService,
                 formContext.passwordResetForm.Instance.fill(PasswordReset("", "", token))))
@@ -155,6 +163,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             formContext.passwordResetForm.Instance.bindFromRequest.fold(
               formWithErrors => BadRequest(passwordResetView(userService, formWithErrors)),
               formSuccess => {
@@ -205,6 +215,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             Ok(oAuthDeniedView(userService, getProviderKey))
           }
         }
@@ -217,6 +229,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             Ok(existsView(userService))
           }
         }
@@ -229,6 +243,8 @@ class Signup @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION) match {
               case Some(tokenAction) => {
                 val Some(user) = tokenAction.targetUser

@@ -9,7 +9,7 @@ import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
 import constants.{SecurityRoleKey, SessionKey}
 import org.webjars.play._
 import play.api.{Configuration, Environment}
-import play.api.mvc._
+import play.api.mvc.{request, _}
 import services.{GoogleAuthService, UserService}
 import play.api.i18n._
 import play.api.routing.JavaScriptReverseRouter
@@ -51,6 +51,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           Ok(indexView(userService))
         }
       }
@@ -61,6 +62,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           val localUser = userService.findInSession(jContext.session)
           Ok(restrictedView(userService, localUser))
         }
@@ -72,6 +74,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           val localUser = userService.findInSession(jContext.session)
           Ok(profileView(auth, localUser.get, googleAuthService))
         }
@@ -83,6 +86,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           Ok(loginView(auth, userService, formContext.loginForm.Instance))
         }
       }
@@ -94,6 +98,7 @@ class Application @Inject() (implicit
       SudoForbidCookieAuthAction {
         deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
             val localUser = userService.findInSession(jContext.session)
             Ok(restrictedForbidCookieView(userService, localUser))
           }
@@ -106,6 +111,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           // taking chances here
           val authUser = userService.findInSession(jContext.session).get
           // partially initialize the Login form to only miss the password
@@ -123,6 +129,7 @@ class Application @Inject() (implicit
     TryCookieAuthAction( implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           formContext.loginForm.Instance.bindFromRequest.fold(
             formWithErrors => {
               // user did not fill everything properly
@@ -173,6 +180,8 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
+
           Ok(signupView(auth, userService, formContext.signupForm.Instance))
         }
       }
@@ -183,6 +192,8 @@ class Application @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
+          implicit val lang = request.acceptLanguages.head
+
           verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
             form.fold(
               formWithErrors => {
@@ -205,6 +216,8 @@ class Application @Inject() (implicit
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
+
             userService.findInSession(jContext.session) match {
               case Some(user) =>
                 googleAuthService.regenerateKey(user.id)

@@ -3,14 +3,14 @@ package controllers
 import javax.inject._
 import actions.{NoCache, TryCookieAuthAction}
 import akka.stream.Materializer
-import be.objectify.deadbolt.scala.{DeadboltActions, DeadboltHandler}
+import be.objectify.deadbolt.scala.DeadboltActions
 import com.feth.play.module.pa.PlayAuthenticate
 import constants.{FlashKey, SecurityRoleKey}
 import generated.Tables.UserRow
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Environment}
 import play.api.i18n._
-import play.api.mvc.{AbstractController, ControllerComponents, InjectedController}
+import play.api.mvc.InjectedController
 import play.core.j.JavaHelpers
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
@@ -42,6 +42,7 @@ class Account @Inject() (implicit
       TryCookieAuthAction { implicit jContext =>
         deadbolt.SubjectPresent()() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
             Ok(linkView(userService, auth))
           }
         }
@@ -52,6 +53,7 @@ class Account @Inject() (implicit
   def verifyEmail = NoCache { TryCookieAuthAction( implicit jContext => {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           // TODO: change because this is cowboy style
           val Some(user) = userService.findInSession(jContext.session)
           val tuple =
@@ -75,6 +77,7 @@ class Account @Inject() (implicit
   def changePassword = NoCache { TryCookieAuthAction( implicit jContext => {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           // TODO: change because this is cowboy style
           val Some(user) = userService.findInSession(jContext.session)
           val result =
@@ -95,6 +98,7 @@ class Account @Inject() (implicit
       TryCookieAuthAction { implicit jContext =>
         deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
           Future {
+            implicit val lang = request.acceptLanguages.head
             formContext.passwordChangeForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not select whether to link or not link
@@ -118,6 +122,7 @@ class Account @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => Ok(askLinkView(userService, formContext.acceptForm.Instance, user))
             case None => {
@@ -135,6 +140,7 @@ class Account @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => {
               formContext.acceptForm.Instance.bindFromRequest.fold(
@@ -165,6 +171,8 @@ class Account @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
+
           // this is the currently logged in user
           val userA = auth.getUser(jContext.session)
 
@@ -190,6 +198,8 @@ class Account @Inject() (implicit
     TryCookieAuthAction { implicit jContext =>
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
+          implicit val lang = request.acceptLanguages.head
+
           // this is the currently logged in user
           val userA = auth.getUser(jContext.session)
 

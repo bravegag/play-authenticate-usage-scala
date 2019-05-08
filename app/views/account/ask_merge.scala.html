@@ -3,10 +3,12 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
 @import be.objectify.deadbolt.scala.views.html.di._
 
 @this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
-@(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: play.api.i18n.Lang)
+@(userService: UserService, acceptForm: Form[Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)(implicit request: AuthenticatedRequest[Any],
+  webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: Lang, messagesApi: MessagesApi, messages: Messages)
 
 @import helper._
 @import b3.vertical.fieldConstructor
