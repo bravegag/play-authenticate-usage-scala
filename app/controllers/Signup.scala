@@ -62,7 +62,7 @@ class Signup @Inject() (implicit
           Future {
             val form = Option(email) match {
               case Some(email) => {
-                if (!email.trim.isEmpty) {
+                if (email.trim.nonEmpty) {
                   formContext.forgotPasswordForm.Instance.fill(ForgotPassword(email))
 
                 } else {

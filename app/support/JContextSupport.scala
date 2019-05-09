@@ -23,12 +23,10 @@ trait JContextSupport {
   def withContext[A](block: JContext => A)(implicit request: RequestHeader, components: JComponents): A = {
     implicit val jContext = createJavaContext(request, components)
     try {
-      println(s"Adding jContext for request with id ${request.id}.")
       JContextSupport.store += (request.id -> jContext)
       block(jContext)
     } finally {
-      //JContextSupport.store -= request.id
-      //println(s"Removed jContext for request with id ${request.id}.")
+      JContextSupport.store -= request.id
     }
   }
 
@@ -38,7 +36,6 @@ trait JContextSupport {
   }
 
   implicit def jContext(implicit request: RequestHeader): JContext = {
-    println(s"Attempting to recover jContext for request with id ${request.id}.")
     store.get(request.id).getOrElse(
       throw new IllegalStateException(s"jContext not found for request with id ${request.id}.")
     )

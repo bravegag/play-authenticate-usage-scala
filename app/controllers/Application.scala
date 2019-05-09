@@ -52,7 +52,6 @@ class Application @Inject() (implicit
     TryCookieAuthAction {
       deadbolt.WithAuthRequest()() { implicit request =>
         Future {
-          implicitly[JContextSupport.JContext]
           Ok(indexView(userService))
         }
       }
@@ -181,9 +180,8 @@ class Application @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def doSignup =
+  def doSignup = NoCache {
     TryCookieAuthAction {
-      NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
             form.fold(
@@ -202,9 +200,8 @@ class Application @Inject() (implicit
       }
     }
 
-  def enableGoogleAuthenticator =
+  def enableGoogleAuthenticator = NoCache {
     TryCookieAuthAction {
-      NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
             userService.findInSession(jContext.session) match {
