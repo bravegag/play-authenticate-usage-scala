@@ -11,7 +11,7 @@ autoScalaLibrary := false
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 // needed for adrianhurt's play-bootstrap dependency
-resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.3",
