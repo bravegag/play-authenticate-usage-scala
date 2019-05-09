@@ -14,6 +14,7 @@ import play.api.mvc.InjectedController
 import play.core.j.JavaHelpers
 import providers.{MyAuthProvider, MySignupAuthUser}
 import services.UserService
+import support.JContextSupport
 import views.form._
 
 import scala.concurrent._
@@ -34,15 +35,14 @@ class Account @Inject() (implicit
                          auth: PlayAuthenticate,
                          userService: UserService,
                          authProvider: MyAuthProvider,
-                         formContext: FormContext) extends InjectedController with I18nSupport {
+                         formContext: FormContext) extends InjectedController with I18nSupport with JContextSupport {
   //-------------------------------------------------------------------
   // public
   //-------------------------------------------------------------------
   def link = NoCache {
-      TryCookieAuthAction { implicit jContext =>
+      TryCookieAuthAction {
         deadbolt.SubjectPresent()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
             Ok(linkView(userService, auth))
           }
         }
@@ -50,10 +50,10 @@ class Account @Inject() (implicit
   }
 
   //-------------------------------------------------------------------
-  def verifyEmail = NoCache { TryCookieAuthAction( implicit jContext => {
+  def verifyEmail = NoCache {
+    TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          implicit val lang = request.acceptLanguages.head
           // TODO: change because this is cowboy style
           val Some(user) = userService.findInSession(jContext.session)
           val tuple =
@@ -70,14 +70,14 @@ class Account @Inject() (implicit
           Redirect(routes.Application.profile).flashing(tuple)
         }
       }
-    })
+    }
   }
 
   //-------------------------------------------------------------------
-  def changePassword = NoCache { TryCookieAuthAction( implicit jContext => {
+  def changePassword = NoCache {
+    TryCookieAuthAction {
       deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
         Future {
-          implicit val lang = request.acceptLanguages.head
           // TODO: change because this is cowboy style
           val Some(user) = userService.findInSession(jContext.session)
           val result =
@@ -90,15 +90,14 @@ class Account @Inject() (implicit
           result
         }
       }
-    })
+    }
   }
 
     //-------------------------------------------------------------------
     def doChangePassword = NoCache {
-      TryCookieAuthAction { implicit jContext =>
+      TryCookieAuthAction {
         deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
             formContext.passwordChangeForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not select whether to link or not link
@@ -119,10 +118,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def askLink = NoCache {
-    TryCookieAuthAction { implicit jContext =>
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          implicit val lang = request.acceptLanguages.head
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => Ok(askLinkView(userService, formContext.acceptForm.Instance, user))
             case None => {
@@ -137,10 +135,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doLink = NoCache {
-    TryCookieAuthAction { implicit jContext =>
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          implicit val lang = request.acceptLanguages.head
           Option(auth.getLinkUser(jContext.session)) match {
             case Some(user) => {
               formContext.acceptForm.Instance.bindFromRequest.fold(
@@ -168,11 +165,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def askMerge = NoCache {
-    TryCookieAuthAction { implicit jContext =>
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          implicit val lang = request.acceptLanguages.head
-
           // this is the currently logged in user
           val userA = auth.getUser(jContext.session)
 
@@ -195,11 +190,9 @@ class Account @Inject() (implicit
 
   //-------------------------------------------------------------------
   def doMerge = NoCache {
-    TryCookieAuthAction { implicit jContext =>
+    TryCookieAuthAction {
       deadbolt.SubjectPresent()() { implicit request =>
         Future {
-          implicit val lang = request.acceptLanguages.head
-
           // this is the currently logged in user
           val userA = auth.getUser(jContext.session)
 

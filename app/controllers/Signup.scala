@@ -15,6 +15,7 @@ import play.api.i18n._
 import providers._
 import services._
 import generated.Tables.TokenActionRow
+import support.JContextSupport
 import views.form._
 
 @Singleton
@@ -34,7 +35,7 @@ class Signup @Inject() (implicit
                         userService: UserService,
                         tokenActionService: TokenActionService,
                         authProvider: MyAuthProvider,
-                        formContext: FormContext) extends InjectedController with I18nSupport {
+                        formContext: FormContext) extends InjectedController with I18nSupport with JContextSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
   import services.PluggableUserService._
@@ -44,12 +45,10 @@ class Signup @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def unverified =
-    TryCookieAuthAction { implicit jContext =>
+    TryCookieAuthAction {
       NoCache {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             Ok(unverifiedView(userService))
           }
         }
@@ -57,13 +56,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def forgotPassword(email: String) =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
+  def forgotPassword(email: String) = NoCache {
+      TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             val form = Option(email) match {
               case Some(email) => {
                 if (!email.trim.isEmpty) {
@@ -84,13 +80,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def doForgotPassword =
-    TryCookieAuthAction {  implicit jContext =>
-      NoCache {
+  def doForgotPassword = NoCache {
+    TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             formContext.forgotPasswordForm.Instance.bindFromRequest.fold(
               formWithErrors => {
                 // user did not fill in his/her email
@@ -140,13 +133,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def resetPassword(token: String) =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
+  def resetPassword(token: String) = NoCache {
+    TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             tokenIsValid(token, TokenActionKey.PASSWORD_RESET) match {
               case Some(_) => Ok(passwordResetView(userService,
                 formContext.passwordResetForm.Instance.fill(PasswordReset("", "", token))))
@@ -158,13 +148,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def doResetPassword =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
+  def doResetPassword = NoCache {
+    TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             formContext.passwordResetForm.Instance.bindFromRequest.fold(
               formWithErrors => BadRequest(passwordResetView(userService, formWithErrors)),
               formSuccess => {
@@ -210,13 +197,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def oAuthDenied(getProviderKey: String) =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
+  def oAuthDenied(getProviderKey: String) = NoCache {
+    TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             Ok(oAuthDeniedView(userService, getProviderKey))
           }
         }
@@ -224,13 +208,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def exists =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
+  def exists = NoCache {
+    TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             Ok(existsView(userService))
           }
         }
@@ -238,13 +219,10 @@ class Signup @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def verify(token: String) =
-    TryCookieAuthAction { implicit jContext =>
-      NoCache {
+  def verify(token: String) = NoCache {
+    TryCookieAuthAction {
         deadbolt.WithAuthRequest()() { implicit request =>
           Future {
-            implicit val lang = request.acceptLanguages.head
-
             tokenIsValid(token, TokenActionKey.EMAIL_VERIFICATION) match {
               case Some(tokenAction) => {
                 val Some(user) = tokenAction.targetUser

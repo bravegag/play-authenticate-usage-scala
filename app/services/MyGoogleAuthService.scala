@@ -19,12 +19,16 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
 
   private val googleAuthenticator = new GoogleAuthenticator()
 
+  //------------------------------------------------------------------------
+  // public
+  //------------------------------------------------------------------------
   override def isKnownDevice(userEmail: String, deviceType: String, fingerprint: String): Boolean = {
     getUserIdByEmail(userEmail).fold(false) { userId =>
       userDeviceDao.exists(userId, deviceType, fingerprint)
     }
   }
 
+  //------------------------------------------------------------------------
   override def isValidGAuthCode(userEmail: String, code: Int): Boolean = {
     getUserIdByEmail(userEmail).fold(false) { userId => {
         val sharedSecretOpt : Option[String] = getSharedSecret(userId).map(_.providerUserId)
@@ -35,6 +39,7 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
     }
   }
 
+  //------------------------------------------------------------------------
   override def tryAuthenticateWithRecoveryToken(userEmail: String, recoveryToken: String): Boolean = {
     getUserIdByEmail(userEmail).fold(false) { userId =>
       daoContext.gauthRecoveryTokenDao.findByToken(userId, recoveryToken).fold(false) { token =>
@@ -47,6 +52,7 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
     }
   }
 
+  //------------------------------------------------------------------------
   override def regenerateKey(userId: Long): (SharedSecret, Seq[RecoveryToken]) = {
     disable(userId)
 
@@ -66,15 +72,38 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
     (newSharedKey.getKey, tokens)
   }
 
+  //------------------------------------------------------------------------
   override def disable(userId: Long): Unit = {
     getSharedSecret(userId).map(_.providerUserId).foreach(key => await(linkedAccountDao.deleteByProvider(PROVIDER_KEY, key)))
     await(daoContext.gauthRecoveryTokenDao.delete(userId))
   }
 
+  //------------------------------------------------------------------------
   override def isEnabled(userId: Long): Boolean = {
     getSharedSecret(userId).isDefined
   }
 
+  //------------------------------------------------------------------------
+  override def isEnabled(email: String): Boolean = {
+    getUserIdByEmail(email).fold(false) { userId =>
+      isEnabled(userId)
+    }
+  }
+
+  //------------------------------------------------------------------------
+  override def getUserSharedKey(userId: Long): SharedSecret = {
+    getSharedSecret(userId).map(_.providerUserId).get
+  }
+
+  //------------------------------------------------------------------------
+  override def getUserRecoveryTokens(userId: Long): Seq[RecoveryToken] = {
+    val recoveryTokens: Seq[GoogleAuthRecoveryTokenRow] = daoContext.gauthRecoveryTokenDao.findByUser(userId)
+    recoveryTokens.map(_.token)
+  }
+
+  //------------------------------------------------------------------------
+  // private
+  //------------------------------------------------------------------------
   private def getSharedSecret(userId: Long): Option[LinkedAccountRow] = {
     for {
       user <- daoContext.userDao.findById(userId)
@@ -82,22 +111,8 @@ class MyGoogleAuthService @Inject() (userDeviceDao: UserDeviceDao,
     } yield linkedAccount.headOption
   }
 
-  override def isEnabled(email: String): Boolean = {
-    getUserIdByEmail(email).fold(false) { userId =>
-      isEnabled(userId)
-    }
-  }
-
+  //------------------------------------------------------------------------
   private def getUserIdByEmail(email: String): Option[Long] = {
     daoContext.userDao.findByEmail(email).headOption.map(_.id)
-  }
-
-  override def getUserSharedKey(userId: Long): SharedSecret = {
-    getSharedSecret(userId).map(_.providerUserId).get
-  }
-
-  override def getUserRecoveryTokens(userId: Long): Seq[RecoveryToken] = {
-    val recoveryTokens: Seq[GoogleAuthRecoveryTokenRow] = daoContext.gauthRecoveryTokenDao.findByUser(userId)
-    recoveryTokens.map(_.token)
   }
 }
