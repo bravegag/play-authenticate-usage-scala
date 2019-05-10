@@ -175,8 +175,7 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   override protected def getVerifyEmailMailingSubject(user: MySignupAuthUser, context: Http.Context): String = {
-    implicit val lang = context.lang()
-
+    implicit val lang = context.lang
     messagesApi("playauthenticate.password.verify_signup.subject")
   }
 
@@ -184,7 +183,7 @@ class MyAuthProvider @Inject()(implicit
   override protected def getVerifyEmailMailingBody(token: String, user: MySignupAuthUser, context: Http.Context): Body = {
     val isSecure: Boolean = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url: String = routes.Signup.verify(token).absoluteURL(context.request, isSecure)
-    implicit val lang = context.lang()
+    val lang: Lang = context.lang
     val langCode: String = lang.code
     val html: String = getEmailTemplate("views.html.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
     val text: String = getEmailTemplate("views.txt.account.signup.email.verify_email", langCode, url, token, user.getName, user.getEmail)
@@ -213,7 +212,7 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   protected def getPasswordResetMailingSubject(user: UserRow, context: Http.Context): String = {
-    implicit val lang = context.lang()
+    implicit val lang = context.lang
     messagesApi("playauthenticate.password.reset_email.subject")
   }
 
@@ -221,7 +220,7 @@ class MyAuthProvider @Inject()(implicit
   protected def getPasswordResetMailingBody(token: String, user: UserRow, context: Http.Context) : Body = {
     val isSecure: Boolean = getConfiguration.getBoolean(SETTING_KEY_PASSWORD_RESET_LINK_SECURE)
     val url: String = routes.Signup.resetPassword(token).absoluteURL(context.request, isSecure)
-    implicit val lang = context.lang()
+    val lang: Lang = context.lang
     val langCode: String = lang.code
     val html: String = getEmailTemplate("views.html.account.email.password_reset", langCode, url, token, user.username, user.email)
     val text: String = getEmailTemplate("views.txt.account.email.password_reset", langCode, url, token, user.username, user.email)
@@ -230,7 +229,7 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   protected def getVerifyEmailMailingSubjectAfterSignup(user: UserRow, context: Http.Context): String = {
-    implicit val lang = context.lang()
+    implicit val lang = context.lang
     messagesApi("playauthenticate.password.verify_email.subject")
   }
 
@@ -276,7 +275,7 @@ class MyAuthProvider @Inject()(implicit
   protected def getVerifyEmailMailingBodyAfterSignup(token: String, user: UserRow, context: Http.Context): Body = {
     val isSecure = getConfiguration.getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE)
     val url = routes.Signup.verify(token).absoluteURL(context.request, isSecure)
-    implicit val lang = context.lang()
+    val lang: Lang = context.lang
     val langCode = lang.code
     val html = getEmailTemplate("views.html.account.email.verify_email", langCode, url, token, user.username, user.email)
     val text = getEmailTemplate("views.txt.account.email.verify_email", langCode, url, token, user.username, user.email)
