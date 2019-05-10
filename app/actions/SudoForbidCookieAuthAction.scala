@@ -7,7 +7,7 @@ import play.api.{Configuration, Environment}
 import play.api.mvc._
 import scala.concurrent.Future
 import play.api.mvc.Results._
-import support.JContextSupport
+import WithJContextSupportAction._
 
 /**
   * Custom action that checks whether an user is attempting to access a sudo protected area e.g. accessing payments
@@ -17,16 +17,14 @@ import support.JContextSupport
   * @param auth The PlayAuthenticate singleton
   * @tparam A the type of the request body
   */
-case class SudoForbidCookieAuthAction[A](action: Action[A])(implicit auth: PlayAuthenticate, config: Configuration, env: Environment) extends Action[A] with JContextSupport {
+case class SudoForbidCookieAuthAction[A](action: Action[A])(implicit auth: PlayAuthenticate, config: Configuration, env: Environment, jContext: JContext) extends Action[A] {
   def apply(request: Request[A]): Future[Result] = {
-    withContext(request) { jContext =>
-      if (auth.isAuthorizedWithCookie(jContext)) {
-        // save url in session
-        jContext.session().put(SessionKey.REDIRECT_TO_URI_KEY, request.uri)
-        Future.successful(Redirect(routes.Application.relogin()).flashing(FlashKey.FLASH_ERROR_KEY -> "Please type password again to access requested page"))
-      } else {
-        action(request)
-      }
+    if (auth.isAuthorizedWithCookie(jContext)) {
+      // save url in session
+      jContext.session().put(SessionKey.REDIRECT_TO_URI_KEY, request.uri)
+      Future.successful(Redirect(routes.Application.relogin()).flashing(FlashKey.FLASH_ERROR_KEY -> "Please type password again to access requested page"))
+    } else {
+      action(request)
     }
   }
 

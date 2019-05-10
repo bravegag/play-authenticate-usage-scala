@@ -7,7 +7,7 @@ import play.api.mvc._
 import services.{GoogleAuthService, UserService}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import support.JContextSupport.RequestToContext
+import actions.WithJContextSupportAction._
 
 class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService, googleAuthService: GoogleAuthService) extends DeadboltHandler {
 	import services.PluggableUserService._

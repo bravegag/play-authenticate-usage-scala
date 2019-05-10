@@ -15,7 +15,7 @@ import play.api.i18n._
 import play.api.routing.JavaScriptReverseRouter
 import play.core.j.JavaHelpers
 import providers.MyAuthProvider
-import support.JContextSupport
+import support.LangLookupSupport
 import views.form._
 import views.html.recaptcha
 
@@ -41,7 +41,8 @@ class Application @Inject() (implicit
                              authProvider: MyAuthProvider,
                              formContext: FormContext,
                              googleAuthService: GoogleAuthService,
-                             recaptchaWidget: recaptcha.recaptchaWidget) extends InjectedController with I18nSupport with JContextSupport {
+                             recaptchaWidget: recaptcha.recaptchaWidget,
+                             bodyParsers: PlayBodyParsers) extends InjectedController with I18nSupport with LangLookupSupport {
   import scala.concurrent._
   import ExecutionContext.Implicits.global
 
@@ -49,167 +50,192 @@ class Application @Inject() (implicit
   // public
   //-------------------------------------------------------------------
   def index =
-    TryCookieAuthAction {
-      deadbolt.WithAuthRequest()() { implicit request =>
-        Future {
-          Ok(indexView(userService))
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        deadbolt.WithAuthRequest()() { implicit authRequest =>
+          Future {
+            Ok(indexView(userService))
+          }
         }
       }
     }
 
   //-------------------------------------------------------------------
   def restricted =
-    TryCookieAuthAction {
-      deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-        Future {
-          val localUser = userService.findInSession(jContext.session)
-          Ok(restrictedView(userService, localUser))
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit authRequest =>
+          Future {
+            val localUser = userService.findInSession(jContext.session)
+            Ok(restrictedView(userService, localUser))
+          }
         }
       }
     }
 
   //-------------------------------------------------------------------
   def profile =
-    TryCookieAuthAction {
-      deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-        Future {
-          val localUser = userService.findInSession(jContext.session)
-          Ok(profileView(auth, localUser.get, googleAuthService))
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit authRequest =>
+          Future {
+            val localUser = userService.findInSession(jContext.session)
+            Ok(profileView(auth, localUser.get, googleAuthService))
+          }
         }
       }
     }
 
   //-------------------------------------------------------------------
   def login =
-    TryCookieAuthAction {
-      deadbolt.WithAuthRequest()() { implicit request =>
-        Future {
-          Ok(loginView(auth, userService, formContext.loginForm.Instance))
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        deadbolt.WithAuthRequest()() { implicit authRequest =>
+          Future {
+            Ok(loginView(auth, userService, formContext.loginForm.Instance))
+          }
         }
       }
     }
 
   //-------------------------------------------------------------------
   def restrictedForbidCookie =
-    TryCookieAuthAction {
-      SudoForbidCookieAuthAction {
-        deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit request =>
-          Future {
-            val localUser = userService.findInSession(jContext.session)
-            Ok(restrictedForbidCookieView(userService, localUser))
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        SudoForbidCookieAuthAction {
+          deadbolt.Restrict(List(Array(SecurityRoleKey.USER_ROLE.toString)))() { implicit authRequest =>
+            Future {
+              val localUser = userService.findInSession(jContext.session)
+              Ok(restrictedForbidCookieView(userService, localUser))
+            }
           }
         }
       }
     }
 
   //-------------------------------------------------------------------
-  def relogin = NoCache {
-    TryCookieAuthAction {
-      deadbolt.WithAuthRequest()() { implicit request =>
-        Future {
-          // taking chances here
-          val authUser = userService.findInSession(jContext.session).get
-          // partially initialize the Login form to only miss the password
-          val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
-            email = authUser.email.toString, password = "", isRememberMe = true))
-          // everything was filled
-          Ok(reloginView(auth, userService, updatedForm))
+  def relogin =
+    NoCacheAction {
+      WithJContextSupportAction { implicit jContext =>
+        TryCookieAuthAction {
+          deadbolt.WithAuthRequest()() { implicit authRequest =>
+            Future {
+              // taking chances here
+              val authUser = userService.findInSession(jContext.session).get
+              // partially initialize the Login form to only miss the password
+              val updatedForm = formContext.loginForm.Instance.fill(views.form.Login(
+                email = authUser.email.toString, password = "", isRememberMe = true))
+              // everything was filled
+              Ok(reloginView(auth, userService, updatedForm))
+            }
+          }
         }
       }
     }
-  }
 
   //-------------------------------------------------------------------
-  def doLogin = NoCache {
-    TryCookieAuthAction(
-      deadbolt.WithAuthRequest()() { implicit request =>
-        Future {
-          formContext.loginForm.Instance.bindFromRequest.fold(
-            formWithErrors => {
-              // user did not fill everything properly
-              BadRequest(loginView(auth, userService, formWithErrors))
-            },
-            formSuccess => {
-              // everything was filled
+  def doLogin =
+    NoCacheAction {
+      WithJContextSupportAction { implicit jContext =>
+        TryCookieAuthAction {
+          deadbolt.WithAuthRequest()() { implicit authRequest =>
+            Future {
+              formContext.loginForm.Instance.bindFromRequest.fold(
+                formWithErrors => {
+                  // user did not fill everything properly
+                  BadRequest(loginView(auth, userService, formWithErrors))
+                },
+                formSuccess => {
+                  // everything was filled
 
-              val result = JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext, formSuccess.isRememberMe))
+                  val result = JavaHelpers.createResult(jContext, authProvider.handleLogin(jContext, formSuccess.isRememberMe))
 
-              def authorize(): Result =
-                Option(jContext.session().remove(SessionKey.REDIRECT_TO_URI_KEY)).map { uri =>
-                  result.withHeaders(LOCATION -> uri)
-                }.getOrElse(result)
+                  def authorize(): Result =
+                    Option(jContext.session().remove(SessionKey.REDIRECT_TO_URI_KEY)).map { uri =>
+                      result.withHeaders(LOCATION -> uri)
+                    }.getOrElse(result)
 
-              auth.getUser(jContext) match {
-                case null =>
-                  result
-                case user if googleAuthService.isEnabled(user.getId) =>
-                  (formSuccess.gauthCode, formSuccess.recoveryCode) match {
-                    case (Some(gauthCode), _) if googleAuthService.isValidGAuthCode(user.getId, gauthCode) =>
-                      authorize()
-                    case (_, Some(recoveryCode)) if googleAuthService.tryAuthenticateWithRecoveryToken(user.getId, recoveryCode) =>
-                      authorize()
-                    case _ =>
-                      val form = formContext.loginForm.Instance.fill(formSuccess)
-                      val formWithError =
-                        if(formSuccess.gauthCode.isDefined) {
-                          form.withGlobalError(messagesApi("playauthenticate.gauthCode.login.invalid_code"))
-                        } else if(formSuccess.recoveryCode.exists(_.nonEmpty)) {
-                          form.withGlobalError(messagesApi("playauthenticate.recoveryToken.login.invalid_token"))
-                        } else {
-                          form
-                        }
-                      auth.logout(jContext)
-                      Ok(googleAuthenticationView(auth, userService, formWithError))
+                  auth.getUser(jContext) match {
+                    case null =>
+                      result
+                    case user if googleAuthService.isEnabled(user.getId) =>
+                      (formSuccess.gauthCode, formSuccess.recoveryCode) match {
+                        case (Some(gauthCode), _) if googleAuthService.isValidGAuthCode(user.getId, gauthCode) =>
+                          authorize()
+                        case (_, Some(recoveryCode)) if googleAuthService.tryAuthenticateWithRecoveryToken(user.getId, recoveryCode) =>
+                          authorize()
+                        case _ =>
+                          val form = formContext.loginForm.Instance.fill(formSuccess)
+                          val formWithError =
+                            if (formSuccess.gauthCode.isDefined) {
+                              form.withGlobalError(messagesApi("playauthenticate.gauthCode.login.invalid_code"))
+                            } else if (formSuccess.recoveryCode.exists(_.nonEmpty)) {
+                              form.withGlobalError(messagesApi("playauthenticate.recoveryToken.login.invalid_token"))
+                            } else {
+                              form
+                            }
+                          auth.logout(jContext)
+                          Ok(googleAuthenticationView(auth, userService, formWithError))
+                      }
+                    case user => authorize()
                   }
-                case user => authorize()
-              }
+                }
+              )
             }
-          )
+          }
         }
-    })
-  }
+      }
+    }
 
   //-------------------------------------------------------------------
   def signup =
-    TryCookieAuthAction {
-      deadbolt.WithAuthRequest()() { implicit request =>
-        Future {
-          Ok(signupView(auth, userService, formContext.signupForm.Instance))
-        }
-      }
-    }
-
-  //-------------------------------------------------------------------
-  def doSignup = NoCache {
-    TryCookieAuthAction {
-        deadbolt.WithAuthRequest()() { implicit request =>
-          verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
-            form.fold(
-              formWithErrors => {
-                // user did not fill everything properly
-                BadRequest(signupView(auth, userService, formWithErrors))
-              },
-              _ => {
-                // everything was filled:
-                // do something with your part of the form before handling the user signup
-                JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
-              }
-            )
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        deadbolt.WithAuthRequest()() { implicit authRequest =>
+          Future {
+            Ok(signupView(auth, userService, formContext.signupForm.Instance))
           }
         }
       }
     }
 
-  def enableGoogleAuthenticator = NoCache {
-    TryCookieAuthAction {
-        deadbolt.WithAuthRequest()() { implicit request =>
-          Future {
-            userService.findInSession(jContext.session) match {
-              case Some(user) =>
-                googleAuthService.regenerateKey(user.id)
-                Ok(profileView(auth, user, googleAuthService, showSecrets = true))
-              case None =>
-                Ok("Current user not found")
+  //-------------------------------------------------------------------
+  def doSignup =
+    NoCacheAction {
+      WithJContextSupportAction { implicit jContext =>
+        TryCookieAuthAction {
+          deadbolt.WithAuthRequest()() { implicit authRequest =>
+            verifier.bindFromRequestAndVerify(formContext.signupForm.Instance).map { form =>
+              form.fold(
+                formWithErrors => {
+                  // user did not fill everything properly
+                  BadRequest(signupView(auth, userService, formWithErrors))
+                },
+                _ => {
+                  // everything was filled:
+                  // do something with your part of the form before handling the user signup
+                  JavaHelpers.createResult(jContext, authProvider.handleSignup(jContext))
+                }
+              )
+            }
+          }
+        }
+      }
+    }
+
+  def enableGoogleAuthenticator =
+    NoCacheAction {
+      WithJContextSupportAction { implicit jContext =>
+        TryCookieAuthAction {
+          deadbolt.WithAuthRequest()() { implicit authRequest =>
+            Future {
+              userService.findInSession(jContext.session) match {
+                case Some(user) =>
+                  googleAuthService.regenerateKey(user.id)
+                  Ok(profileView(auth, user, googleAuthService, showSecrets = true))
+                case None =>
+                  Ok("Current user not found")
+              }
             }
           }
         }
@@ -217,16 +243,18 @@ class Application @Inject() (implicit
     }
 
   def disableGoogleAuthenticator =
-    TryCookieAuthAction {
-      NoCache {
-        deadbolt.WithAuthRequest()() { implicit request =>
-          Future {
-            userService.findInSession(jContext.session) match {
-              case Some(user) =>
-                googleAuthService.disable(user.id)
-                Redirect(routes.Application.profile)
-              case None =>
-                Ok("Current user not found")
+    WithJContextSupportAction { implicit jContext =>
+      TryCookieAuthAction {
+        NoCacheAction {
+          deadbolt.WithAuthRequest()() { implicit authRequest =>
+            Future {
+              userService.findInSession(jContext.session) match {
+                case Some(user) =>
+                  googleAuthService.disable(user.id)
+                  Redirect(routes.Application.profile)
+                case None =>
+                  Ok("Current user not found")
+              }
             }
           }
         }
@@ -234,10 +262,11 @@ class Application @Inject() (implicit
     }
 
   //-------------------------------------------------------------------
-  def jsRoutes = deadbolt.WithAuthRequest()() { implicit request =>
-    Future {
-      Ok(JavaScriptReverseRouter("jsRoutes")(routes.javascript.Signup.forgotPassword)).
-        as("text/javascript")
+  def jsRoutes =
+    deadbolt.WithAuthRequest()() { implicit authRequest =>
+      Future {
+        Ok(JavaScriptReverseRouter("jsRoutes")(routes.javascript.Signup.forgotPassword)).
+          as("text/javascript")
+      }
     }
-  }
 }
