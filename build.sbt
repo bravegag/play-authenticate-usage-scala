@@ -10,7 +10,6 @@ crossScalaVersions := Seq("2.11.12", "2.12.6")
 autoScalaLibrary := false
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
-// needed for adrianhurt's play-bootstrap dependency
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
