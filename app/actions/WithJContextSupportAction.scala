@@ -9,7 +9,8 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import WithJContextSupportAction._
 
-case class WithJContextSupportAction[A](block: JContext => Action[A])(implicit config: Configuration, env: Environment, bodyParsers: PlayBodyParsers, ec: ExecutionContext) extends Action[A] {
+case class WithJContextSupportAction[A](block: JContext => Action[A])(implicit config: Configuration, env: Environment,
+                                                                      bodyParsers: PlayBodyParsers, ec: ExecutionContext) extends Action[A] {
   def apply(request: Request[A]): Future[Result] = {
     val components = JavaHelpers.createContextComponents(config, env)
     val jContext = createJavaContext(request, components)
@@ -41,5 +42,6 @@ object WithJContextSupportAction {
     def jContext : JContext = store(request.id)
   }
 
-  def apply[A](action: Action[A])(implicit config: Configuration, env: Environment, bodyParsers: PlayBodyParsers, ec: ExecutionContext): WithJContextSupportAction[A] = WithJContextSupportAction(_ => action)
+  def apply[A](action: Action[A])(implicit config: Configuration, env: Environment, bodyParsers: PlayBodyParsers,
+                                  ec: ExecutionContext): WithJContextSupportAction[A] = WithJContextSupportAction(_ => action)
 }
