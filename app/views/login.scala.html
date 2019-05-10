@@ -1,16 +1,23 @@
 @import services.UserService
+@import play.api._
 @import play.api.mvc._
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import views.form._
+@import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, loginForm: Form[Login])(implicit request: AuthenticatedRequest[Any],
+  webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, config: Configuration, env: Environment,
+  lang: Lang, messagesApi: MessagesApi, messages: MessagesProvider)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, messagesApi("playauthenticate.login.title"), jContext, "login") {
+@main(userService, messagesApi("playauthenticate.login.title"), jContext, subjectNotPresent, subjectPresentOr, "login") {
     @if(loginForm.hasGlobalErrors) {
         <p class="alert alert-danger">@loginForm.globalError.get.message</p>
     }

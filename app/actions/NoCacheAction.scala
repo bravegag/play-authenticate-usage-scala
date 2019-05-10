@@ -25,7 +25,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @param action The inner action
   * @tparam A Action type
   */
-case class NoCache[A](action: Action[A]) extends Action[A] with HeaderNames {
+case class NoCacheAction[A](action: Action[A]) extends Action[A] with HeaderNames {
   def apply(request: Request[A]): Future[Result] = {
     action(request).map { result =>
       result.withHeaders(
@@ -36,5 +36,7 @@ case class NoCache[A](action: Action[A]) extends Action[A] with HeaderNames {
     }
   }
 
-  lazy val parser = action.parser
+  override def executionContext = action.executionContext
+
+  override val parser: BodyParser[A] = action.parser
 }

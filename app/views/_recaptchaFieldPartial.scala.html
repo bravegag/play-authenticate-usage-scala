@@ -12,17 +12,16 @@
 * @param request           (Implicit) The current request
 * @param messages          (Implicit) The current I18n messages
 ****************************************************************************************@
-@(form: Form[_], fieldName: String, tabindex: Option[Int] = None, includeNoScript: Boolean = true,
+@(form: Form[_], recaptchaWidget: recaptcha.recaptchaWidget, fieldName: String, tabindex: Int = 0, includeNoScript: Boolean = true,
 isRequired: Boolean = true)(implicit widgetHelper: WidgetHelper, request: Request[AnyContent], messages: Messages)
 
 @messageOrDefault(key: String, default: String) = @{ if (messages.isDefinedAt(key)) { messages(key) } else { default } }
 @errorCode = @{ form.error(RecaptchaVerifier.formErrorKey).map(e => { Some(e.message) }).getOrElse(None) }
-@recaptchaError = @{ errorCode.filter(code => !RecaptchaErrorCode.isInternalErrorCode(code)) }
 
 <div class="form-group @if(errorCode.isDefined) {has-error}">
     <label for="@fieldName" class="control-label">@messages(fieldName)</label>
     <div class="row">
-        <div class="col-md-7">@recaptcha.recaptchaWidget(tabindex = tabindex, includeNoScript = includeNoScript)</div>
+        <div class="col-md-7">@recaptchaWidget(includeNoScript = includeNoScript, tabindex = tabindex)</div>
     </div>
     @errorCode match {
         case Some(RecaptchaErrorCode.captchaIncorrect) => {

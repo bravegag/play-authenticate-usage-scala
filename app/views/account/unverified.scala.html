@@ -1,10 +1,15 @@
 @import services.UserService
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
+@import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
 
-@(userService: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
+@(userService: UserService)(implicit request: AuthenticatedRequest[Any], webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context,
+  lang: Lang, messagesApi: MessagesApi)
 
-@main(userService, messagesApi("playauthenticate.verify.account.title"), jContext) {
+@main(userService, messagesApi("playauthenticate.verify.account.title"), jContext, subjectNotPresent, subjectPresentOr) {
 	<h1>@messagesApi("playauthenticate.verify.account.title")</h1>
 	<p>@messagesApi("playauthenticate.verify.account.before") <a href="@routes.Account.verifyEmail">@messagesApi("playauthenticate.verify.account.first")</a>.<br/></p>
 }

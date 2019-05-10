@@ -1,16 +1,13 @@
 package security
 
-import actions.TryCookieAuthAction
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler, ExecutionContextProvider}
 import com.feth.play.module.pa.PlayAuthenticate
 import play.api.mvc._
 import services.{GoogleAuthService, UserService}
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import TryCookieAuthAction.RequestToContext
-import providers.MyResolver
+import actions.WithJContextSupportAction._
 
 class MyDeadboltHandler()(implicit auth: PlayAuthenticate, context: ExecutionContextProvider, userService: UserService, googleAuthService: GoogleAuthService) extends DeadboltHandler {
 	import services.PluggableUserService._

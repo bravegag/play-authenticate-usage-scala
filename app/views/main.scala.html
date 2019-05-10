@@ -3,8 +3,12 @@
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
 @import constants._
+@import org.webjars.play.{WebJarsUtil, WebJarAssets }
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
 
-@(userService: UserService, title: String, jContext: play.mvc.Http.Context, nav: String = "")(content: Html)(implicit lang: Lang, request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets)
+@(userService: UserService, title: String, jContext: play.mvc.Http.Context, subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr, nav: String = "")(content: Html)(implicit request: AuthenticatedRequest[Any],
+  webJarsUtil: WebJarsUtil, lang: Lang, messagesApi: MessagesApi)
 
 @import be.objectify.deadbolt.scala.views.html._
 
@@ -18,16 +22,17 @@
         <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
         <meta name="author" content="The Play Authenticate Team">
 
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.css"))">
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("font-awesome.min.css"))">
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap-datepicker3.css"))">
+        @webJarsUtil.locate("bootstrap.min.css").css()
+        @webJarsUtil.locate("font-awesome.min.css").css()
+        @webJarsUtil.locate("bootstrap-datepicker3.css").css()
+
         <link rel="stylesheet" href="@routes.Assets.versioned("css/main.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/azmind-style.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/azmind-form-elements.css")">
 
-        <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))"></script>
-        <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.js"))"></script>
-        <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap-datepicker.js"))"></script>
+        @webJarsUtil.locate("jquery.min.js").script()
+        @webJarsUtil.locate("bootstrap.min.js").script()
+        @webJarsUtil.locate("bootstrap-datepicker.js").script()
 
         <script type="text/javascript" src="@routes.Application.jsRoutes" defer="defer"></script>
     </head>

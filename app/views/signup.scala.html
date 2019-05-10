@@ -1,17 +1,24 @@
 @import services.UserService
 @import views.form._
+@import play.api._
 @import play.api.mvc._
 @import play.api.data._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import com.nappin.play.recaptcha.WidgetHelper
+@import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context)
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, userService: UserService, signupForm: Form[_])(implicit request: AuthenticatedRequest[Any],
+  webJarsUtil: WebJarsUtil, recaptchaWidget: recaptcha.recaptchaWidget, widgetHelper: WidgetHelper, jContext: play.mvc.Http.Context,
+  config: Configuration, env: Environment, lang: Lang, messagesApi: MessagesApi, messages: Messages)
 
 @import helper._
 @import b3.vertical.fieldConstructor
 @import com.feth.play.module.pa.views.html._
 
-@main(userService, messagesApi("playauthenticate.signup.title"), jContext, "signup") {
+@main(userService, messagesApi("playauthenticate.signup.title"), jContext, subjectNotPresent, subjectPresentOr, "signup") {
     @if(signupForm.hasGlobalErrors) {
         <p class="alert alert-danger">@signupForm.globalError.get.message</p>
     }
@@ -55,7 +62,7 @@
                                     @input
                                 </div>
                             }
-                            @_recaptchaFieldPartial(form=signupForm, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
+                            @_recaptchaFieldPartial(form=signupForm, recaptchaWidget=recaptchaWidget, fieldName="playauthenticate.signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
                             @b3.submit('class -> "btn btn-default") {
                                 @messagesApi("playauthenticate.signup.now")
                             }

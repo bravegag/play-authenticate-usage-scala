@@ -1,6 +1,10 @@
+@import play.api._
+@import play.core.j.JavaHelpers
 @import be.objectify.deadbolt.scala._
+@import play.api.i18n._
 
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit messagesApi: MessagesApi, request: AuthenticatedRequest[Any])
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, skipCurrent: Boolean = true)(implicit request: AuthenticatedRequest[Any],
+  config: Configuration, env: Environment, messagesApi: MessagesApi)
 
 @import com.feth.play.module.pa.views.html._
 
@@ -13,7 +17,7 @@ function askOpenID(url) {
 }
 </script>
 
-@play.core.j.JavaHelpers.withContext(request) { jContext =>
+@JavaHelpers.withContext(request, JavaHelpers.createContextComponents(config, env)) { jContext =>
     @forProviders(playAuth, skipCurrent) { p =>
         @defining(p.getKey().head.toUpper + p.getKey().tail) { label =>
             @if(p.getKey() == "openid") {

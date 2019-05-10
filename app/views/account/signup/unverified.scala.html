@@ -1,10 +1,15 @@
 @import services.UserService
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
+@import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
 
-@(userProvider: UserService)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
+@(userProvider: UserService)(implicit request: AuthenticatedRequest[Any], webJarsUtil: WebJarsUtil,
+  jContext: play.mvc.Http.Context, lang: Lang, messagesApi: MessagesApi, messages: Messages)
 
-@main(userProvider, messagesApi("playauthenticate.verify.email.title"), jContext) {
+@main(userProvider, messagesApi("playauthenticate.verify.email.title"), jContext, subjectNotPresent, subjectPresentOr) {
 	<h1>@messagesApi("playauthenticate.verify.email.title")</h1>
 	<p>
 		@messagesApi("playauthenticate.verify.email.requirement")</br>

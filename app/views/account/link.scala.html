@@ -1,10 +1,16 @@
 @import services.UserService
+@import play.api._
 @import play.api.mvc._
 @import be.objectify.deadbolt.scala._
+@import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
 
-@(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: AuthenticatedRequest[Any], messagesApi: MessagesApi, webJarAssets: WebJarAssets, jContext: play.mvc.Http.Context)
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
+@(userService: UserService, playAuth: com.feth.play.module.pa.PlayAuthenticate)(implicit request: AuthenticatedRequest[Any],
+  webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, config: Configuration, env: Environment, lang: Lang, messagesApi: MessagesApi)
 
-@main(userService, messagesApi("playauthenticate.link.account.title"), jContext) {
+@main(userService, messagesApi("playauthenticate.link.account.title"), jContext, subjectNotPresent, subjectPresentOr) {
     <h1>@messagesApi("playauthenticate.link.account.title")</h1>
     <p>@_providerPartial(playAuth)<br/>
     </p>

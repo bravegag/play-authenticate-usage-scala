@@ -1,8 +1,7 @@
 @import services.UserService
 @import generated._
 @import generated.Tables._
-@import play.api.mvc._
-@import be.objectify.deadbolt.scala._
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import org.webjars.play.WebJarsUtil
 @import play.api.i18n._
 @import be.objectify.deadbolt.scala.views.html.di._
@@ -11,7 +10,7 @@
 @(userService: UserService, localUser: Option[UserRow] = None)(implicit request: AuthenticatedRequest[Any],
   webJarsUtil: WebJarsUtil, jContext: play.mvc.Http.Context, lang: Lang, messagesApi: MessagesApi)
 
-@main(userService, messagesApi("playauthenticate.navigation.restricted"), jContext, subjectNotPresent, subjectPresentOr, "restricted") {
+@main(userService, messagesApi("playauthenticate.navigation.restrictedForbidCookie"), jContext, subjectNotPresent, subjectPresentOr, "restrictedForbidCookie") {
 <h1>@messagesApi("playauthenticate.navigation.restricted")</h1>
 <p>
     @messagesApi("playauthenticate.restricted.secrets")

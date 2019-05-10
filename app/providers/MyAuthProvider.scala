@@ -76,12 +76,15 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   override protected def onLoginUserNotFound(context: Http.Context): String = {
+    implicit val lang = context.lang()
+
     context.flash.put(FlashKey.FLASH_ERROR_KEY, messagesApi("playauthenticate.password.login.unknown_user_or_pw"))
     super.onLoginUserNotFound(context)
   }
 
   //-------------------------------------------------------------------
   override protected def getSignup(context: Http.Context): Signup = {
+    implicit val lang = context.lang()
     val request = RequestHelpers.parseRequest(context.request())
     val filledForm = formContext.signupForm.Instance.bindFromRequest(request)
     filledForm.get
@@ -172,6 +175,7 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   override protected def getVerifyEmailMailingSubject(user: MySignupAuthUser, context: Http.Context): String = {
+    implicit val lang = context.lang
     messagesApi("playauthenticate.password.verify_signup.subject")
   }
 
@@ -208,6 +212,7 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   protected def getPasswordResetMailingSubject(user: UserRow, context: Http.Context): String = {
+    implicit val lang = context.lang
     messagesApi("playauthenticate.password.reset_email.subject")
   }
 
@@ -224,6 +229,7 @@ class MyAuthProvider @Inject()(implicit
 
   //-------------------------------------------------------------------
   protected def getVerifyEmailMailingSubjectAfterSignup(user: UserRow, context: Http.Context): String = {
+    implicit val lang = context.lang
     messagesApi("playauthenticate.password.verify_email.subject")
   }
 

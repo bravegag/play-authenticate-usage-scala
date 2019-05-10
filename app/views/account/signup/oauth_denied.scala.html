@@ -1,0 +1,16 @@
+@import services.UserService
+@import play.api.mvc._
+@import be.objectify.deadbolt.scala._
+@import org.webjars.play.WebJarsUtil
+@import play.api.i18n._
+@import be.objectify.deadbolt.scala.views.html.di._
+
+@this(subjectNotPresent: subjectNotPresent, subjectPresentOr: subjectPresentOr)
+@(userService: UserService, providerKey: String)(implicit request: AuthenticatedRequest[Any], webJarsUtil: WebJarsUtil,
+  jContext: play.mvc.Http.Context, lang: Lang, messagesApi: MessagesApi)
+
+@main(userService, messagesApi("playauthenticate.oauth.access.denied.title"), jContext, subjectNotPresent, subjectPresentOr) {
+	<h1>@messagesApi("playauthenticate.oauth.access.denied.title")</h1>
+	<p>@messagesApi("playauthenticate.oauth.access.denied.explanation")<br/></p>
+	<p>@messagesApi("playauthenticate.oauth.access.denied.alternative")<a href="@routes.Application.signup">@messagesApi("playauthenticate.oauth.access.denied.alternative.cta")</a>.</p>
+}

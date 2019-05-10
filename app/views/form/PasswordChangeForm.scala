@@ -1,16 +1,15 @@
 package views.form
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
 
 case class PasswordChange(password: String, repeatPassword: String)
 
 @Singleton
 class PasswordChangeForm @Inject() (implicit val messagesApi: MessagesApi) {
-  val Instance = Form {
+  def Instance(implicit lang: Lang) = Form {
     mapping(
       "password" -> nonEmptyText(minLength = 5),
       "repeatPassword" -> nonEmptyText(minLength = 5)

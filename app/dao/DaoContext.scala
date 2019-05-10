@@ -19,5 +19,5 @@ class DaoContext @Inject()(val linkedAccountDao: LinkedAccountDao,
                            val tokenActionDao: TokenActionDao,
                            val userDao: UserDao,
                            val cookieTokenSeriesDao: CookieTokenSeriesDao,
-                           val gauthRecoveryTokenDao: GauthRecoveryTokenDao,
+                           val gauthRecoveryTokenDao: GoogleAuthRecoveryTokenDao,
                            val userDeviceDao: UserDeviceDao)
