@@ -25,8 +25,8 @@ case class WithJContextSupportAction[A](block: JContext => Action[A])(implicit c
     }
   }
 
-  override def executionContext= ec
-  override def parser= bodyParsers.default.asInstanceOf[BodyParser[A]]
+  override def executionContext = ec
+  override def parser = bodyParsers.anyContent.asInstanceOf[BodyParser[A]]
 }
 
 object WithJContextSupportAction {
